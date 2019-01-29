@@ -115,11 +115,11 @@ var drawMesh = map.createDraw({
   `,
   vert: `
     precision highp float;
-    attribute vec2 position;
+    attribute vec2 position, normal;
     uniform vec4 viewbox;
     uniform vec2 offset;
     void main () {
-      vec2 p = position.xy + offset;
+      vec2 p = position.xy + offset + normal*0.0001;
       gl_Position = vec4(
         (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
         (p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0,
@@ -127,9 +127,14 @@ var drawMesh = map.createDraw({
     }
   `,
   attributes: {
-    position: map.prop('position')
+    position: map.prop('position'),
+    normal: map.prop('normal')
   },
-  elements: map.prop('cells'),
+  primitive: "triangle strip",
+  count: function (context, props) {
+    console.log(props.position.length)
+    return props.position.length
+  },
   blend: {
     enable: true,
     func: { src: 'src alpha', dst: 'one minus src alpha' }
@@ -137,12 +142,12 @@ var drawMesh = map.createDraw({
 })
 resl({
   manifest: {
-    mesh: { type: 'text', src: 'mesh.json', parser: JSON.parse }
+    mesh: { type: 'text', src: 'tmesh4.json', parser: JSON.parse }
   },
   onDone: function (assets) {
     drawMesh.props.push({
       position: assets.mesh.positions,
-      cells: assets.mesh.cells
+      normal: assets.mesh.normals
     })
   }
 })
