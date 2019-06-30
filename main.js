@@ -153,10 +153,12 @@ resl({
 })
  
 window.addEventListener('keydown', function (ev) {
-  if (ev.code === 'Equal') {
+  if (ev.code === 'Digit0') {
     map.setZoom(Math.min(6,Math.round(map.getZoom()+1)))
   } else if (ev.code === 'Minus') {
     map.setZoom(map.getZoom()-1)
+  } else if (ev.code === 'Equal') {
+    map.setZoom(map.getZoom()+1)
   }
 })
  
