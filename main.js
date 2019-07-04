@@ -101,7 +101,9 @@ map.addLayer({
     })
   }
 })
- 
+
+var size = new Float32Array(2)
+
 var drawMesh = map.createDraw({
   frag: glsl`
     precision highp float;
@@ -117,22 +119,30 @@ var drawMesh = map.createDraw({
     precision highp float;
     attribute vec2 position, normal;
     uniform vec4 viewbox;
-    uniform vec2 offset;
+    uniform vec2 offset, size;
     void main () {
-      vec2 p = position.xy + offset + normal*0.0001;
+      float linewidth = 1.0;
+      vec2 p = position.xy + offset + normal*(linewidth*(viewbox.z - viewbox.x)/size.x);
       gl_Position = vec4(
         (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
         (p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0,
         0, 1);
     }
   `,
+  uniforms: {
+    size: function (context) {
+      size[0] = context.viewportWidth
+      size[1] = context.viewportHeight
+      return size
+    }
+  },
   attributes: {
     position: map.prop('position'),
     normal: map.prop('normal')
   },
   primitive: "triangle strip",
   count: function (context, props) {
-    console.log(props.position.length)
+    //console.log(props.position.length)
     return props.position.length
   },
   blend: {
