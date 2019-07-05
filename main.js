@@ -103,6 +103,7 @@ map.addLayer({
 })
 
 var size = new Float32Array(2)
+var lw
 
 var drawMesh = map.createDraw({
   frag: glsl`
@@ -120,8 +121,8 @@ var drawMesh = map.createDraw({
     attribute vec2 position, normal;
     uniform vec4 viewbox;
     uniform vec2 offset, size;
+    uniform float linewidth;
     void main () {
-      float linewidth = 1.0;
       vec2 p = position.xy + offset + normal*(linewidth*(viewbox.z - viewbox.x)/size.x);
       gl_Position = vec4(
         (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
@@ -134,6 +135,13 @@ var drawMesh = map.createDraw({
       size[0] = context.viewportWidth
       size[1] = context.viewportHeight
       return size
+    },
+    linewidth: function () {
+      if (map.getZoom() <= 13) { lw = 0.5 }      
+      else if (map.getZoom() >= 16) { lw = 2.0 }      
+      else lw = 1.0
+      console.log(map.getZoom())
+      return lw
     }
   },
   attributes: {
