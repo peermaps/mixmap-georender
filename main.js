@@ -135,7 +135,7 @@ var drawLines = map.createDraw({
     uniform sampler2D texture;
     #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
     void main () {
-      vec3 c = hsl2rgb(0.0, 0.5, 0.5);
+      vec3 c = hsl2rgb(0.5, 0.5, 0.2);
       gl_FragColor = vec4(c,0.9);
     }
   `,
@@ -144,9 +144,9 @@ var drawLines = map.createDraw({
     attribute vec2 position, normal;
     uniform vec4 viewbox;
     uniform vec2 offset, size;
-    uniform float linewidth;
+    uniform float lineWidth;
     void main () {
-      vec2 p = position.xy + offset + normal*(linewidth*(viewbox.z - viewbox.x)/size.x);
+      vec2 p = position.xy + offset + normal*(lineWidth*(viewbox.z - viewbox.x)/size.x);
       gl_Position = vec4(
         (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
         (p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0,
@@ -159,7 +159,7 @@ var drawLines = map.createDraw({
       size[1] = context.viewportHeight
       return size
     },
-    linewidth: function () {
+    lineWidth: function () {
       if (map.getZoom() <= 13) { lw = 0.5 }      
       else if (map.getZoom() >= 16) { lw = 2.0 }      
       else lw = 1.0
@@ -181,7 +181,6 @@ var drawLines = map.createDraw({
   }
 })
 
-
 var drawPoints = map.createDraw({
   frag: glsl`
     precision highp float;
@@ -197,14 +196,14 @@ var drawPoints = map.createDraw({
     attribute vec2 position;
     uniform vec4 viewbox;
     uniform vec2 offset, size;
-    uniform float pointwidth;
+    uniform float pointSize;
     void main () {
       vec2 p = position.xy + offset;
       gl_Position = vec4(
         (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
         (p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0,
         0, 1);
-      gl_PointSize = 2.0;
+      gl_PointSize = pointSize;
     }
   `,
   uniforms: {
@@ -213,10 +212,10 @@ var drawPoints = map.createDraw({
       size[1] = context.viewportHeight
       return size
     },
-    pointwidth: function () {
-      if (map.getZoom() <= 13) { pw = 2.0 }      
-      else if (map.getZoom() >= 16) { pw = 4.0 }      
-      else pw = 2.0
+    pointSize: function () {
+      if (map.getZoom() <= 13) { pw = 3.0 }      
+      else if (map.getZoom() >= 16) { pw = 4.0 }
+      else pw = 3.5
       return pw
     }
   },
@@ -239,12 +238,10 @@ resl({
     points: { type: 'text', src: 'nodesonly.json', parser: JSON.parse }
   },
   onDone: function (assets) {
-  /*
     drawLines.props.push({
       position: assets.lines.positions,
       normal: assets.lines.normals
     })
-  */
     drawPoints.props.push({
       position: assets.points.positions
     })
