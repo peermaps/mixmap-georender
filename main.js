@@ -103,16 +103,39 @@ map.addLayer({
 })
 
 var size = new Float32Array(2)
+var texArray = new Float32Array(497*4)
 var lw
 
-var drawMesh = map.createDraw({
+for (var i = 0; i <= texArray.length; i+=4) {
+  if (i % 10 === 0) {
+    texArray[i] = 20
+    texArray[i+1] = 0
+    texArray[i+2] = 0
+    texArray[i+3] = 0
+
+  }
+  else
+    texArray[i] = 10
+    texArray[i+1] = 0
+    texArray[i+2] = 0
+    texArray[i+3] = 0
+}
+console.log(texArray)
+/*
+var featuresTex = regl.texture({
+  width: texArray.length,
+  height: 1,
+  data: texArray 
+})
+*/
+
+var drawLines = map.createDraw({
   frag: glsl`
     precision highp float;
+    uniform sampler2D texture;
     #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
     void main () {
-      vec3 c = hsl2rgb(
-        0.0, 0.5, 0.5
-      );
+      vec3 c = hsl2rgb(0.0, 0.5, 0.5);
       gl_FragColor = vec4(c,0.9);
     }
   `,
@@ -150,7 +173,6 @@ var drawMesh = map.createDraw({
   },
   primitive: "triangle strip",
   count: function (context, props) {
-    //console.log(props.position.length)
     return props.position.length
   },
   blend: {
@@ -158,14 +180,73 @@ var drawMesh = map.createDraw({
     func: { src: 'src alpha', dst: 'one minus src alpha' }
   }
 })
+
+
+var drawPoints = map.createDraw({
+  frag: glsl`
+    precision highp float;
+    uniform sampler2D texture;
+    #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
+    void main () {
+      vec3 c = hsl2rgb(0.0, 0.5, 0.5);
+      gl_FragColor = vec4(c,0.9);
+    }
+  `,
+  vert: `
+    precision highp float;
+    attribute vec2 position;
+    uniform vec4 viewbox;
+    uniform vec2 offset, size;
+    uniform float pointwidth;
+    void main () {
+      vec2 p = position.xy + offset;
+      gl_Position = vec4(
+        (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
+        (p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0,
+        0, 1);
+      gl_PointSize = 2.0;
+    }
+  `,
+  uniforms: {
+    size: function (context) {
+      size[0] = context.viewportWidth
+      size[1] = context.viewportHeight
+      return size
+    },
+    pointwidth: function () {
+      if (map.getZoom() <= 13) { pw = 2.0 }      
+      else if (map.getZoom() >= 16) { pw = 4.0 }      
+      else pw = 2.0
+      return pw
+    }
+  },
+  attributes: {
+    position: map.prop('position')
+  },
+  primitive: "points",
+  count: function (context, props) {
+    return props.position.length
+  },
+  blend: {
+    enable: true,
+    func: { src: 'src alpha', dst: 'one minus src alpha' }
+  }
+})
+
 resl({
   manifest: {
-    mesh: { type: 'text', src: 'tmesh4.json', parser: JSON.parse }
+    lines: { type: 'text', src: 'tmesh4.json', parser: JSON.parse },
+    points: { type: 'text', src: 'nodesonly.json', parser: JSON.parse }
   },
   onDone: function (assets) {
-    drawMesh.props.push({
-      position: assets.mesh.positions,
-      normal: assets.mesh.normals
+  /*
+    drawLines.props.push({
+      position: assets.lines.positions,
+      normal: assets.lines.normals
+    })
+  */
+    drawPoints.props.push({
+      position: assets.points.positions
     })
   }
 })
@@ -182,3 +263,10 @@ window.addEventListener('keydown', function (ev) {
  
 document.body.appendChild(mix.render())
 document.body.appendChild(map.render({ width: 600, height: 400 }))
+//each point (including all points in a way) need to have attribute 'type' that
+//is pulled from the osm tags and corresponds to the items in features.json
+
+//texture should be 1 pixel high. each pixel should have a 4 item array with the
+//values that will correspond with rgba channels.
+//    texture2D(texture, vec2()
+//    texture: featuresTex
