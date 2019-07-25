@@ -2,8 +2,9 @@ var mixmap = require('mixmap')
 var regl = require('regl')
 var glsl = require('glslify')
 var resl = require('resl')
+var featureList = require('./features.json')
  
-var mix = mixmap(regl, { extensions: ['oes_element_index_uint'] })
+var mix = mixmap(regl, { extensions: ['oes_element_index_uint', 'oes_texture_float'] })
 var map = mix.create({ viewbox: [+36.1, +49.9, +36.3, +50.1]})
  
 var drawTile = map.createDraw({
@@ -103,31 +104,7 @@ map.addLayer({
 })
 
 var size = new Float32Array(2)
-var texArray = new Float32Array(497*4)
 var lw
-
-for (var i = 0; i <= texArray.length; i+=4) {
-  if (i % 10 === 0) {
-    texArray[i] = 20
-    texArray[i+1] = 0
-    texArray[i+2] = 0
-    texArray[i+3] = 0
-
-  }
-  else
-    texArray[i] = 10
-    texArray[i+1] = 0
-    texArray[i+2] = 0
-    texArray[i+3] = 0
-}
-console.log(texArray)
-/*
-var featuresTex = regl.texture({
-  width: texArray.length,
-  height: 1,
-  data: texArray 
-})
-*/
 
 var drawLines = map.createDraw({
   frag: glsl`
@@ -168,18 +145,27 @@ var drawLines = map.createDraw({
     }
   },
   attributes: {
-    position: map.prop('position'),
-    normal: map.prop('normal')
+    position: map.prop('positions'),
+    normal: map.prop('normals')
   },
   primitive: "triangle strip",
   count: function (context, props) {
-    return props.position.length
+    return props.positions.length
   },
   blend: {
     enable: true,
     func: { src: 'src alpha', dst: 'one minus src alpha' }
   }
 })
+
+var pointStyleData = new Float32Array(4*Object.keys(featureList).length)
+for (var x = 0; x < pointStyleData.length; x += 4) {
+  pointStyleData[x+0] = 2 //r
+  pointStyleData[x+1] = 0 //g
+  pointStyleData[x+2] = 0 //b
+  pointStyleData[x+3] = 0 //a
+}
+pointStyleData[featureList['amenity.cafe']*4+0] = 20 //sets r to 20 for cafe
 
 var drawPoints = map.createDraw({
   frag: glsl`
@@ -194,16 +180,20 @@ var drawPoints = map.createDraw({
   vert: `
     precision highp float;
     attribute vec2 position;
+    attribute float featureType;
     uniform vec4 viewbox;
     uniform vec2 offset, size;
-    uniform float pointSize;
+    uniform float pointSize, featureCount;
+    uniform sampler2D styleTexture;
     void main () {
+      vec2 uv = vec2(featureType/(featureCount-1.0),0.5);
       vec2 p = position.xy + offset;
+      vec4 c = texture2D(styleTexture, uv);
       gl_Position = vec4(
         (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
         (p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0,
         0, 1);
-      gl_PointSize = pointSize;
+      gl_PointSize = c.x;
     }
   `,
   uniforms: {
@@ -217,14 +207,23 @@ var drawPoints = map.createDraw({
       else if (map.getZoom() >= 16) { pw = 4.0 }
       else pw = 3.5
       return pw
-    }
+    },
+    styleTexture: function () {
+      return map.regl.texture({
+        data: pointStyleData,
+        width: pointStyleData.length/4,
+        height: 1
+      })
+    },
+    featureCount: Object.keys(featureList).length
   },
   attributes: {
-    position: map.prop('position')
+    position: map.prop('positions'),
+    featureType: map.prop('types')
   },
   primitive: "points",
   count: function (context, props) {
-    return props.position.length
+    return props.positions.length
   },
   blend: {
     enable: true,
@@ -239,11 +238,12 @@ resl({
   },
   onDone: function (assets) {
     drawLines.props.push({
-      position: assets.lines.positions,
-      normal: assets.lines.normals
+      positions: assets.lines.positions,
+      normals: assets.lines.normals
     })
     drawPoints.props.push({
-      position: assets.points.positions
+      positions: assets.points.positions,
+      types: assets.points.types
     })
   }
 })
