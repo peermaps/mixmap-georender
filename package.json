@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "budo main.js -- -t glslify"
+    "watch": "budo main.js -- -t glslify",
+    "example": "budo ./example/render.js -- -t glslify"
   },
   "author": "",
   "license": "ISC",
