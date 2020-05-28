@@ -1,19 +1,25 @@
 {
-  "name": "render-osm-extract",
+  "name": "mixmap-georender",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "budo main.js -- -t glslify"
+    "watch": "budo index.js -- -t glslify",
+    "example": "budo ./example/render.js -- -t glslify"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
+    "georender-pack": "^1.0.1",
     "glsl-hsl2rgb": "^1.1.0",
     "glslify": "^7.0.0",
     "mixmap": "^1.5.1",
     "regl": "^1.3.11",
-    "resl": "^1.0.3"
+    "resl": "^1.0.3",
+    "xhr": "^2.5.0"
+  },
+  "devDependencies": {
+    "budo": "^11.6.2"
   }
 }
