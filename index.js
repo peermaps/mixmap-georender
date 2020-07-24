@@ -118,7 +118,7 @@ module.exports = function (map) {
           vec2 uv = vec2(vfeatureType/(featureCount-1.0),0.5);
           vec4 d = texture2D(styleTexture, uv);
           if (d.x < 0.1) discard;
-          vec3 c = hsl2rgb(0.0+d.y, d.z + 0.1, 0.3);
+          vec3 c = hsl2rgb(0.0+d.y, d.z + 0.1, 0.5);
           gl_FragColor = vec4(c,d.x+0.3);
         }
       `,
@@ -135,11 +135,15 @@ module.exports = function (map) {
           vfeatureType = featureType;
           vec2 uv = vec2(featureType/(featureCount-1.0),0.5);
           vec4 c = texture2D(styleTexture, uv);
-          vec2 p = position.xy + offset + normal*(c.y*lineWidth*(viewbox.z - viewbox.x)/size.x);
+          //vec2 p = position.xy + offset + normal*(c.y*lineWidth*(viewbox.z - viewbox.x)/size.x);
+          vec2 p = position.xy + offset;
+          float pw = 20.0;
+          vec2 n = pw/size;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             0, 1);
+          gl_Position += vec4(normal*n, 0, 0);
         }
       `,
       uniforms: {
@@ -152,7 +156,7 @@ module.exports = function (map) {
           if (map.getZoom() <= 13) { lw = 0.5 }      
           else if (map.getZoom() >= 16) { lw = 2.0 }      
           else lw = 0.8 
-          console.log(map.getZoom())
+          //console.log(map.getZoom())
           return lw
         },
         styleTexture: function () {
@@ -245,3 +249,14 @@ module.exports = function (map) {
 //values that will correspond with rgba channels.
 //    texture2D(texture, vec2()
 //    texture: featuresTex
+
+/*
+calculation to go from pixels to value to multiply normal by in screen
+coordinates. need: canvas width and height (should be provided by mixmap..look
+in docs). to check if it's correct, take a screenshot and look in graphics
+program to see how many pixels.
+
+screen space is -1 to +1, value is 2. if you have a canvas that's 400 width and
+you input pixel value of 400, output of formula should be 2. and if the normal
+is in one direction, so (1, 0).
+*/

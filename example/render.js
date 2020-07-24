@@ -5,7 +5,7 @@ var glsl = require('glslify')
 var mix = mixmap(regl, { extensions: ['oes_element_index_uint', 'oes_texture_float'] })
 var map = mix.create({ 
   viewbox: [+29.9, +31.1, +30.1, +31.3],
-  backgroundColor: [0.8, 0.84, 0.8, 1.0]
+  backgroundColor: [0.82, 0.85, 0.99, 1.0]
 })
 var geoRender = require('../index.js')(map)
  
@@ -14,7 +14,7 @@ var drawPoints = map.createDraw(geoRender.points)
 var drawAreas = map.createDraw(geoRender.areas)
 
 var xhr = require('xhr')
-var decode = require('georender-pack/decode')
+var decode = require('../../georender-pack/decode')
 
 var buffers = []
 xhr.get('./example/alexlabelbuf', function(err, resp) {
