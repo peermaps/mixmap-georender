@@ -19,7 +19,7 @@ for (var x = 0; x < lineStyleData.length; x += 4) {
   lineStyleData[x+0] = 2 //r
   lineStyleData[x+1] = 0.5 //g
   lineStyleData[x+2] = 0.2 //b
-  lineStyleData[x+3] = 0 //a
+  lineStyleData[x+3] = 2 //linewidth
 }
 lineStyleData[featureList['highway.residential']*4+2] = 0
 
@@ -65,12 +65,12 @@ module.exports = function (map) {
           vfeatureType = featureType;
           vec2 uv = vec2(featureType/(featureCount-1.0),0.5);
           vec2 p = position.xy + offset;
-          vec4 c = texture2D(styleTexture, uv);
+          vec4 d = texture2D(styleTexture, uv);
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             0, 1);
-          gl_PointSize = c.x;
+          gl_PointSize = d.x;
         }
       `,
       uniforms: {
@@ -128,16 +128,15 @@ module.exports = function (map) {
         attribute float featureType;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
-        uniform float lineWidth, featureCount, aspect;
+        uniform float featureCount, aspect;
         uniform sampler2D styleTexture;
         varying float vfeatureType;
         void main () {
           vfeatureType = featureType;
           vec2 uv = vec2(featureType/(featureCount-1.0),0.5);
-          vec4 c = texture2D(styleTexture, uv);
-          //vec2 p = position.xy + offset + normal*(c.y*lineWidth*(viewbox.z - viewbox.x)/size.x);
+          vec4 d = texture2D(styleTexture, uv);
           vec2 p = position.xy + offset;
-          float pw = 20.0;
+          float pw = d.w;
           vec2 n = pw/size;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
@@ -151,13 +150,6 @@ module.exports = function (map) {
           size[0] = context.viewportWidth
           size[1] = context.viewportHeight
           return size
-        },
-        lineWidth: function () {
-          if (map.getZoom() <= 13) { lw = 0.5 }      
-          else if (map.getZoom() >= 16) { lw = 2.0 }      
-          else lw = 0.8 
-          //console.log(map.getZoom())
-          return lw
         },
         styleTexture: function () {
           return map.regl.texture({
