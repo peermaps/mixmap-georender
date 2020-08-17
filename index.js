@@ -4,7 +4,9 @@ var featureList = require('./features.json')
 var size = new Float32Array(2)
 var lw
 
-var pointStyleData = new Float32Array(4*Object.keys(featureList).length)
+var featureListLength = Object.keys(featureList).length
+
+var pointStyleData = new Float32Array(4*featureListLength)
 for (var x = 0; x < pointStyleData.length; x += 4) {
   pointStyleData[x+0] = 1 //r
   pointStyleData[x+1] = 0 //g
@@ -14,16 +16,23 @@ for (var x = 0; x < pointStyleData.length; x += 4) {
 pointStyleData[featureList['amenity.cafe']*4+0] = 20 //sets r to 20 for cafe
 pointStyleData[featureList['amenity.cafe']*4+1] = 0.2
 
-var lineStyleData = new Float32Array(4*Object.keys(featureList).length)
-for (var x = 0; x < lineStyleData.length; x += 4) {
-  lineStyleData[x+0] = 2 //r
-  lineStyleData[x+1] = 0.5 //g
-  lineStyleData[x+2] = 0.2 //b
-  lineStyleData[x+3] = 2 //linewidth
+var lineStyleData = new Float32Array(4*2*featureListLength)
+var i = 0;
+for (var x = 0; x < featureListLength; x++) {
+  lineStyleData[i++] = 2 //r
+  lineStyleData[i++] = 0.5 //g
+  lineStyleData[i++] = 0.2 //b
+  lineStyleData[i++] = 4 //linewidth
+}
+for (var x = 0; x < featureListLength; x++) {
+  lineStyleData[i++] = 1 //r
+  lineStyleData[i++] = 0.5 //g
+  lineStyleData[i++] = 0.2 //b
+  lineStyleData[i++] = 1 //linewidth
 }
 lineStyleData[featureList['highway.residential']*4+2] = 0
 
-var areaStyleData = new Float32Array(4*Object.keys(featureList).length)
+var areaStyleData = new Float32Array(4*featureListLength)
 for (var x = 0; x < areaStyleData.length; x += 4) {
   areaStyleData[x+0] = 0 //r
   areaStyleData[x+1] = 0 //g
@@ -36,6 +45,7 @@ areaStyleData[226*4+1] = 0.2 //sets g
 areaStyleData[226*4+0] = 0.5 //sets r
 
 module.exports = function (map) {
+  var styleTexture
   return {
     points: {
       frag: glsl`
@@ -63,7 +73,7 @@ module.exports = function (map) {
         varying float vfeatureType;
         void main () {
           vfeatureType = featureType;
-          vec2 uv = vec2(featureType/(featureCount-1.0),0.5);
+          vec2 uv = vec2(vfeatureType/(featureCount-1.0),0.5);
           vec2 p = position.xy + offset;
           vec4 d = texture2D(styleTexture, uv);
           gl_Position = vec4(
@@ -112,14 +122,13 @@ module.exports = function (map) {
         precision highp float;
         uniform sampler2D texture, styleTexture;
         varying float vfeatureType;
-        uniform float featureCount;
+        uniform float featureCount, styleTextureWidth, styleTextureHeight;
+        varying vec4 d0, d1;
         #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
-          vec2 uv = vec2(vfeatureType/(featureCount-1.0),0.5);
-          vec4 d = texture2D(styleTexture, uv);
-          if (d.x < 0.1) discard;
-          vec3 c = hsl2rgb(0.0+d.y, d.z + 0.1, 0.5);
-          gl_FragColor = vec4(c,d.x+0.3);
+          if (d0.x < 0.1) discard;
+          vec3 c = hsl2rgb(0.0+d0.y, d0.z + 0.1, 0.5);
+          gl_FragColor = vec4(c,d0.x+0.3);
         }
       `,
       vert: `
@@ -128,15 +137,22 @@ module.exports = function (map) {
         attribute float featureType;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
-        uniform float featureCount, aspect;
+        uniform float featureCount, aspect, styleTextureHeight, styleTextureWidth;
         uniform sampler2D styleTexture;
         varying float vfeatureType;
+        varying vec4 d0, d1;
         void main () {
           vfeatureType = featureType;
-          vec2 uv = vec2(featureType/(featureCount-1.0),0.5);
-          vec4 d = texture2D(styleTexture, uv);
+          d0 = texture2D(styleTexture, vec2(
+            vfeatureType/featureCount+0.5/featureCount,
+            0.0/styleTextureHeight + 0.5/styleTextureHeight
+          ));
+          d1 = texture2D(styleTexture, vec2(
+            vfeatureType/featureCount+0.5/featureCount,
+            0.0/styleTextureHeight + 0.5/styleTextureHeight
+          ));
           vec2 p = position.xy + offset;
-          float pw = d.w;
+          float pw = d0.w;
           vec2 n = pw/size;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
@@ -151,12 +167,17 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
+        styleTextureWidth: featureListLength,
+        styleTextureHeight: 2,
         styleTexture: function () {
-          return map.regl.texture({
-            data: lineStyleData,
-            width: lineStyleData.length/4,
-            height: 1
-          })
+          if (!styleTexture) {
+            styleTexture = map.regl.texture({
+              data: lineStyleData,
+              width: featureListLength,
+              height: 2
+            })
+          }
+          return styleTexture
         },
         featureCount: Object.keys(featureList).length
       },
