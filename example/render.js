@@ -9,7 +9,8 @@ var map = mix.create({
 })
 var geoRender = require('../index.js')(map)
  
-var drawLines = map.createDraw(geoRender.lines)
+var drawLinesStroke = map.createDraw(geoRender.linesStroke)
+var drawLinesFill = map.createDraw(geoRender.linesFill)
 var drawPoints = map.createDraw(geoRender.points)
 var drawAreas = map.createDraw(geoRender.areas)
 
@@ -30,11 +31,19 @@ xhr.get('./example/alexlabelbuf', function(err, resp) {
     types: decoded.point.types,
     id: decoded.point.ids
   })
-  drawLines.props.push({
+  drawLinesStroke.props.push({
     positions: decoded.line.positions,
     types: decoded.line.types,
     normals: decoded.line.normals,
-    id: decoded.line.ids
+    id: decoded.line.ids,
+    zindex: 1.0
+  })
+  drawLinesFill.props.push({
+    positions: decoded.line.positions,
+    types: decoded.line.types,
+    normals: decoded.line.normals,
+    id: decoded.line.ids,
+    zindex: 2.0
   })
   drawAreas.props.push({
     positions: decoded.area.positions,

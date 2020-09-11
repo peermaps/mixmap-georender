@@ -125,26 +125,17 @@ module.exports = function (map) {
         func: { src: 'src alpha', dst: 'one minus src alpha' }
       }
     },
-    lines: {
+    linesStroke: {
       frag: glsl`
         precision highp float;
         uniform sampler2D texture, styleTexture;
         varying float vfeatureType;
         uniform float featureCount, styleTextureWidth, styleTextureHeight;
         uniform vec2 size;
-        //varying vec2 pos-before-add-anything-in-screen-space
-        //lineposinscreenspace+normal
-        varying vec2 vpos, vnorm;
         varying vec4 d0, d1;
-        #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
           if (d0.x < 0.1) discard;
-          vec4 c1 = vec4(d0.xyz, 1);
-          vec4 c2 = vec4(d1.xyz, 1);
-          float fw = d0.w;
-          float dist = distance(vpos*size, gl_FragCoord.xy*size);
-          //gl_FragColor = mix(c1, c2, 0.25*sqrt(length(vnorm*size)));
-          gl_FragColor = mix(c1, c2, step(fw, 0.5*length(vnorm*size)));
+          gl_FragColor = vec4(d1.xyz, 1);
         }
       `,
       vert: `
@@ -153,7 +144,7 @@ module.exports = function (map) {
         attribute float featureType;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
-        uniform float featureCount, aspect, styleTextureHeight, styleTextureWidth;
+        uniform float featureCount, aspect, styleTextureHeight, styleTextureWidth, zindex;
         uniform sampler2D styleTexture;
         varying float vfeatureType;
         varying vec2 vpos, vnorm;
@@ -176,7 +167,7 @@ module.exports = function (map) {
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
-            0, 1);
+            1.0/(1.0+zindex), 1);
           vpos = gl_Position.xy;
           gl_Position += vec4(normal*n, 0, 0);
         }
@@ -199,7 +190,92 @@ module.exports = function (map) {
           }
           return styleTexture
         },
-        featureCount: styleFeaturesLength
+        featureCount: styleFeaturesLength,
+        zindex: map.prop('zindex')
+      },
+      attributes: {
+        position: map.prop('positions'),
+        featureType: map.prop('types'),
+        normal: map.prop('normals')
+      },
+      primitive: "triangle strip",
+      count: function (context, props) {
+        return props.positions.length/2
+      },
+      blend: {
+        enable: true,
+        func: { src: 'src alpha', dst: 'one minus src alpha' }
+      }
+    },
+    linesFill: {
+      frag: glsl`
+        precision highp float;
+        uniform sampler2D texture, styleTexture;
+        varying float vfeatureType;
+        uniform float featureCount, styleTextureWidth, styleTextureHeight;
+        uniform vec2 size;
+        varying vec2 vpos, vnorm;
+        varying vec4 d0, d1;
+        #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
+        void main () {
+          if (d0.x < 0.1) discard;
+          gl_FragColor = vec4(d0.xyz, 1);
+        }
+      `,
+      vert: `
+        precision highp float;
+        attribute vec2 position, normal;
+        attribute float featureType;
+        uniform vec4 viewbox;
+        uniform vec2 offset, size;
+        uniform float featureCount, aspect, styleTextureHeight, styleTextureWidth, zindex;
+        uniform sampler2D styleTexture;
+        varying float vfeatureType;
+        varying vec2 vpos, vnorm;
+        varying vec4 d0, d1;
+        void main () {
+          vfeatureType = featureType;
+          d0 = texture2D(styleTexture, vec2(
+            vfeatureType/featureCount+0.5/featureCount,
+            0.0/styleTextureHeight + 0.5/styleTextureHeight
+          ));
+          d1 = texture2D(styleTexture, vec2(
+            vfeatureType/featureCount+0.5/featureCount,
+            1.0/styleTextureHeight + 0.5/styleTextureHeight
+          ));
+          vec2 p = position.xy + offset;
+          vec2 n = (d0.w)/size*2.0;
+          vnorm = normal*n;
+          //float pw = d0.w;
+          //vec2 n = pw/size;
+          gl_Position = vec4(
+            (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
+            ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
+            1.0/(1.0+zindex), 1);
+          vpos = gl_Position.xy;
+          gl_Position += vec4(normal*n, 0, 0);
+        }
+      `,
+      uniforms: {
+        size: function (context) {
+          size[0] = context.viewportWidth
+          size[1] = context.viewportHeight
+          return size
+        },
+        styleTextureWidth: styleFeaturesLength,
+        styleTextureHeight: 2,
+        styleTexture: function () {
+          if (!styleTexture) {
+            styleTexture = map.regl.texture({
+              data: lineStyleData,
+              width: styleFeaturesLength,
+              height: 2
+            })
+          }
+          return styleTexture
+        },
+        featureCount: styleFeaturesLength,
+        zindex: map.prop('zindex')
       },
       attributes: {
         position: map.prop('positions'),
