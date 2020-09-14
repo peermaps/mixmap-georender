@@ -160,7 +160,7 @@ module.exports = function (map) {
             1.0/styleTextureHeight + 0.5/styleTextureHeight
           ));
           vec2 p = position.xy + offset;
-          vec2 n = (d0.w+d1.w)/size*2.0;
+          vec2 n = (d0.w+2.0*d1.w)/size;
           vnorm = normal*n;
           //float pw = d0.w;
           //vec2 n = pw/size;
@@ -244,7 +244,7 @@ module.exports = function (map) {
             1.0/styleTextureHeight + 0.5/styleTextureHeight
           ));
           vec2 p = position.xy + offset;
-          vec2 n = (d0.w)/size*2.0;
+          vec2 n = d0.w/size;
           vnorm = normal*n;
           //float pw = d0.w;
           //vec2 n = pw/size;
