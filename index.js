@@ -6,6 +6,17 @@ var styleProps = require('./teststylesheet.json')
 var styleFeatures = Object.keys(styleProps)
 var styleFeaturesLength = styleFeatures.length
 
+/*
+var vectorizeText = require('vectorize-text')
+
+var textMesh = vectorizeText('all cats are bastards', {
+  textAlign: 'center',
+  size: 50,
+  font: 'arial',
+  textBaseline: 'middle'
+})
+*/
+
 var size = new Float32Array(2)
 var lw
 
@@ -161,7 +172,7 @@ module.exports = function (map) {
           ));
           vec2 p = position.xy + offset;
           vec2 n = (d0.w+2.0*d1.w)/size;
-          vnorm = normal*n;
+          vnorm = normalize(normal)*n;
           //float pw = d0.w;
           //vec2 n = pw/size;
           gl_Position = vec4(
@@ -169,7 +180,7 @@ module.exports = function (map) {
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             1.0/(1.0+zindex), 1);
           vpos = gl_Position.xy;
-          gl_Position += vec4(normal*n, 0, 0);
+          gl_Position += vec4(vnorm, 0, 0);
         }
       `,
       uniforms: {
@@ -245,7 +256,7 @@ module.exports = function (map) {
           ));
           vec2 p = position.xy + offset;
           vec2 n = d0.w/size;
-          vnorm = normal*n;
+          vnorm = normalize(normal)*n;
           //float pw = d0.w;
           //vec2 n = pw/size;
           gl_Position = vec4(
@@ -253,7 +264,7 @@ module.exports = function (map) {
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             1.0/(1.0+zindex), 1);
           vpos = gl_Position.xy;
-          gl_Position += vec4(normal*n, 0, 0);
+          gl_Position += vec4(vnorm, 0, 0);
         }
       `,
       uniforms: {
@@ -350,6 +361,24 @@ module.exports = function (map) {
         enable: true,
         func: { src: 'src alpha', dst: 'one minus src alpha' }
       }
+    },
+    labels: {
+			frag: `
+			precision mediump float;
+			void main () {
+				gl_FragColor = vec4(0,0,1,1);
+			}`,
+			vert: `
+			precision mediump float;
+			attribute vec2 position;
+			void main () {
+				gl_Position = vec4(position.xy*vec2(1,-1)*0.2, 0, 1);
+			}`,
+			attributes: {
+				position: map.prop('positions')
+      },
+			elements: map.prop('cells'),
+			depth: { enable: false }
     }
   }
 }
