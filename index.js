@@ -78,7 +78,7 @@ module.exports = function (map) {
           if (d.x < 0.1) discard;
           //vec3 c = hsl2rgb(0.0+d.y, 1.0, 0.5);
           vec3 c = vec3(d.x, d.y, d.z);
-          gl_FragColor = vec4(c, 0.9);
+          gl_FragColor = vec4(c, 1.0);
         }
       `,
       vert: `
@@ -318,18 +318,35 @@ module.exports = function (map) {
           gl_FragColor = vec4(d.xyz, 1.0);
         }
       `,
+      pickFrag: glsl`
+        precision highp float;
+        uniform sampler2D texture;
+        varying float vfeatureType, vid;
+        uniform float featureCount;
+        uniform sampler2D styleTexture, pickTexture;
+        #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
+        void main () {
+          vec2 uv = vec2(vfeatureType/(featureCount-1.0),0.5);
+          vec4 d = texture2D(styleTexture, uv);
+          vec4 e = texture2D(pickTexture, uv);
+          //if (d.x < 0.1) discard;
+          //vec3 c = hsl2rgb(0.0+d.y, 1.0, 0.5);
+          gl_FragColor = vec4(vid, 0.0, 0.0, 1.0);
+        }
+      `,
       vert: `
         precision highp float;
         attribute vec2 position;
-        attribute float featureType;
+        attribute float featureType, id;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
         uniform float featureCount, aspect;
         uniform sampler2D styleTexture;
-        varying float vfeatureType;
+        varying float vfeatureType, vid;
         void main () {
           vec2 p = position.xy + offset;
           vfeatureType = featureType;
+          vid = id;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
@@ -349,11 +366,19 @@ module.exports = function (map) {
             height: 1
           })
         },
-        featureCount: styleFeaturesLength
+        featureCount: styleFeaturesLength,
+        pickTexture: function () {
+          return map.regl.texture({
+            data: areaPickData,
+            width: areaPickData.length/4,
+            height: 1
+          })
+        },
       },
       attributes: {
         position: map.prop('positions'),
-        featureType: map.prop('types')
+        featureType: map.prop('types'),
+        id: map.prop('id')
       },
       elements: map.prop('cells'),
       primitive: "triangles",
