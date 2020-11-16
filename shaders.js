@@ -69,7 +69,7 @@ module.exports = function (map) {
         func: { src: 'src alpha', dst: 'one minus src alpha' }
       }
     },
-    linesStroke: {
+    lineStroke: {
       frag: glsl`
         precision highp float;
         uniform sampler2D texture, styleTexture;
@@ -124,7 +124,7 @@ module.exports = function (map) {
         },
         styleTextureWidth: map.prop('styleCount'),
         styleTextureHeight: 2,
-        styleTexture: styleTexture('linesStroke'),
+        styleTexture: styleTexture('lineStroke'),
         featureCount: map.prop('styleCount'),
         zindex: map.prop('zindex')
       },
@@ -142,7 +142,7 @@ module.exports = function (map) {
         func: { src: 'src alpha', dst: 'one minus src alpha' }
       }
     },
-    linesFill: {
+    lineFill: {
       frag: glsl`
         precision highp float;
         uniform sampler2D texture, styleTexture;
@@ -153,10 +153,12 @@ module.exports = function (map) {
         varying vec4 d0, d1;
         #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
+          //float d = max(vdist.x, vdist.y)*20.0;
+          float d = length(vdist)*20.0;
           if (d0.x < 0.1) discard;
           //gl_FragColor = vec4(d0.xyz, 1);
-          //gl_FragColor = vec4(step(0.5, mod(vdist.x*2000.0, 1.0)), 0, 0, 1);
-          gl_FragColor = vec4(0, 0, 1, 1);
+          gl_FragColor = vec4(step(0.5, mod(d, 1.0)), 0, 0, 1);
+          //gl_FragColor = vec4(0, 0, 1, 1);
         }
       `,
       vert: `
@@ -207,7 +209,7 @@ module.exports = function (map) {
           return props.styleCount
         },
         styleTextureHeight: 2,
-        styleTexture: styleTexture('linesFill'),
+        styleTexture: styleTexture('lineFill'),
         featureCount: map.prop('styleCount'),
         zindex: map.prop('zindex')
       },
@@ -312,8 +314,8 @@ module.exports = function (map) {
       if (!styleTextureCache[name]) {
         styleTextureCache[name] = map.regl.texture({
           data: props.style,
-          width: props.style.length/4,
-          height: 1
+          width: props.styleCount,
+          height: props.texHeight
         })
       }
       return styleTextureCache[name]

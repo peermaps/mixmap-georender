@@ -54,7 +54,7 @@ module.exports = function (decoded) {
   decoded.area.ids.forEach(function (id, i) {
     indexes[i] = idToIndex[id]
   })
-  var distances = []
+  var distances = [0,0]
   var distx = 0
   var disty = 0
   var lids = decoded.line.ids
@@ -74,6 +74,7 @@ module.exports = function (decoded) {
     }
     distances.push(distx, disty)
   }
+  console.log(lposits.length, distances.length)
 
   return {
     point: {
@@ -83,6 +84,7 @@ module.exports = function (decoded) {
       labels: decoded.point.labels,
       style: pointStyle,
       styleCount,
+      texHeight: 1,
     },
     lineStroke: {
       positions: decoded.line.positions,
@@ -92,6 +94,7 @@ module.exports = function (decoded) {
       labels: decoded.line.labels,
       style: lineStyle,
       styleCount,
+      texHeight: 2,
       zindex: 1.0,
       distances,
     },
@@ -103,6 +106,7 @@ module.exports = function (decoded) {
       labels: decoded.line.labels,
       style: lineStyle,
       styleCount,
+      texHeight: 2,
       zindex: 2.0,
       distances,
     },
@@ -114,6 +118,7 @@ module.exports = function (decoded) {
       labels: decoded.area.labels,
       style: areaStyle,
       styleCount,
+      texHeight: 1,
     }
   }
 }

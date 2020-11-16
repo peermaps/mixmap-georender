@@ -13,8 +13,8 @@ var map = mix.create({
 var geoRender = require('../shaders.js')(map)
  
 var draw = {
-  lineStroke: map.createDraw(geoRender.linesStroke),
-  lineFill: map.createDraw(geoRender.linesFill),
+  lineStroke: map.createDraw(geoRender.lineStroke),
+  lineFill: map.createDraw(geoRender.lineFill),
   point: map.createDraw(geoRender.points),
   area: map.createDraw(geoRender.areas),
 }
