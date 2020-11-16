@@ -54,14 +54,26 @@ module.exports = function (decoded) {
   decoded.area.ids.forEach(function (id, i) {
     indexes[i] = idToIndex[id]
   })
-  /*
-  var lineCounter = 0
-  decoded.line.positions.forEach(function (pos, i) {
-    if (decoded.line.ids[i] === decoded.line.ids[i-1]) {
-      console.log(decoded.line.ids[i])
+  var distances = []
+  var distx = 0
+  var disty = 0
+  var lids = decoded.line.ids
+  var lposits = decoded.line.positions
+  for (var i=0;i<lids.length-1;i++){
+    if (lids[i] === lids[i+1]) {
+      distx += Math.abs(lposits[2*i] - lposits[2*i+2])
+      disty += Math.abs(lposits[2*i+1] - lposits[2*i+3])
     }
-  })
-  */
+    else {
+      distx = 0
+      disty = 0
+    }
+    if (isNaN(distx) || isNaN(disty)){
+      distx = 0
+      disty = 0
+    }
+    distances.push(distx, disty)
+  }
 
   return {
     point: {
@@ -80,7 +92,8 @@ module.exports = function (decoded) {
       labels: decoded.line.labels,
       style: lineStyle,
       styleCount,
-      zindex: 1.0
+      zindex: 1.0,
+      distances,
     },
     lineFill: {
       positions: decoded.line.positions,
@@ -90,7 +103,8 @@ module.exports = function (decoded) {
       labels: decoded.line.labels,
       style: lineStyle,
       styleCount,
-      zindex: 2.0
+      zindex: 2.0,
+      distances,
     },
     area: {
       positions: decoded.area.positions,

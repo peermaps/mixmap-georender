@@ -10,7 +10,7 @@ var map = mix.create({
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
   pickfb: { colorFormat: 'rgba', colorType: 'float32' }
 })
-var geoRender = require('../index.js')(map)
+var geoRender = require('../shaders.js')(map)
  
 var draw = {
   lineStroke: map.createDraw(geoRender.linesStroke),

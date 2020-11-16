@@ -1,7 +1,8 @@
 var glsl = require('glslify')
+var size = [0,0]
 
 module.exports = function (map) {
-  var styleTexture = null
+  var styleTextureCache = {}
   return {
     points: {
       frag: glsl`
@@ -52,16 +53,8 @@ module.exports = function (map) {
           else pw = 3.5
           return pw
         },
-        styleTexture: function (context, props) {
-          return map.regl.texture({
-            data: props.style,
-            width: props.style.length/4,
-            height: 1
-          })
-        },
-        featureCount: function (context, props) {
-          return props.styleCount
-        }
+        styleTexture: styleTexture('points'),
+        featureCount: map.prop('styleCount')
       },
       attributes: {
         position: map.prop('positions'),
@@ -129,21 +122,10 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
-        styleTextureWidth: styleCount,
+        styleTextureWidth: map.prop('styleCount'),
         styleTextureHeight: 2,
-        styleTexture: function (context, props) {
-          if (!styleTexture) {
-            styleTexture = map.regl.texture({
-              data: props.style,
-              width: props.styleCount,
-              height: 2
-            })
-          }
-          return styleTexture
-        },
-        featureCount: function (context, props) {
-          return props.styleCount
-        },
+        styleTexture: styleTexture('linesStroke'),
+        featureCount: map.prop('styleCount'),
         zindex: map.prop('zindex')
       },
       attributes: {
@@ -167,24 +149,26 @@ module.exports = function (map) {
         varying float vfeatureType;
         uniform float featureCount, styleTextureWidth, styleTextureHeight;
         uniform vec2 size;
-        varying vec2 vpos, vnorm;
+        varying vec2 vpos, vnorm, vdist;
         varying vec4 d0, d1;
         #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
           if (d0.x < 0.1) discard;
-          gl_FragColor = vec4(d0.xyz, 1);
+          //gl_FragColor = vec4(d0.xyz, 1);
+          //gl_FragColor = vec4(step(0.5, mod(vdist.x*2000.0, 1.0)), 0, 0, 1);
+          gl_FragColor = vec4(0, 0, 1, 1);
         }
       `,
       vert: `
         precision highp float;
-        attribute vec2 position, normal;
+        attribute vec2 position, normal, dist;
         attribute float featureType;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
         uniform float featureCount, aspect, styleTextureHeight, styleTextureWidth, zindex;
         uniform sampler2D styleTexture;
         varying float vfeatureType;
-        varying vec2 vpos, vnorm;
+        varying vec2 vpos, vnorm, vdist;
         varying vec4 d0, d1;
         void main () {
           vfeatureType = featureType;
@@ -201,6 +185,10 @@ module.exports = function (map) {
           vnorm = normalize(normal)*n;
           //float pw = d0.w;
           //vec2 n = pw/size;
+          vdist = vec2(
+            dist.x / (viewbox.z - viewbox.x) * 2.0 - 1.0,
+            (dist.y / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect
+          );
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
@@ -219,25 +207,15 @@ module.exports = function (map) {
           return props.styleCount
         },
         styleTextureHeight: 2,
-        styleTexture: function (context, props) {
-          if (!styleTexture) {
-            styleTexture = map.regl.texture({
-              data: props.style,
-              width: props.styleCount,
-              height: 2
-            })
-          }
-          return styleTexture
-        },
-        featureCount: function (context, props) {
-          return props.styleCount
-        },
+        styleTexture: styleTexture('linesFill'),
+        featureCount: map.prop('styleCount'),
         zindex: map.prop('zindex')
       },
       attributes: {
         position: map.prop('positions'),
         featureType: map.prop('types'),
-        normal: map.prop('normals')
+        normal: map.prop('normals'),
+        dist: map.prop('distances')
       },
       primitive: "triangle strip",
       count: function (context, props) {
@@ -251,7 +229,6 @@ module.exports = function (map) {
     areas: {
       frag: glsl`
         precision highp float;
-        uniform sampler2D texture;
         varying float vfeatureType;
         uniform float featureCount;
         uniform sampler2D styleTexture;
@@ -266,7 +243,6 @@ module.exports = function (map) {
       `,
       pickFrag: `
         precision highp float;
-        uniform sampler2D texture;
         varying float vfeatureType, vid;
         uniform float featureCount;
         void main () {
@@ -297,6 +273,8 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
+        featureCount: map.prop('styleCount'),
+        styleTexture: styleTexture('areas'),
       },
       attributes: {
         position: map.prop('positions'),
@@ -327,6 +305,18 @@ module.exports = function (map) {
       },
 			elements: map.prop('cells'),
 			depth: { enable: false }
+    }
+  }
+  function styleTexture (name) {
+    return function (context, props) {
+      if (!styleTextureCache[name]) {
+        styleTextureCache[name] = map.regl.texture({
+          data: props.style,
+          width: props.style.length/4,
+          height: 1
+        })
+      }
+      return styleTextureCache[name]
     }
   }
 }
