@@ -123,7 +123,7 @@ module.exports = function (map) {
           return size
         },
         styleTextureWidth: map.prop('styleCount'),
-        styleTextureHeight: 2,
+        styleTextureHeight: map.prop('texHeight'),
         styleTexture: styleTexture('lineStroke'),
         featureCount: map.prop('styleCount'),
         zindex: map.prop('zindex')
@@ -205,10 +205,8 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
-        styleTextureWidth: function (context, props) {
-          return props.styleCount
-        },
-        styleTextureHeight: 2,
+        styleTextureWidth: map.prop('styleCount'),
+        styleTextureHeight: map.prop('texHeight'),
         styleTexture: styleTexture('lineFill'),
         featureCount: map.prop('styleCount'),
         zindex: map.prop('zindex')
