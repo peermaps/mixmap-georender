@@ -154,7 +154,7 @@ module.exports = function (map) {
         #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
           //float d = max(vdist.x, vdist.y)*20.0;
-          float d = length(vdist)*20.0;
+          float d = length(vdist)*40.0;
           if (d0.x < 0.1) discard;
           //gl_FragColor = vec4(d0.xyz, 1);
           gl_FragColor = vec4(step(0.5, mod(d, 1.0)), 0, 0, 1);
@@ -188,7 +188,7 @@ module.exports = function (map) {
           //float pw = d0.w;
           //vec2 n = pw/size;
           vdist = vec2(
-            dist.x / (viewbox.z - viewbox.x) * 2.0 - 1.0,
+            (dist.x / (viewbox.z - viewbox.x) * 2.0 - 1.0) * aspect,
             (dist.y / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect
           );
           gl_Position = vec4(

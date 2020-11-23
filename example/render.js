@@ -49,6 +49,10 @@ window.addEventListener('click', function (ev) {
     //console.log(indexToId[data[0]])
   })
 })
+
+window.addEventListener('resize', function (ev) {
+  map.resize(window.innerWidth, window.innerHeight)
+})
  
 document.body.appendChild(mix.render())
-document.body.appendChild(map.render({ width: 1000, height: 800 }))
+document.body.appendChild(map.render({ width: window.innerWidth, height: window.innerHeight }))
