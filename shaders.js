@@ -150,11 +150,11 @@ module.exports = function (map) {
         uniform float featureCount, styleTextureWidth, styleTextureHeight;
         uniform vec2 size;
         varying vec2 vpos, vnorm, vdist;
-        varying vec4 d0, d1;
+        varying vec4 d0, d1, d2;
         #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
           //float d = max(vdist.x, vdist.y)*20.0;
-          float d = length(vdist)*40.0;
+          float d = length(vdist)*20.0*d2.x;
           if (d0.x < 0.1) discard;
           //gl_FragColor = vec4(d0.xyz, 1);
           gl_FragColor = vec4(step(0.5, mod(d, 1.0)), 0, 0, 1);
@@ -171,16 +171,20 @@ module.exports = function (map) {
         uniform sampler2D styleTexture;
         varying float vfeatureType;
         varying vec2 vpos, vnorm, vdist;
-        varying vec4 d0, d1;
+        varying vec4 d0, d1, d2;
         void main () {
           vfeatureType = featureType;
           d0 = texture2D(styleTexture, vec2(
             vfeatureType/featureCount+0.5/featureCount,
-            0.0/styleTextureHeight + 0.5/styleTextureHeight
+            0.0/styleTextureHeight + 0.3/styleTextureHeight
           ));
           d1 = texture2D(styleTexture, vec2(
             vfeatureType/featureCount+0.5/featureCount,
-            1.0/styleTextureHeight + 0.5/styleTextureHeight
+            1.0/styleTextureHeight + 0.3/styleTextureHeight
+          ));
+          d2 = texture2D(styleTexture, vec2(
+            vfeatureType/featureCount+0.5/featureCount,
+            2.0/styleTextureHeight + 0.3/styleTextureHeight
           ));
           vec2 p = position.xy + offset;
           vec2 n = d0.w/size;

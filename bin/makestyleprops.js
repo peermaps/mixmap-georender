@@ -1,5 +1,5 @@
 var fs = require('fs')
-var featureList = require('./features.json')
+var featureList = require('../features.json')
 
 var styleObj = {}
 var arr = Object.keys(featureList)
@@ -17,8 +17,10 @@ arr.forEach(function (entry) {
 			"point-stroke-width": "",
 			"line-width": "3.0",
 			"line-fill-color": "#1f9393",
+      "line-fill-style": 1,
 			"line-stroke-color": "#ffb6c1",
 			"line-stroke-width": "3.0",
+      "line-stroke-style": 3,
 			"line-overlay": "",
 			"area-fill-color": "#ffb6c1",
 			"area-fill-pattern": "",

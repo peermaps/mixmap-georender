@@ -1,6 +1,6 @@
 var hextorgb = require('hex-to-rgb')
 var featureList = require('./features.json')
-var styleProps = require('./stylesheet.json')
+var styleProps = require('./teststylesheet.json')
 
 var styleFeatures = Object.keys(styleProps)
 var styleCount = styleFeatures.length
@@ -17,19 +17,25 @@ module.exports = function (decoded) {
     pointStyle[x+3] = styleProps[styleFeatures[x]]["point-size"]
   }
 
-  var lineStyle = new Float32Array(4*2*styleCount)
+  var lineStyle = new Float32Array(4*3*styleCount)
   var i = 0;
-  for (var x = 0; x < lineStyle.length/8; x++) {
+  for (var x = 0; x < lineStyle.length/12; x++) {
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[0] //r
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[1] //g
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[2] //b
     lineStyle[i++] = styleProps[styleFeatures[x]]["line-width"] //linewidth
   }
-  for (var x = 0; x < lineStyle.length/8; x++) {
+  for (var x = 0; x < lineStyle.length/12; x++) {
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-stroke-color"])[0] //r
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-stroke-color"])[1] //g
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-stroke-color"])[2] //b
     lineStyle[i++] = styleProps[styleFeatures[x]]["line-stroke-width"] //linestrokewidth
+  }
+  for (var x = 0; x < lineStyle.length/12; x++) {
+    lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-style"] //linefillstyle
+    lineStyle[i++] = 0
+    lineStyle[i++] = 0
+    lineStyle[i++] = 0
   }
 
   var areaStyle = new Float32Array(4*styleCount)
@@ -94,7 +100,7 @@ module.exports = function (decoded) {
       labels: decoded.line.labels,
       style: lineStyle,
       styleCount,
-      texHeight: 2,
+      texHeight: 3,
       zindex: 1.0,
       distances,
     },
@@ -106,7 +112,7 @@ module.exports = function (decoded) {
       labels: decoded.line.labels,
       style: lineStyle,
       styleCount,
-      texHeight: 2,
+      texHeight: 3,
       zindex: 2.0,
       distances,
     },
