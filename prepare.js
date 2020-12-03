@@ -23,7 +23,7 @@ module.exports = function (decoded) {
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[0] //r
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[1] //g
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[2] //b
-    lineStyle[i++] = styleProps[styleFeatures[x]]["line-width"] //linewidth
+    lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-width"] //linewidth
   }
   for (var x = 0; x < lineStyle.length/12; x++) {
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-stroke-color"])[0] //r
@@ -32,10 +32,10 @@ module.exports = function (decoded) {
     lineStyle[i++] = styleProps[styleFeatures[x]]["line-stroke-width"] //linestrokewidth
   }
   for (var x = 0; x < lineStyle.length/12; x++) {
-    lineStyle[i++] = parseLineStyle(styleProps[styleFeatures[x]]) //linefillstyle
+    lineStyle[i++] = parseLineStyle(styleProps[styleFeatures[x]], 'fill') //linefillstyle
     lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-dash-gap"]
-    lineStyle[i++] = 0
-    lineStyle[i++] = 0
+    lineStyle[i++] = parseLineStyle(styleProps[styleFeatures[x]], 'stroke') //linestrokestyle
+    lineStyle[i++] = styleProps[styleFeatures[x]]["line-stroke-dash-gap"]
   }
 
   var areaStyle = new Float32Array(4*styleCount)
@@ -133,13 +133,13 @@ function parseHex (hex) {
   return hex.match(/([0-9a-f]{2})/ig).map(s => parseInt(s,16)/255)
 }
 
-function parseLineStyle (props) {
-  var style = props["line-fill-style"]
+function parseLineStyle (props, name) {
+  var style = props[`line-${name}-style`]
   var dashLength
 
-  if (props["line-fill-dash-length"] === "short") dashLength = 1
-  if (props["line-fill-dash-length"] === "medium") dashLength = 0.5
-  if (props["line-fill-dash-length"] === "long") dashLength = 0.1
+  if (props[`line-${name}-dash-length`] === "short") dashLength = 1
+  if (props[`line-${name}-dash-length`] === "medium") dashLength = 0.5
+  if (props[`line-${name}-dash-length`] === "long") dashLength = 0.1
   else dashLength = 0.5
 
   if (style === "solid") return 0
