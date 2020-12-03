@@ -155,9 +155,11 @@ module.exports = function (map) {
         void main () {
           //float d = max(vdist.x, vdist.y)*20.0;
           float d = length(vdist)*20.0*d2.x;
+          float gl = d2.y;
           if (d0.x < 0.1) discard;
           //gl_FragColor = vec4(d0.xyz, 1);
-          gl_FragColor = vec4(step(0.5, mod(d, 1.0)), 0, 0, 1);
+          //gl_FragColor = vec4(step(0.5, mod(d, 1.0)), 0, 0, 1);
+          gl_FragColor = vec4(step(gl, mod(d, 1.0)), 0, 0, 1);
           //gl_FragColor = vec4(0, 0, 1, 1);
         }
       `,

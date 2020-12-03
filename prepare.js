@@ -32,8 +32,8 @@ module.exports = function (decoded) {
     lineStyle[i++] = styleProps[styleFeatures[x]]["line-stroke-width"] //linestrokewidth
   }
   for (var x = 0; x < lineStyle.length/12; x++) {
-    lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-style"] //linefillstyle
-    lineStyle[i++] = 0
+    lineStyle[i++] = parseLineStyle(styleProps[styleFeatures[x]]) //linefillstyle
+    lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-dash-gap"]
     lineStyle[i++] = 0
     lineStyle[i++] = 0
   }
@@ -131,4 +131,19 @@ module.exports = function (decoded) {
 
 function parseHex (hex) {
   return hex.match(/([0-9a-f]{2})/ig).map(s => parseInt(s,16)/255)
+}
+
+function parseLineStyle (props) {
+  var style = props["line-fill-style"]
+  var dashLength
+
+  if (props["line-fill-dash-length"] === "short") dashLength = 1
+  if (props["line-fill-dash-length"] === "medium") dashLength = 0.5
+  if (props["line-fill-dash-length"] === "long") dashLength = 0.1
+  else dashLength = 0.5
+
+  if (style === "solid") return 0
+  if (style === "dot") return 5 
+  if (style === "dash") return dashLength
+  else return 0
 }
