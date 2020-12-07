@@ -135,15 +135,14 @@ function parseHex (hex) {
 
 function parseLineStyle (props, name) {
   var style = props[`line-${name}-style`]
-  var dashLength
+  var dashLength = 1.0
 
-  if (props[`line-${name}-dash-length`] === "short") dashLength = 1
-  if (props[`line-${name}-dash-length`] === "medium") dashLength = 0.5
-  if (props[`line-${name}-dash-length`] === "long") dashLength = 0.1
-  else dashLength = 0.5
+  if (props[`line-${name}-dash-length`] === "short") dashLength = 1.0
+  if (props[`line-${name}-dash-length`] === "medium") dashLength = 1.5 
+  if (props[`line-${name}-dash-length`] === "long") dashLength = 2.0
 
   if (style === "solid") return 0
-  if (style === "dot") return 5 
+  if (style === "dot") return 0.6
   if (style === "dash") return dashLength
   else return 0
 }

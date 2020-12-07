@@ -79,11 +79,9 @@ module.exports = function (map) {
         varying vec2 vdist;
         varying vec4 d0, d1, d2;
         void main () {
-          float d = length(vdist)*20.0*d2.z;
-          float gl = d2.z;
-          if (d0.x < 0.1) discard;
+          float d = step(d2.w, mod(length(vdist)*20.0, d2.z));
           //gl_FragColor = vec4(d1.xyz, 1);
-          gl_FragColor = vec4(step(gl, mod(d, d1.x)), d1.y, d1.z, 1);
+          gl_FragColor = vec4(d1.xyz, d);
         }
       `,
       vert: `
@@ -166,13 +164,11 @@ module.exports = function (map) {
         varying vec4 d0, d1, d2;
         #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
-          //float d = max(vdist.x, vdist.y)*20.0;
-          float d = length(vdist)*20.0*d2.x;
-          float gl = d2.y;
           if (d0.x < 0.1) discard;
           //gl_FragColor = vec4(d0.xyz, 1);
           //gl_FragColor = vec4(step(0.5, mod(d, 1.0)), 0, 0, 1);
-          gl_FragColor = vec4(step(gl, mod(d, d0.x)), d0.y, d0.z, 1);
+          float d = step(d2.y, mod(length(vdist)*20.0, d2.x));
+          gl_FragColor = vec4(d0.xyz, d);
         }
       `,
       vert: `
