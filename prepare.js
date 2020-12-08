@@ -33,9 +33,11 @@ module.exports = function (decoded) {
   }
   for (var x = 0; x < lineStyle.length/12; x++) {
     lineStyle[i++] = parseLineStyle(styleProps[styleFeatures[x]], 'fill') //linefillstyle
-    lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-dash-gap"]
+    if (styleProps[styleFeatures[x]]["line-fill-style"] === "solid"){ lineStyle[i++] = 0 }
+    else lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-dash-gap"]
     lineStyle[i++] = parseLineStyle(styleProps[styleFeatures[x]], 'stroke') //linestrokestyle
-    lineStyle[i++] = styleProps[styleFeatures[x]]["line-stroke-dash-gap"]
+    if (styleProps[styleFeatures[x]]["line-stroke-style"] === "solid"){ lineStyle[i++] = 0 }
+    else lineStyle[i++] = styleProps[styleFeatures[x]]["line-stroke-dash-gap"]
   }
 
   var areaStyle = new Float32Array(4*styleCount)
@@ -141,7 +143,7 @@ function parseLineStyle (props, name) {
   if (props[`line-${name}-dash-length`] === "medium") dashLength = 1.5 
   if (props[`line-${name}-dash-length`] === "long") dashLength = 2.0
 
-  if (style === "solid") return 0
+  if (style === "solid") return 1.0 
   if (style === "dot") return 0.6
   if (style === "dash") return dashLength
   else return 0
