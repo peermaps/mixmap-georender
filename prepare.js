@@ -82,7 +82,7 @@ module.exports = function (decoded) {
     }
     distances.push(distx, disty)
   }
-  console.log(lposits.length, distances.length)
+  //console.log(lposits.length, distances.length)
 
   return {
     point: {
@@ -121,7 +121,10 @@ module.exports = function (decoded) {
     area: {
       positions: decoded.area.positions,
       types: decoded.area.types,
-      id: indexes,
+      indexes: indexes,
+      //id: decoded.area.ids,
+      indexToId,
+      idToIndex,
       cells: decoded.area.cells,
       labels: decoded.area.labels,
       style: areaStyle,

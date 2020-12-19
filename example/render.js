@@ -4,7 +4,7 @@ var prepare = require('../prepare.js')
 var decode = require('../../georender-pack/decode')
 var xhr = require('xhr')
  
-var mix = mixmap(regl, { extensions: ['oes_element_index_uint', 'oes_texture_float'] })
+var mix = mixmap(regl, { extensions: ['oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend'] })
 var map = mix.create({ 
   viewbox: [+29.9, +31.1, +30.1, +31.3],
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
@@ -27,6 +27,14 @@ xhr.get('./example/alexlabelbuf3', function(err, resp) {
     }
   })
   var props = prepare(decode(buffers))
+  console.log(props.area.id)
+  window.addEventListener('click', function (ev) {
+    map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
+      //console.log(data[0], indexToId[data[0]])
+      console.log(data[0], props.area.indexToId[data[0]])
+    })
+  })
+
   draw.point.props.push(props.point)
   draw.lineFill.props.push(props.lineFill)
   draw.lineStroke.props.push(props.lineStroke)
@@ -44,11 +52,6 @@ window.addEventListener('keydown', function (ev) {
   }
 })
 
-window.addEventListener('click', function (ev) {
-  map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
-    //console.log(indexToId[data[0]])
-  })
-})
 
 window.addEventListener('resize', function (ev) {
   map.resize(window.innerWidth, window.innerHeight)

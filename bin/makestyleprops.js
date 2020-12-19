@@ -17,18 +17,18 @@ arr.forEach(function (entry) {
 			"point-stroke-width": "",
 			"line-fill-width": 3.0,
 			"line-fill-color": "#1f9393",
-      "line-fill-style": "dash",
+      "line-fill-style": "solid",
       "line-fill-dash-color": "",
       "line-fill-dash-length": "long",
-      "line-fill-dash-gap": 0.3,
+      "line-fill-dash-gap": 0.5,
 			"line-stroke-color": "#ffb6c1",
 			"line-stroke-width": 3.0,
-      "line-stroke-style": "dash",
+      "line-stroke-style": "solid",
       "line-stroke-dash-color": "",
       "line-stroke-dash-length": "long",
       "line-stroke-dash-gap": 0.5,
 			"line-overlay": "",
-			"area-fill-color": "#ffb6c1",
+			"area-fill-color": "#0000ff",
 			"area-fill-pattern": "",
 			"label-fill-color": "",
 			"label-stroke-color": "",
@@ -38,3 +38,4 @@ arr.forEach(function (entry) {
 })
 
 fs.writeFileSync('teststylesheet.json', JSON.stringify(styleObj))
+//"area-fill-color": "#ffb6c1",

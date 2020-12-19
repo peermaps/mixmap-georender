@@ -253,28 +253,29 @@ module.exports = function (map) {
           //if (d.x < 0.1) discard;
           //vec3 c = hsl2rgb(0.0+d.y, 1.0, 0.5);
           gl_FragColor = vec4(d.xyz, 1.0);
+          //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
         }
       `,
       pickFrag: `
         precision highp float;
-        varying float vfeatureType, vid;
+        varying float vfeatureType, vindex;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vid, 0.0, 0.0, 1.0);
+          gl_FragColor = vec4(vindex, 0.0, 0.0, 1.0);
         }
       `,
       vert: `
         precision highp float;
         attribute vec2 position;
-        attribute float featureType, id;
+        attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
         uniform float aspect;
-        varying float vfeatureType, vid;
+        varying float vfeatureType, vindex;
         void main () {
           vec2 p = position.xy + offset;
           vfeatureType = featureType;
-          vid = id;
+          vindex = index;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
@@ -293,7 +294,7 @@ module.exports = function (map) {
       attributes: {
         position: map.prop('positions'),
         featureType: map.prop('types'),
-        id: map.prop('id')
+        index: map.prop('indexes')
       },
       elements: map.prop('cells'),
       primitive: "triangles",
