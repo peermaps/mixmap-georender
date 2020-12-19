@@ -30,8 +30,7 @@ xhr.get('./example/alexlabelbuf3', function(err, resp) {
   console.log(props.area.id)
   window.addEventListener('click', function (ev) {
     map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
-      //console.log(data[0], indexToId[data[0]])
-      console.log(data[0], props.area.indexToId[data[0]])
+      console.log(data[1], props.area.indexToId[data[0]])
     })
   })
 

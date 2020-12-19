@@ -10,28 +10,28 @@ module.exports = function (decoded) {
   var lw
 
   var pointStyle = new Float32Array(4*styleCount)
-  for (var x = 0; x < pointStyle.length/4; x += 4) {
-    pointStyle[x+0] = parseHex(styleProps[styleFeatures[x]]["point-fill-color"])[0] //r
-    pointStyle[x+1] = parseHex(styleProps[styleFeatures[x]]["point-fill-color"])[1] //g
-    pointStyle[x+2] = parseHex(styleProps[styleFeatures[x]]["point-fill-color"])[2] //b
-    pointStyle[x+3] = styleProps[styleFeatures[x]]["point-size"]
+  for (var x = 0; x < styleCount; x ++) {
+    pointStyle[x*4+0] = parseHex(styleProps[styleFeatures[x]]["point-fill-color"])[0] //r
+    pointStyle[x*4+1] = parseHex(styleProps[styleFeatures[x]]["point-fill-color"])[1] //g
+    pointStyle[x*4+2] = parseHex(styleProps[styleFeatures[x]]["point-fill-color"])[2] //b
+    pointStyle[x*4+3] = styleProps[styleFeatures[x]]["point-size"]
   }
 
   var lineStyle = new Float32Array(4*3*styleCount)
   var i = 0;
-  for (var x = 0; x < lineStyle.length/12; x++) {
+  for (var x = 0; x < styleCount; x++) {
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[0] //r
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[1] //g
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[2] //b
     lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-width"] //linewidth
   }
-  for (var x = 0; x < lineStyle.length/12; x++) {
+  for (var x = 0; x < styleCount; x++) {
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-stroke-color"])[0] //r
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-stroke-color"])[1] //g
     lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-stroke-color"])[2] //b
     lineStyle[i++] = styleProps[styleFeatures[x]]["line-stroke-width"] //linestrokewidth
   }
-  for (var x = 0; x < lineStyle.length/12; x++) {
+  for (var x = 0; x < styleCount; x++) {
     lineStyle[i++] = parseLineStyle(styleProps[styleFeatures[x]], 'fill') //linefillstyle
     if (styleProps[styleFeatures[x]]["line-fill-style"] === "solid"){ lineStyle[i++] = 0 }
     else lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-dash-gap"]
@@ -41,11 +41,11 @@ module.exports = function (decoded) {
   }
 
   var areaStyle = new Float32Array(4*styleCount)
-  for (var x = 0; x < areaStyle.length/4; x += 4) {
-    areaStyle[x+0] = parseHex(styleProps[styleFeatures[x]]["area-fill-color"])[0] //r
-    areaStyle[x+1] = parseHex(styleProps[styleFeatures[x]]["area-fill-color"])[1] //g
-    areaStyle[x+2] = parseHex(styleProps[styleFeatures[x]]["area-fill-color"])[2] //b
-    areaStyle[x+3] = 0 //a
+  for (var x = 0; x < styleCount; x++) {
+    areaStyle[x*4+0] = parseHex(styleProps[styleFeatures[x]]["area-fill-color"])[0] //r
+    areaStyle[x*4+1] = parseHex(styleProps[styleFeatures[x]]["area-fill-color"])[1] //g
+    areaStyle[x*4+2] = parseHex(styleProps[styleFeatures[x]]["area-fill-color"])[2] //b
+    areaStyle[x*4+3] = 0 //a
   }
 
   var indexToId = {}

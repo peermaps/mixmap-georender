@@ -261,7 +261,7 @@ module.exports = function (map) {
         varying float vfeatureType, vindex;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, 0.0, 0.0, 1.0);
+          gl_FragColor = vec4(vindex, vfeatureType, 0.0, 1.0);
         }
       `,
       vert: `
