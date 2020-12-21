@@ -1,0 +1,17 @@
+{
+	"*": {
+		"point-size": 3,
+		"point-fill-color": "#ff5a92",
+		"point-stroke-color": ""
+	},
+	"amenity.*": {
+		"point-size": 2,
+		"point-fill-color": "#1f5a92",
+		"point-stroke-color": ""
+	},
+  "amenity.cafe": {
+		"point-size": 15,
+		"point-fill-color": "#2f5a92",
+		"point-stroke-color": ""
+	}
+}

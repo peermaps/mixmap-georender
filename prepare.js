@@ -1,50 +1,54 @@
 var hextorgb = require('hex-to-rgb')
-var featureList = require('./features.json')
-var styleProps = require('./teststylesheet.json')
+var featureList = require('georender-pack/features.json')
+var defaults = require('./defaults.json')
 
-var styleFeatures = Object.keys(styleProps)
-var styleCount = styleFeatures.length
+var styleCount = Object.keys(featureList).length
 
-module.exports = function (decoded) {
+module.exports = function (decoded, styleProps) {
+  var styleFeatures = Object.keys(styleProps)
   var size = new Float32Array(2)
   var lw
 
   var pointStyle = new Float32Array(4*styleCount)
   for (var x = 0; x < styleCount; x ++) {
-    pointStyle[x*4+0] = parseHex(styleProps[styleFeatures[x]]["point-fill-color"])[0] //r
-    pointStyle[x*4+1] = parseHex(styleProps[styleFeatures[x]]["point-fill-color"])[1] //g
-    pointStyle[x*4+2] = parseHex(styleProps[styleFeatures[x]]["point-fill-color"])[2] //b
-    pointStyle[x*4+3] = styleProps[styleFeatures[x]]["point-size"]
+    var h = parseHex(getStyle(styleProps, styleFeatures[x], "point-fill-color"))
+    pointStyle[x*4+0] = h[0] //r
+    pointStyle[x*4+1] = h[1] //g
+    pointStyle[x*4+2] = h[2] //b
+    pointStyle[x*4+3] = getStyle(styleProps, styleFeatures[x], "point-size")
   }
 
   var lineStyle = new Float32Array(4*3*styleCount)
   var i = 0;
   for (var x = 0; x < styleCount; x++) {
-    lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[0] //r
-    lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[1] //g
-    lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-fill-color"])[2] //b
-    lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-width"] //linewidth
+    var h = parseHex(getStyle(styleProps, styleFeatures[x], "line-fill-color"))
+    lineStyle[i++] = h[0] //r
+    lineStyle[i++] = h[1] //g
+    lineStyle[i++] = h[2] //b
+    lineStyle[i++] = getStyle(styleProps, styleFeatures[x], "line-fill-width")
   }
   for (var x = 0; x < styleCount; x++) {
-    lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-stroke-color"])[0] //r
-    lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-stroke-color"])[1] //g
-    lineStyle[i++] = parseHex(styleProps[styleFeatures[x]]["line-stroke-color"])[2] //b
-    lineStyle[i++] = styleProps[styleFeatures[x]]["line-stroke-width"] //linestrokewidth
+    var h = parseHex(getStyle(styleProps, styleFeatures[x], "line-stroke-color"))
+    lineStyle[i++] = h[0] //r
+    lineStyle[i++] = h[1] //g
+    lineStyle[i++] = h[2] //b
+    lineStyle[i++] = getStyle(styleProps, styleFeatures[x], "line-stroke-width")
   }
   for (var x = 0; x < styleCount; x++) {
-    lineStyle[i++] = parseLineStyle(styleProps[styleFeatures[x]], 'fill') //linefillstyle
-    if (styleProps[styleFeatures[x]]["line-fill-style"] === "solid"){ lineStyle[i++] = 0 }
-    else lineStyle[i++] = styleProps[styleFeatures[x]]["line-fill-dash-gap"]
-    lineStyle[i++] = parseLineStyle(styleProps[styleFeatures[x]], 'stroke') //linestrokestyle
-    if (styleProps[styleFeatures[x]]["line-stroke-style"] === "solid"){ lineStyle[i++] = 0 }
-    else lineStyle[i++] = styleProps[styleFeatures[x]]["line-stroke-dash-gap"]
+    lineStyle[i++] = parseLineStyle(styleProps, styleFeatures[x], 'fill')
+    if (getStyle(styleProps, styleFeatures[x], "line-fill-style") === "solid"){ lineStyle[i++] = 0 }
+    else lineStyle[i++] = getStyle(styleProps, styleFeatures[x], "line-fill-dash-gap")
+    lineStyle[i++] = parseLineStyle(styleProps, styleFeatures[x], 'stroke')
+    if (getStyle(styleProps, styleFeatures[x], "line-stroke-style") === "solid"){ lineStyle[i++] = 0 }
+    else lineStyle[i++] = getStyle(styleProps, styleFeatures[x], "line-stroke-dash-gap")
   }
 
   var areaStyle = new Float32Array(4*styleCount)
   for (var x = 0; x < styleCount; x++) {
-    areaStyle[x*4+0] = parseHex(styleProps[styleFeatures[x]]["area-fill-color"])[0] //r
-    areaStyle[x*4+1] = parseHex(styleProps[styleFeatures[x]]["area-fill-color"])[1] //g
-    areaStyle[x*4+2] = parseHex(styleProps[styleFeatures[x]]["area-fill-color"])[2] //b
+    var h = parseHex(getStyle(styleProps, styleFeatures[x], "area-fill-color"))
+    areaStyle[x*4+0] = h[0] //r
+    areaStyle[x*4+1] = h[1] //g
+    areaStyle[x*4+2] = h[2] //b
     areaStyle[x*4+3] = 0 //a
   }
 
@@ -138,16 +142,33 @@ function parseHex (hex) {
   return hex.match(/([0-9a-f]{2})/ig).map(s => parseInt(s,16)/255)
 }
 
-function parseLineStyle (props, name) {
-  var style = props[`line-${name}-style`]
+function parseLineStyle (styleProps, type, property) {
+  var style = getStyle(styleProps, type, `line-${property}-style`)
   var dashLength = 1.0
+  var x = getStyle(styleProps, type, `line-${property}-dash-length`)
 
-  if (props[`line-${name}-dash-length`] === "short") dashLength = 1.0
-  if (props[`line-${name}-dash-length`] === "medium") dashLength = 1.5 
-  if (props[`line-${name}-dash-length`] === "long") dashLength = 2.0
+  if (x === "short") dashLength = 1.0
+  if (x === "medium") dashLength = 1.5
+  if (x === "long") dashLength = 2.0
 
   if (style === "solid") return 1.0 
   if (style === "dot") return 0.6
   if (style === "dash") return dashLength
   else return 0
+}
+
+function getStyle (styleProps, type, property) {
+  if (styleProps[type] && styleProps[type][property] !== undefined) {
+    return styleProps[type][property]
+  }
+  if (type !== undefined) {
+    var dtype = type.split('.')[0]+'.*'
+    if (styleProps[dtype] && styleProps[dtype][property] !== undefined) {
+      return styleProps[dtype][property]
+    }
+  }
+  if (styleProps['*'] && styleProps['*'][property] !== undefined) {
+    return styleProps['*'][property]
+  }
+  return defaults[property]
 }

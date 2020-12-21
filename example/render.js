@@ -1,7 +1,7 @@
 var mixmap = require('mixmap')
 var regl = require('regl')
 var prepare = require('../prepare.js')
-var decode = require('../../georender-pack/decode')
+var decode = require('georender-pack/decode')
 var xhr = require('xhr')
  
 var mix = mixmap(regl, { extensions: ['oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend'] })
@@ -26,8 +26,7 @@ xhr.get('./example/alexlabelbuf3', function(err, resp) {
       buffers.push(Buffer.from(line, 'base64'))
     }
   })
-  var props = prepare(decode(buffers))
-  console.log(props.area.id)
+  var props = prepare(decode(buffers), require('./style.json'))
   window.addEventListener('click', function (ev) {
     map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
       console.log(data[1], props.area.indexToId[data[0]])
