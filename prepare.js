@@ -5,7 +5,7 @@ var defaults = require('./defaults.json')
 var styleCount = Object.keys(featureList).length
 
 module.exports = function (decoded, styleProps) {
-  var styleFeatures = Object.keys(styleProps)
+  var styleFeatures = Object.keys(featureList)
   var size = new Float32Array(2)
   var lw
 
@@ -161,7 +161,7 @@ function getStyle (styleProps, type, property) {
   if (styleProps[type] && styleProps[type][property] !== undefined) {
     return styleProps[type][property]
   }
-  if (type !== undefined) {
+  if (type !== undefined && type !== '*') {
     var dtype = type.split('.')[0]+'.*'
     if (styleProps[dtype] && styleProps[dtype][property] !== undefined) {
       return styleProps[dtype][property]
@@ -170,5 +170,5 @@ function getStyle (styleProps, type, property) {
   if (styleProps['*'] && styleProps['*'][property] !== undefined) {
     return styleProps['*'][property]
   }
-  return defaults[property]
+  else return defaults[property]
 }

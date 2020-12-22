@@ -1,17 +1,22 @@
 {
 	"*": {
 		"point-size": 3,
-		"point-fill-color": "#ff5a92",
+		"point-fill-color": "#eee8aa",
 		"point-stroke-color": ""
 	},
 	"amenity.*": {
-		"point-size": 2,
-		"point-fill-color": "#1f5a92",
+		"point-size": 15,
+		"point-fill-color": "#0000ff",
 		"point-stroke-color": ""
 	},
   "amenity.cafe": {
 		"point-size": 15,
 		"point-fill-color": "#2f5a92",
 		"point-stroke-color": ""
+	},
+  "railway.*": {
+    "line-fill-width": 9.0,
+    "line-fill-color": "#eee8aa",
+    "line-fill-style": "solid"
 	}
 }
