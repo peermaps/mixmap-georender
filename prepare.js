@@ -1,55 +1,72 @@
 var hextorgb = require('hex-to-rgb')
 var featureList = require('georender-pack/features.json')
 var defaults = require('./defaults.json')
+var evalExpr = require('./lib/expr.js')
 
 var styleCount = Object.keys(featureList).length
+var zoomStart = 1
+var zoomEnd = 21 //inclusive
+var zoomCount = zoomEnd - zoomStart + 1
 
 module.exports = function (decoded, styleProps) {
+  preProcess(styleProps)
+  console.log(styleProps)
   var styleFeatures = Object.keys(featureList)
-  var size = new Float32Array(2)
   var lw
 
-  var pointStyle = new Float32Array(4*styleCount)
-  for (var x = 0; x < styleCount; x ++) {
-    var h = parseHex(getStyle(styleProps, styleFeatures[x], "point-fill-color"))
-    pointStyle[x*4+0] = h[0] //r
-    pointStyle[x*4+1] = h[1] //g
-    pointStyle[x*4+2] = h[2] //b
-    pointStyle[x*4+3] = getStyle(styleProps, styleFeatures[x], "point-size")
+  var pointStyle = new Float32Array(4*styleCount*zoomCount)
+  var poffset = 0
+  for (var y = zoomStart; y <= zoomEnd; y++) {
+    for (var x = 0; x < styleCount; x++) {
+      var h = parseHex(getStyle(styleProps, styleFeatures[x], "point-fill-color", y))
+      pointStyle[poffset++] = h[0] //r
+      pointStyle[poffset++] = h[1] //g
+      pointStyle[poffset++] = h[2] //b
+      pointStyle[poffset++] = getStyle(styleProps, styleFeatures[x], "point-size", y)
+    }
   }
 
-  var lineStyle = new Float32Array(4*3*styleCount)
-  var i = 0;
-  for (var x = 0; x < styleCount; x++) {
-    var h = parseHex(getStyle(styleProps, styleFeatures[x], "line-fill-color"))
-    lineStyle[i++] = h[0] //r
-    lineStyle[i++] = h[1] //g
-    lineStyle[i++] = h[2] //b
-    lineStyle[i++] = getStyle(styleProps, styleFeatures[x], "line-fill-width")
-  }
-  for (var x = 0; x < styleCount; x++) {
-    var h = parseHex(getStyle(styleProps, styleFeatures[x], "line-stroke-color"))
-    lineStyle[i++] = h[0] //r
-    lineStyle[i++] = h[1] //g
-    lineStyle[i++] = h[2] //b
-    lineStyle[i++] = getStyle(styleProps, styleFeatures[x], "line-stroke-width")
-  }
-  for (var x = 0; x < styleCount; x++) {
-    lineStyle[i++] = parseLineStyle(styleProps, styleFeatures[x], 'fill')
-    if (getStyle(styleProps, styleFeatures[x], "line-fill-style") === "solid"){ lineStyle[i++] = 0 }
-    else lineStyle[i++] = getStyle(styleProps, styleFeatures[x], "line-fill-dash-gap")
-    lineStyle[i++] = parseLineStyle(styleProps, styleFeatures[x], 'stroke')
-    if (getStyle(styleProps, styleFeatures[x], "line-stroke-style") === "solid"){ lineStyle[i++] = 0 }
-    else lineStyle[i++] = getStyle(styleProps, styleFeatures[x], "line-stroke-dash-gap")
+  var lineStyle = new Float32Array(4*3*styleCount*zoomCount)
+  var loffset = 0
+  for (var y = zoomStart; y <= zoomEnd; y++) {
+    for (var x = 0; x < styleCount; x++) {
+      var h = parseHex(getStyle(styleProps, styleFeatures[x], "line-fill-color", y))
+      lineStyle[loffset++] = h[0] //r
+      lineStyle[loffset++] = h[1] //g
+      lineStyle[loffset++] = h[2] //b
+      lineStyle[loffset++] = getStyle(styleProps, styleFeatures[x], "line-fill-width", y)
+    }
+    for (var x = 0; x < styleCount; x++) {
+      var h = parseHex(getStyle(styleProps, styleFeatures[x], "line-stroke-color", y))
+      lineStyle[loffset++] = h[0] //r
+      lineStyle[loffset++] = h[1] //g
+      lineStyle[loffset++] = h[2] //b
+      lineStyle[loffset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-width", y)
+    }
+    for (var x = 0; x < styleCount; x++) {
+      lineStyle[loffset++] = parseLineStyle(styleProps, styleFeatures[x], 'fill')
+      if (getStyle(styleProps, styleFeatures[x], "line-fill-style", y) === "solid") {
+        lineStyle[loffset++] = 0
+      }
+      else lineStyle[loffset++] = getStyle(styleProps, styleFeatures[x], "line-fill-dash-gap", y)
+      lineStyle[loffset++] = parseLineStyle(styleProps, styleFeatures[x], 'stroke')
+      if (getStyle(styleProps, styleFeatures[x], "line-stroke-style", y) === "solid") {
+        lineStyle[loffset++] = 0
+      }
+      else lineStyle[loffset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-dash-gap", y)
+    }
   }
 
-  var areaStyle = new Float32Array(4*styleCount)
-  for (var x = 0; x < styleCount; x++) {
-    var h = parseHex(getStyle(styleProps, styleFeatures[x], "area-fill-color"))
-    areaStyle[x*4+0] = h[0] //r
-    areaStyle[x*4+1] = h[1] //g
-    areaStyle[x*4+2] = h[2] //b
-    areaStyle[x*4+3] = 0 //a
+  var areaStyle = new Float32Array(4*styleCount*zoomCount)
+  var aoffset = 0
+  for (var y = zoomStart; y <= zoomEnd; y++) {
+    for (var x = 0; x < styleCount; x++) {
+      var h = parseHex(getStyle(styleProps, styleFeatures[x], "area-fill-color", y))
+      areaStyle[aoffset++] = h[0] //r
+      areaStyle[aoffset++] = h[1] //g
+      areaStyle[aoffset++] = h[2] //b
+      areaStyle[aoffset++] = 0 //a
+    }
   }
 
   var indexToId = {}
@@ -87,6 +104,7 @@ module.exports = function (decoded, styleProps) {
     distances.push(distx, disty)
   }
   //console.log(lposits.length, distances.length)
+  //console.log(decoded.area.types[idToIndex[5062505]])
 
   return {
     point: {
@@ -96,7 +114,10 @@ module.exports = function (decoded, styleProps) {
       labels: decoded.point.labels,
       style: pointStyle,
       styleCount,
-      texHeight: 1,
+      zoomStart,
+      zoomEnd,
+      zoomCount,
+      texHeight: 1*zoomCount,
     },
     lineStroke: {
       positions: decoded.line.positions,
@@ -106,8 +127,11 @@ module.exports = function (decoded, styleProps) {
       labels: decoded.line.labels,
       style: lineStyle,
       styleCount,
-      texHeight: 3,
-      zindex: 1.0,
+      texHeight: 3*zoomCount,
+      zindex: 2.0,
+      zoomStart,
+      zoomEnd,
+      zoomCount,
       distances,
     },
     lineFill: {
@@ -118,8 +142,11 @@ module.exports = function (decoded, styleProps) {
       labels: decoded.line.labels,
       style: lineStyle,
       styleCount,
-      texHeight: 3,
-      zindex: 2.0,
+      texHeight: 3*zoomCount,
+      zindex: 3.0,
+      zoomStart,
+      zoomEnd,
+      zoomCount,
       distances,
     },
     area: {
@@ -133,7 +160,11 @@ module.exports = function (decoded, styleProps) {
       labels: decoded.area.labels,
       style: areaStyle,
       styleCount,
-      texHeight: 1,
+      texHeight: 1*zoomCount,
+      zoomStart,
+      zoomEnd,
+      zoomCount,
+      zindex: 1.0,
     }
   }
 }
@@ -157,18 +188,45 @@ function parseLineStyle (styleProps, type, property) {
   else return 0
 }
 
-function getStyle (styleProps, type, property) {
-  if (styleProps[type] && styleProps[type][property] !== undefined) {
-    return styleProps[type][property]
-  }
-  if (type !== undefined && type !== '*') {
+function getStyle (styleProps, type, property, zoom) {
+  var x = getProp(styleProps[type], property, zoom)
+  if (x !== undefined) return x
+  if (type !== undefined) {
     var dtype = type.split('.')[0]+'.*'
-    if (styleProps[dtype] && styleProps[dtype][property] !== undefined) {
-      return styleProps[dtype][property]
+    var y = getProp(styleProps[dtype], property, zoom)
+    if (y !== undefined) return y
+  }
+  var z = getProp(styleProps['*'], property, zoom)
+  if (z !== undefined) return z
+  else return defaults[property]
+}
+
+function getProp (rules, property, zoom) {
+  if (!rules) return undefined
+  var zkey = property + "[zoom=" + zoom + "]"
+  if (rules[zkey] !== undefined) {
+    return rules[zkey]
+  }
+  if (rules[property] !== undefined) {
+    return rules[property]
+  }
+}
+
+function preProcess (styleProps) {
+  var vars = { zoom: 0 }
+  var keys = Object.keys(styleProps)
+  for (var i=0; i<keys.length; i++) {
+    var pkeys = Object.keys(styleProps[keys[i]])
+    for (var j=0; j<pkeys.length; j++) {
+      var m = /([\w-]+)(?:\s*\[([^\]]*)\]\s*)/.exec(pkeys[j])
+      if (!m) continue
+      for (var zoom=zoomStart; zoom<=zoomEnd; zoom++) {
+        vars.zoom = zoom
+        if (!evalExpr(m[2], vars)) continue
+        var zkey = m[1] + "[zoom=" + zoom + "]"
+        styleProps[keys[i]][zkey] = styleProps[keys[i]][pkeys[j]]
+      }
     }
   }
-  if (styleProps['*'] && styleProps['*'][property] !== undefined) {
-    return styleProps['*'][property]
-  }
-  else return defaults[property]
+  return styleProps
 }

@@ -8,15 +8,16 @@ var mix = mixmap(regl, { extensions: ['oes_element_index_uint', 'oes_texture_flo
 var map = mix.create({ 
   viewbox: [+29.9, +31.1, +30.1, +31.3],
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
+  //backgroundColor: [1.0, 0.5, 0.5, 1.0],
   pickfb: { colorFormat: 'rgba', colorType: 'float32' }
 })
 var geoRender = require('../shaders.js')(map)
  
 var draw = {
+  area: map.createDraw(geoRender.areas),
   lineStroke: map.createDraw(geoRender.lineStroke),
   lineFill: map.createDraw(geoRender.lineFill),
   point: map.createDraw(geoRender.points),
-  area: map.createDraw(geoRender.areas),
 }
 
 var buffers = []
@@ -45,8 +46,10 @@ window.addEventListener('keydown', function (ev) {
     map.setZoom(Math.min(6,Math.round(map.getZoom()+1)))
   } else if (ev.code === 'Minus') {
     map.setZoom(map.getZoom()-1)
+    console.log(map.getZoom())
   } else if (ev.code === 'Equal') {
     map.setZoom(map.getZoom()+1)
+    console.log(map.getZoom())
   }
 })
 
