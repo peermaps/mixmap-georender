@@ -25,18 +25,22 @@
     "area-fill-color": "#5b0309"
 	},
   "highway.motorway": {
-    "line-fill-width": 9.0,
-    "line-fill-color": "#a74b05",
+    "line-fill-width[zoom<10]": 3.0,
+    "line-fill-width[zoom>=10&&zoom<=14]": 6.0,
+    "line-fill-width[zoom>13]": 9.0,
+    "line-fill-color": "#331f5b",
     "line-fill-style": "solid"
 	},
   "highway.trunk": {
-    "line-fill-width": 7.0,
+    "line-fill-width[zoom<10]": 3.0,
+    "line-fill-width[zoom>=10&&zoom<=14]": 6.0,
+    "line-fill-width[zoom>13]": 7.0,
     "line-fill-color": "#655447",
     "line-fill-style": "solid"
 	},
   "highway.primary": {
     "line-fill-width": 4.0,
-    "line-fill-color": "#03355b",
+    "line-fill-color": "#a74b05",
     "line-fill-style": "solid"
 	},
 	"highway.residential": {
@@ -92,32 +96,28 @@
 		"point-size": 2,
 		"point-fill-color": "#5d5d5d",
 		"point-stroke-color": "",
-    "line-fill-width": 1.0,
+    "line-fill-width[zoom<10]": 1.0,
+    "line-fill-width[zoom>=10]": 2.0,
     "line-fill-color": "#5d5d5d",
     "line-fill-style": "dash",
     "line-stroke-dash-length": "long",
     "line-stroke-dash-gap": 0.5,
     "line-stroke-color": "#228b22",
-    "line-stroke-width": 1.0,
+    "line-stroke-width": 0.0,
     "line-stroke-style": "dash",
     "line-stroke-dash-color": "",
     "line-stroke-dash-length": "long",
     "line-stroke-dash-gap": 0.5,
     "area-fill-color": "#5d5d5d"
 	},
-
-  "power.*": {
-    "line-fill-width[zoom<=14]": 40.0,
-    "line-fill-width[zoom>14]": 10.0
-  },
-
   "railway.*": {
-    "line-fill-width": 5.0,
+    "line-fill-width[zoom>=10]": 4.0,
+    "line-fill-width[zoom<10]": 3.0,
     "line-fill-color": "#eee8aa",
     "line-fill-style": "dash",
     "line-stroke-dash-length": "long",
     "line-stroke-dash-gap": 0.5,
-    "line-stroke-color": "#cccccc",
+    "line-stroke-color": "#5d5d5d",
     "line-stroke-width": 1.0,
     "line-stroke-style": "solid",
     "line-stroke-dash-color": "",
@@ -140,7 +140,9 @@
 		"point-size": 5,
 		"point-fill-color": "#a6a6f4",
 		"point-stroke-color": "",
-    "line-fill-width": 5.0,
+    "line-fill-width[zoom<10]": 1.0,
+    "line-fill-width[zoom>=10&&zoom<=12]": 3.0,
+    "line-fill-width[zoom>12]": 5.0,
     "line-fill-color": "#a6a6f4",
     "line-fill-style": "solid",
     "area-fill-color": "#a6a6f4"

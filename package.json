@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "tape test/*.js",
     "watch": "budo index.js -- -t glslify",
     "example": "budo ./example/render.js -- -t glslify"
   },
@@ -21,6 +21,7 @@
     "xhr": "^2.5.0"
   },
   "devDependencies": {
-    "budo": "^11.6.2"
+    "budo": "^11.6.2",
+    "tape": "^5.1.1"
   }
 }

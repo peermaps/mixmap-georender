@@ -10,7 +10,6 @@ var zoomCount = zoomEnd - zoomStart + 1
 
 module.exports = function (decoded, styleProps) {
   preProcess(styleProps)
-  console.log(styleProps)
   var styleFeatures = Object.keys(featureList)
   var lw
 

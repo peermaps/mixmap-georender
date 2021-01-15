@@ -8,14 +8,12 @@ module.exports = function (map) {
       frag: glsl`
         precision highp float;
         uniform sampler2D texture, styleTexture;
-        varying float vfeatureType;
+        varying vec4 vd;
         uniform float featureCount;
         #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
-          vec2 uv = vec2(vfeatureType/(featureCount-1.0),0.5);
-          vec4 d = texture2D(styleTexture, uv);
-          if (d.x < 0.1) discard;
-          vec3 c = vec3(d.x, d.y, d.z);
+          if (vd.x < 0.1) discard;
+          vec3 c = vec3(vd.x, vd.y, vd.z);
           gl_FragColor = vec4(c, 1.0);
         }
       `,
@@ -25,14 +23,15 @@ module.exports = function (map) {
         attribute float featureType;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
-        uniform float pointSize, featureCount, aspect;
+        uniform float featureCount, aspect, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
-        varying float vfeatureType;
+        varying vec4 vd;
         void main () {
-          vfeatureType = featureType;
-          vec2 uv = vec2(vfeatureType/(featureCount-1.0),0.5);
           vec2 p = position.xy + offset;
+          float n = 1.0;
+          vec2 uv = vec2(featureType/(featureCount-1.0),((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0)));
           vec4 d = texture2D(styleTexture, uv);
+          vd = d;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
@@ -46,13 +45,9 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
-        pointSize: function () {
-          if (map.getZoom() <= 13) { pw = 3.0 }      
-          else if (map.getZoom() >= 16) { pw = 4.0 }
-          else pw = 3.5
-          return pw
-        },
         styleTexture: styleTexture('points'),
+        zoomStart: map.prop('zoomStart'),
+        zoomCount: map.prop('zoomCount'),
         featureCount: map.prop('styleCount')
       },
       attributes: {
@@ -73,7 +68,7 @@ module.exports = function (map) {
         precision highp float;
         uniform sampler2D texture, styleTexture;
         varying float vfeatureType;
-        uniform float featureCount, styleTextureWidth, styleTextureHeight;
+        uniform float featureCount;
         uniform vec2 size;
         varying vec2 vdist;
         varying vec4 d0, d1, d2;
@@ -88,8 +83,7 @@ module.exports = function (map) {
         attribute float featureType;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
-        uniform float featureCount, aspect, styleTextureHeight, styleTextureWidth,
-          zindex, zoom, zoomStart, zoomCount;
+        uniform float featureCount, aspect, zindex, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
         varying float vfeatureType;
         varying vec2 vpos, vnorm, vdist;
@@ -130,8 +124,6 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
-        styleTextureWidth: map.prop('styleCount'),
-        styleTextureHeight: map.prop('texHeight'),
         styleTexture: styleTexture('lineStroke'),
         featureCount: map.prop('styleCount'),
         zoomStart: map.prop('zoomStart'),
@@ -158,7 +150,7 @@ module.exports = function (map) {
         precision highp float;
         uniform sampler2D texture, styleTexture;
         varying float vfeatureType;
-        uniform float featureCount, styleTextureWidth, styleTextureHeight;
+        uniform float featureCount;
         uniform vec2 size;
         varying vec2 vpos, vnorm, vdist;
         varying vec4 d0, d1, d2;
@@ -174,8 +166,7 @@ module.exports = function (map) {
         attribute float featureType;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
-        uniform float featureCount, aspect, styleTextureHeight,
-          styleTextureWidth, zindex, zoom, zoomStart, zoomCount;
+        uniform float featureCount, aspect, zindex, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
         varying float vfeatureType;
         varying vec2 vpos, vnorm, vdist;
@@ -215,8 +206,6 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
-        styleTextureWidth: map.prop('styleCount'),
-        styleTextureHeight: map.prop('texHeight'),
         styleTexture: styleTexture('lineFill'),
         featureCount: map.prop('styleCount'),
         zoomStart: map.prop('zoomStart'),
@@ -241,14 +230,9 @@ module.exports = function (map) {
     areas: {
       frag: glsl`
         precision highp float;
-        varying float vfeatureType;
-        uniform float featureCount;
-        uniform sampler2D styleTexture;
-        #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
+        varying vec4 vd;
         void main () {
-          vec2 uv = vec2(vfeatureType/(featureCount-1.0),0.5);
-          vec4 d = texture2D(styleTexture, uv);
-          gl_FragColor = vec4(d.xyz, 1.0);
+          gl_FragColor = vec4(vd.xyz, 1.0);
         }
       `,
       pickFrag: `
@@ -265,12 +249,18 @@ module.exports = function (map) {
         attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
-        uniform float aspect, zindex;
+        uniform float aspect, featureCount, zindex, zoom, zoomStart, zoomCount;
+        uniform sampler2D styleTexture;
         varying float vfeatureType, vindex;
+        varying vec4 vd;
         void main () {
           vec2 p = position.xy + offset;
           vfeatureType = featureType;
           vindex = index;
+          float n = 1.0;
+          vec2 uv = vec2(featureType/(featureCount-1.0),((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0)));
+          vec4 d = texture2D(styleTexture, uv);
+          vd = d;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
@@ -285,6 +275,8 @@ module.exports = function (map) {
         },
         featureCount: map.prop('styleCount'),
         styleTexture: styleTexture('areas'),
+        zoomStart: map.prop('zoomStart'),
+        zoomCount: map.prop('zoomCount'),
         zindex: map.prop('zindex')
       },
       attributes: {
