@@ -17,16 +17,27 @@ module.exports = function (map) {
           gl_FragColor = vec4(c, 1.0);
         }
       `,
+      pickFrag: `
+        precision highp float;
+        varying float vfeatureType, vindex;
+        uniform float featureCount;
+        void main () {
+          gl_FragColor = vec4(vindex, vfeatureType, 0.0, 1.0);
+        }
+      `,
       vert: `
         precision highp float;
         attribute vec2 position;
-        attribute float featureType;
+        attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
+        varying float vfeatureType, vindex;
         varying vec4 vd;
         void main () {
+          vfeatureType = featureType;
+          vindex = index;
           vec2 p = position.xy + offset;
           float n = 1.0;
           vec2 uv = vec2(featureType/(featureCount-1.0),((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0)));
@@ -52,7 +63,8 @@ module.exports = function (map) {
       },
       attributes: {
         position: map.prop('positions'),
-        featureType: map.prop('types')
+        featureType: map.prop('types'),
+        index: map.prop('indexes')
       },
       primitive: "points",
       count: function (context, props) {
@@ -77,19 +89,28 @@ module.exports = function (map) {
           gl_FragColor = vec4(d1.xyz, min(d,step(0.1,d1.x)));
         }
       `,
+      pickFrag: `
+        precision highp float;
+        varying float vfeatureType, vindex;
+        uniform float featureCount;
+        void main () {
+          gl_FragColor = vec4(vindex, vfeatureType, 0.5, 1.0);
+        }
+      `,
       vert: `
         precision highp float;
         attribute vec2 position, normal, dist;
-        attribute float featureType;
+        attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zindex, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
-        varying float vfeatureType;
+        varying float vfeatureType, vindex;
         varying vec2 vpos, vnorm, vdist;
         varying vec4 d0, d1, d2;
         void main () {
           vfeatureType = featureType;
+          vindex = index;
           float n = 3.0;
           d0 = texture2D(styleTexture, vec2(
             vfeatureType/featureCount+0.5/featureCount,
@@ -133,6 +154,7 @@ module.exports = function (map) {
       attributes: {
         position: map.prop('positions'),
         featureType: map.prop('types'),
+        index: map.prop('indexes'),
         normal: map.prop('normals'),
         dist: map.prop('distances')
       },
@@ -160,19 +182,28 @@ module.exports = function (map) {
           gl_FragColor = vec4(d0.xyz, min(d,step(0.1,d0.x)));
         }
       `,
+      pickFrag: `
+        precision highp float;
+        varying float vfeatureType, vindex;
+        uniform float featureCount;
+        void main () {
+          gl_FragColor = vec4(vindex, vfeatureType, 0.5, 1.0);
+        }
+      `,
       vert: `
         precision highp float;
         attribute vec2 position, normal, dist;
-        attribute float featureType;
+        attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zindex, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
-        varying float vfeatureType;
+        varying float vfeatureType, vindex;
         varying vec2 vpos, vnorm, vdist;
         varying vec4 d0, d1, d2;
         void main () {
           vfeatureType = featureType;
+          vindex = index;
           float n = 3.0;
           d0 = texture2D(styleTexture, vec2(
             vfeatureType/featureCount+0.5/featureCount,
@@ -215,6 +246,7 @@ module.exports = function (map) {
       attributes: {
         position: map.prop('positions'),
         featureType: map.prop('types'),
+        index: map.prop('indexes'),
         normal: map.prop('normals'),
         dist: map.prop('distances')
       },
@@ -240,7 +272,7 @@ module.exports = function (map) {
         varying float vfeatureType, vindex;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vfeatureType, 0.0, 1.0);
+          gl_FragColor = vec4(vindex, vfeatureType, 1.0, 1.0);
         }
       `,
       vert: `

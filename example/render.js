@@ -30,7 +30,16 @@ xhr.get('./example/alexlabelbuf3', function(err, resp) {
   var props = prepare(decode(buffers), require('./style.json'))
   window.addEventListener('click', function (ev) {
     map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
-      console.log(data[1], props.area.indexToId[data[0]])
+      if (data[2] === 0.0) {
+        console.log(data[1], props.point.indexToId[data[0]])
+      }
+      else if (data[2] === 0.5) {
+        console.log(data[1], props.lineFill.indexToId[data[0]])
+      }
+      else if (data[2] === 1.0) {
+        console.log(data[1], props.area.indexToId[data[0]])
+      }
+      else console.log(data)
     })
   })
 

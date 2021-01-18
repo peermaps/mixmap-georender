@@ -68,6 +68,10 @@ module.exports = function (decoded, styleProps) {
     }
   }
 
+  var pointIndexes = makeIndexes(decoded.point.ids)
+  var lineIndexes = makeIndexes(decoded.line.ids)
+  var areaIndexes = makeIndexes(decoded.area.ids)
+  /*
   var indexToId = {}
   var idToIndex = {}
   var indexes = new Float32Array(decoded.area.ids.length)
@@ -82,6 +86,7 @@ module.exports = function (decoded, styleProps) {
   decoded.area.ids.forEach(function (id, i) {
     indexes[i] = idToIndex[id]
   })
+  */
   var distances = [0,0]
   var distx = 0
   var disty = 0
@@ -109,6 +114,9 @@ module.exports = function (decoded, styleProps) {
     point: {
       positions: decoded.point.positions,
       types: decoded.point.types,
+      indexes: pointIndexes.indexes,
+      indexToId: pointIndexes.indexToId,
+      idToIndex: pointIndexes.idToIndex,
       id: decoded.point.ids,
       labels: decoded.point.labels,
       style: pointStyle,
@@ -121,6 +129,9 @@ module.exports = function (decoded, styleProps) {
     lineStroke: {
       positions: decoded.line.positions,
       types: decoded.line.types,
+      indexes: lineIndexes.indexes,
+      indexToId: lineIndexes.indexToId,
+      idToIndex: lineIndexes.idToIndex,
       normals: decoded.line.normals,
       id: decoded.line.ids,
       labels: decoded.line.labels,
@@ -136,6 +147,9 @@ module.exports = function (decoded, styleProps) {
     lineFill: {
       positions: decoded.line.positions,
       types: decoded.line.types,
+      indexes: lineIndexes.indexes,
+      indexToId: lineIndexes.indexToId,
+      idToIndex: lineIndexes.idToIndex,
       normals: decoded.line.normals,
       id: decoded.line.ids,
       labels: decoded.line.labels,
@@ -151,10 +165,10 @@ module.exports = function (decoded, styleProps) {
     area: {
       positions: decoded.area.positions,
       types: decoded.area.types,
-      indexes: indexes,
-      //id: decoded.area.ids,
-      indexToId,
-      idToIndex,
+      indexes: areaIndexes.indexes,
+      id: decoded.area.ids,
+      indexToId: areaIndexes.indexToId,
+      idToIndex: areaIndexes.idToIndex,
       cells: decoded.area.cells,
       labels: decoded.area.labels,
       style: areaStyle,
@@ -228,4 +242,26 @@ function preProcess (styleProps) {
     }
   }
   return styleProps
+}
+
+function makeIndexes (ids) { 
+  var indexToId = {}
+  var idToIndex = {}
+  var indexes = new Float32Array(ids.length)
+  var x = 1
+  ids.forEach(function (id) {
+    if (!idToIndex.hasOwnProperty(id)) {
+      idToIndex[id] = x
+      indexToId[x] = id
+      x++
+    }
+  })
+  ids.forEach(function (id, i) {
+    indexes[i] = idToIndex[id]
+  })
+  return {
+    indexes: indexes,
+    idToIndex: idToIndex,
+    indexToId: indexToId
+  }
 }

@@ -110,6 +110,12 @@
     "line-stroke-dash-gap": 0.5,
     "area-fill-color": "#5d5d5d"
 	},
+  "public_transport.station": {
+		"point-size": 15,
+		"point-fill-color": "#30243c",
+		"point-stroke-color": "",
+    "area-fill-color": "#30243c"
+	},
   "railway.*": {
     "line-fill-width[zoom>=10]": 4.0,
     "line-fill-width[zoom<10]": 3.0,
