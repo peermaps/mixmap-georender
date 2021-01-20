@@ -107,8 +107,6 @@ module.exports = function (decoded, styleProps) {
     }
     distances.push(distx, disty)
   }
-  //console.log(lposits.length, distances.length)
-  //console.log(decoded.area.types[idToIndex[5062505]])
 
   return {
     point: {

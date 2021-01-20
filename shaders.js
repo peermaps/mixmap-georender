@@ -8,13 +8,11 @@ module.exports = function (map) {
       frag: glsl`
         precision highp float;
         uniform sampler2D texture, styleTexture;
-        varying vec4 vd;
+        varying vec4 d0;
         uniform float featureCount;
-        #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
-          if (vd.x < 0.1) discard;
-          vec3 c = vec3(vd.x, vd.y, vd.z);
-          gl_FragColor = vec4(c, 1.0);
+          if (d0.x < 0.1) discard;
+          gl_FragColor = vec4(d0.xyz, 1.0);
         }
       `,
       pickFrag: `
@@ -34,20 +32,21 @@ module.exports = function (map) {
         uniform float featureCount, aspect, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
         varying float vfeatureType, vindex;
-        varying vec4 vd;
+        varying vec4 d0;
         void main () {
           vfeatureType = featureType;
           vindex = index;
-          vec2 p = position.xy + offset;
           float n = 1.0;
-          vec2 uv = vec2(featureType/(featureCount-1.0),((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0)));
-          vec4 d = texture2D(styleTexture, uv);
-          vd = d;
+          d0 = texture2D(styleTexture, vec2(
+            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
+            ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
+          ));
+          vec2 p = position.xy + offset;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             0, 1);
-          gl_PointSize = d.w;
+          gl_PointSize = d0.w;
         }
       `,
       uniforms: {
@@ -113,15 +112,15 @@ module.exports = function (map) {
           vindex = index;
           float n = 3.0;
           d0 = texture2D(styleTexture, vec2(
-            vfeatureType/featureCount+0.5/featureCount,
+            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
           ));
           d1 = texture2D(styleTexture, vec2(
-            vfeatureType/featureCount+0.5/featureCount,
+            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (1.0*2.0+1.0)/(n*zoomCount*2.0))
           ));
           d2 = texture2D(styleTexture, vec2(
-            vfeatureType/featureCount+0.5/featureCount,
+            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (2.0*2.0+1.0)/(n*zoomCount*2.0))
           ));
           vec2 p = position.xy + offset;
@@ -206,15 +205,15 @@ module.exports = function (map) {
           vindex = index;
           float n = 3.0;
           d0 = texture2D(styleTexture, vec2(
-            vfeatureType/featureCount+0.5/featureCount,
+            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
           ));
           d1 = texture2D(styleTexture, vec2(
-            vfeatureType/featureCount+0.5/featureCount,
+            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (1.0*2.0+1.0)/(n*zoomCount*2.0))
           ));
           d2 = texture2D(styleTexture, vec2(
-            vfeatureType/featureCount+0.5/featureCount,
+            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (2.0*2.0+1.0)/(n*zoomCount*2.0))
           ));
           vec2 p = position.xy + offset;
@@ -262,9 +261,9 @@ module.exports = function (map) {
     areas: {
       frag: glsl`
         precision highp float;
-        varying vec4 vd;
+        varying vec4 d0;
         void main () {
-          gl_FragColor = vec4(vd.xyz, 1.0);
+          gl_FragColor = vec4(d0.xyz, 1.0);
         }
       `,
       pickFrag: `
@@ -284,15 +283,16 @@ module.exports = function (map) {
         uniform float aspect, featureCount, zindex, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
         varying float vfeatureType, vindex;
-        varying vec4 vd;
+        varying vec4 d0;
         void main () {
-          vec2 p = position.xy + offset;
           vfeatureType = featureType;
           vindex = index;
           float n = 1.0;
-          vec2 uv = vec2(featureType/(featureCount-1.0),((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0)));
-          vec4 d = texture2D(styleTexture, uv);
-          vd = d;
+          d0 = texture2D(styleTexture, vec2(
+            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
+            ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
+          ));
+          vec2 p = position.xy + offset;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
