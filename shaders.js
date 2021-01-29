@@ -28,7 +28,7 @@ module.exports = function (map) {
         attribute vec2 position;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size;
+        uniform vec2 offset, size, texRange;
         uniform float featureCount, aspect, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
         varying float vfeatureType, vindex;
@@ -40,6 +40,7 @@ module.exports = function (map) {
           d0 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
+              * (texRange.y-texRange.x) + texRange.x
           ));
           vec2 p = position.xy + offset;
           gl_Position = vec4(
@@ -58,6 +59,7 @@ module.exports = function (map) {
         styleTexture: styleTexture('points'),
         zoomStart: map.prop('zoomStart'),
         zoomCount: map.prop('zoomCount'),
+        texRange: map.prop('texRange'),
         featureCount: map.prop('styleCount')
       },
       attributes: {
@@ -101,7 +103,7 @@ module.exports = function (map) {
         attribute vec2 position, normal, dist;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size;
+        uniform vec2 offset, size, texRange;
         uniform float featureCount, aspect, zindex, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
         varying float vfeatureType, vindex;
@@ -114,14 +116,17 @@ module.exports = function (map) {
           d0 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
+              * (texRange.y-texRange.x) + texRange.x
           ));
           d1 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (1.0*2.0+1.0)/(n*zoomCount*2.0))
+              * (texRange.y-texRange.x) + texRange.x
           ));
           d2 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (2.0*2.0+1.0)/(n*zoomCount*2.0))
+              * (texRange.y-texRange.x) + texRange.x
           ));
           vec2 p = position.xy + offset;
           vec2 m = (d0.w+2.0*d1.w)/size;
@@ -148,6 +153,7 @@ module.exports = function (map) {
         featureCount: map.prop('styleCount'),
         zoomStart: map.prop('zoomStart'),
         zoomCount: map.prop('zoomCount'),
+        texRange: map.prop('texRange'),
         zindex: map.prop('zindex')
       },
       attributes: {
@@ -194,7 +200,7 @@ module.exports = function (map) {
         attribute vec2 position, normal, dist;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size;
+        uniform vec2 offset, size, texRange;
         uniform float featureCount, aspect, zindex, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
         varying float vfeatureType, vindex;
@@ -207,14 +213,17 @@ module.exports = function (map) {
           d0 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
+              * (texRange.y-texRange.x) + texRange.x
           ));
           d1 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (1.0*2.0+1.0)/(n*zoomCount*2.0))
+              * (texRange.y-texRange.x) + texRange.x
           ));
           d2 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (2.0*2.0+1.0)/(n*zoomCount*2.0))
+              * (texRange.y-texRange.x) + texRange.x
           ));
           vec2 p = position.xy + offset;
           vnorm = normalize(normal)*(d0.w/size);
@@ -240,6 +249,7 @@ module.exports = function (map) {
         featureCount: map.prop('styleCount'),
         zoomStart: map.prop('zoomStart'),
         zoomCount: map.prop('zoomCount'),
+        texRange: map.prop('texRange'),
         zindex: map.prop('zindex')
       },
       attributes: {
@@ -279,7 +289,7 @@ module.exports = function (map) {
         attribute vec2 position;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size;
+        uniform vec2 offset, size, texRange;
         uniform float aspect, featureCount, zindex, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
         varying float vfeatureType, vindex;
@@ -291,6 +301,7 @@ module.exports = function (map) {
           d0 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
+              * (texRange.y-texRange.x) + texRange.x
           ));
           vec2 p = position.xy + offset;
           gl_Position = vec4(
@@ -309,6 +320,7 @@ module.exports = function (map) {
         styleTexture: styleTexture('areas'),
         zoomStart: map.prop('zoomStart'),
         zoomCount: map.prop('zoomCount'),
+        texRange: map.prop('texRange'),
         zindex: map.prop('zindex')
       },
       attributes: {
@@ -342,12 +354,14 @@ module.exports = function (map) {
 			depth: { enable: false }
     }
   }
-  function styleTexture (name) {
+  function styleTexture () {
+    var name = 'default'
     return function (context, props) {
       if (!styleTextureCache[name]) {
+        console.log(props)
         styleTextureCache[name] = map.regl.texture({
           data: props.style,
-          width: props.styleCount,
+          width: props.texWidth,
           height: props.texHeight
         })
       }

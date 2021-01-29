@@ -10,62 +10,72 @@ module.exports = function (styleProps) {
   preProcess(styleProps)
   var styleFeatures = Object.keys(featureList)
   var lw
-
-  var pointStyle = new Float32Array(4*styleCount*zoomCount)
-  var poffset = 0
-  for (var y = zoomStart; y <= zoomEnd; y++) {
-    for (var x = 0; x < styleCount; x++) {
-      var h = parseHex(getStyle(styleProps, styleFeatures[x], "point-fill-color", y))
-      pointStyle[poffset++] = h[0] //r
-      pointStyle[poffset++] = h[1] //g
-      pointStyle[poffset++] = h[2] //b
-      pointStyle[poffset++] = getStyle(styleProps, styleFeatures[x], "point-size", y)
-    }
+  var heights = {
+    point: zoomCount,
+    line: 3*zoomCount,
+    area: zoomCount
   }
+  var totalHeight = heights.point + heights.line + heights.area
+  var arrLength = 4*styleCount*totalHeight
+  var r0 = heights.point/totalHeight
+  var r1 = (heights.point + heights.line)/totalHeight
+  var ranges = [
+    [0, r0],
+    [r0, r1],
+    [r1, 1]
+  ]
 
-  var lineStyle = new Float32Array(4*3*styleCount*zoomCount)
-  var loffset = 0
+  var data = new Float32Array(arrLength)
+  var offset = 0
   for (var y = zoomStart; y <= zoomEnd; y++) {
     for (var x = 0; x < styleCount; x++) {
-      var h = parseHex(getStyle(styleProps, styleFeatures[x], "line-fill-color", y))
-      lineStyle[loffset++] = h[0] //r
-      lineStyle[loffset++] = h[1] //g
-      lineStyle[loffset++] = h[2] //b
-      lineStyle[loffset++] = getStyle(styleProps, styleFeatures[x], "line-fill-width", y)
+      var a = parseHex(getStyle(styleProps, styleFeatures[x], "point-fill-color", y))
+      data[offset++] = a[0] //r
+      data[offset++] = a[1] //g
+      data[offset++] = a[2] //b
+      data[offset++] = getStyle(styleProps, styleFeatures[x], "point-size", y)
     }
     for (var x = 0; x < styleCount; x++) {
-      var h = parseHex(getStyle(styleProps, styleFeatures[x], "line-stroke-color", y))
-      lineStyle[loffset++] = h[0] //r
-      lineStyle[loffset++] = h[1] //g
-      lineStyle[loffset++] = h[2] //b
-      lineStyle[loffset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-width", y)
+      var b = parseHex(getStyle(styleProps, styleFeatures[x], "line-fill-color", y))
+      data[offset++] = b[0] //r
+      data[offset++] = b[1] //g
+      data[offset++] = b[2] //b
+      data[offset++] = getStyle(styleProps, styleFeatures[x], "line-fill-width", y)
     }
     for (var x = 0; x < styleCount; x++) {
-      lineStyle[loffset++] = parseLineStyle(styleProps, styleFeatures[x], 'fill')
+      var c = parseHex(getStyle(styleProps, styleFeatures[x], "line-stroke-color", y))
+      data[offset++] = c[0] //r
+      data[offset++] = c[1] //g
+      data[offset++] = c[2] //b
+      data[offset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-width", y)
+    }
+    for (var x = 0; x < styleCount; x++) {
+      data[offset++] = parseLineStyle(styleProps, styleFeatures[x], 'fill')
       if (getStyle(styleProps, styleFeatures[x], "line-fill-style", y) === "solid") {
-        lineStyle[loffset++] = 0
+        data[offset++] = 0
       }
-      else lineStyle[loffset++] = getStyle(styleProps, styleFeatures[x], "line-fill-dash-gap", y)
-      lineStyle[loffset++] = parseLineStyle(styleProps, styleFeatures[x], 'stroke')
+      else data[offset++] = getStyle(styleProps, styleFeatures[x], "line-fill-dash-gap", y)
+      data[offset++] = parseLineStyle(styleProps, styleFeatures[x], 'stroke')
       if (getStyle(styleProps, styleFeatures[x], "line-stroke-style", y) === "solid") {
-        lineStyle[loffset++] = 0
+        data[offset++] = 0
       }
-      else lineStyle[loffset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-dash-gap", y)
+      else data[offset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-dash-gap", y)
     }
-  }
-
-  var areaStyle = new Float32Array(4*styleCount*zoomCount)
-  var aoffset = 0
-  for (var y = zoomStart; y <= zoomEnd; y++) {
     for (var x = 0; x < styleCount; x++) {
-      var h = parseHex(getStyle(styleProps, styleFeatures[x], "area-fill-color", y))
-      areaStyle[aoffset++] = h[0] //r
-      areaStyle[aoffset++] = h[1] //g
-      areaStyle[aoffset++] = h[2] //b
-      areaStyle[aoffset++] = 0 //a
+      var d = parseHex(getStyle(styleProps, styleFeatures[x], "area-fill-color", y))
+      data[offset++] = d[0] //r
+      data[offset++] = d[1] //g
+      data[offset++] = d[2] //b
+      data[offset++] = 0 //a
     }
   }
-  return {pointStyle, lineStyle, areaStyle}
+  return { 
+    data,
+    width: styleCount,
+    height: totalHeight,
+    heights,
+    ranges
+  }
 }
 
 function parseHex (hex) {
