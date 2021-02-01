@@ -35,6 +35,8 @@ module.exports = function (styleProps) {
       data[offset++] = a[2] //b
       data[offset++] = getStyle(styleProps, styleFeatures[x], "point-size", y)
     }
+  }
+  for (var y = zoomStart; y <= zoomEnd; y++) {
     for (var x = 0; x < styleCount; x++) {
       var b = parseHex(getStyle(styleProps, styleFeatures[x], "line-fill-color", y))
       data[offset++] = b[0] //r
@@ -61,6 +63,8 @@ module.exports = function (styleProps) {
       }
       else data[offset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-dash-gap", y)
     }
+  }
+  for (var y = zoomStart; y <= zoomEnd; y++) {
     for (var x = 0; x < styleCount; x++) {
       var d = parseHex(getStyle(styleProps, styleFeatures[x], "area-fill-color", y))
       data[offset++] = d[0] //r

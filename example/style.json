@@ -9,7 +9,7 @@
 	},
 	"amenity.*": {
 		"point-size": 5,
-		"point-fill-color": "#0000ff",
+		"point-fill-color": "#00ff",
 		"point-stroke-color": "",
     "area-fill-color": "#21abcd"
 	},
@@ -19,18 +19,18 @@
 		"point-stroke-color": ""
 	},
   "border_type.baseline": {
-    "line-fill-width[zoom<10]": 3.0,
-    "line-fill-width[zoom>=10]": 4.0,
+    "line-fill-width[zoom<10]": 3,
+    "line-fill-width[zoom>=10]": 4,
     "line-fill-color": "#999999",
     "line-fill-style": "dash",
     "line-stroke-dash-length": "long",
-    "line-stroke-dash-gap": 0.3,
+    "line-stroke-dash-gap": 30,
     "line-stroke-color": "#999999",
-    "line-stroke-width": 0.0,
+    "line-stroke-width": 0,
     "line-stroke-style": "dash",
     "line-stroke-dash-color": "",
     "line-stroke-dash-length": "long",
-    "line-stroke-dash-gap": 0.3,
+    "line-stroke-dash-gap": 30,
     "area-fill-color": "#999999"
 	},
   "boundary.administrative": {
@@ -39,62 +39,55 @@
   },
   "building.*": {
 		"point-size": 5,
-		"point-fill-color": "#5b0309",
+		"point-fill-color": "#5309",
 		"point-stroke-color": "",
-    "area-fill-color": "#5b0309"
+    "area-fill-color": "#5309"
 	},
   "communication.line": {
-    "line-fill-width[zoom<10]": 3.0,
-    "line-fill-width[zoom>=10]": 4.0,
+    "line-fill-width[zoom<10]": 3,
+    "line-fill-width[zoom>=10]": 4,
     "line-fill-color": "#aaaaaa",
     "line-fill-style": "dash",
-    "line-stroke-dash-length": "short",
-    "line-stroke-dash-gap": 0.3,
-    "line-stroke-color": "#aaaaaa",
-    "line-stroke-width": 0.0,
-    "line-stroke-style": "dash",
-    "line-stroke-dash-color": "",
-    "line-stroke-dash-length": "short",
-    "line-stroke-dash-gap": 0.3,
+    "line-stroke-width": 0,
     "area-fill-color": "#aaaaaa"
 	},
   "highway.footway": {
-    "line-fill-width[16>zoom>=10]": 3.0,
-    "line-fill-width[zoom>=16]": 5.0,
-    "line-fill-width[zoom<10]": 2.0,
-    "line-fill-color": "#b11900",
+    "line-fill-width[16>zoom>=10]": 3,
+    "line-fill-width[zoom>=16]": 5,
+    "line-fill-width[zoom<10]": 2,
+    "line-fill-color": "#b110",
     "line-fill-style": "dash",
     "line-stroke-dash-length": "short",
-    "line-stroke-dash-gap": 0.5,
+    "line-stroke-dash-gap": 50,
     "line-stroke-color": "#aaaaaa",
-    "line-stroke-width": 1.0,
+    "line-stroke-width": 1,
     "line-stroke-style": "solid",
     "line-stroke-dash-color": "",
     "line-stroke-dash-length": "short",
-    "line-stroke-dash-gap": 0.5
+    "line-stroke-dash-gap": 50
   },
   "highway.motorway": {
-    "line-fill-width[zoom<10]": 3.0,
-    "line-fill-width[zoom>=10&&zoom<=14]": 6.0,
-    "line-fill-width[16>zoom>13]": 9.0,
-    "line-fill-width[zoom>=16]": 15.0,
+    "line-fill-width[zoom<10]": 3,
+    "line-fill-width[zoom>=10&&zoom<=14]": 6,
+    "line-fill-width[16>zoom>13]": 9,
+    "line-fill-width[zoom>=16]": 15,
     "line-fill-color": "#331f5b",
     "line-fill-style": "solid"
 	},
   "highway.trunk": {
-    "line-fill-width[zoom<10]": 3.0,
-    "line-fill-width[zoom>=10&&zoom<=14]": 6.0,
-    "line-fill-width[16>zoom>13]": 7.0,
-    "line-fill-width[zoom>=16]": 15.0,
+    "line-fill-width[zoom<10]": 3,
+    "line-fill-width[zoom>=10&&zoom<=14]": 6,
+    "line-fill-width[16>zoom>13]": 7,
+    "line-fill-width[zoom>=16]": 15,
     "line-fill-color": "#655447",
     "line-fill-style": "solid"
 	},
   "highway.primary": {
-    "line-fill-width[zoom<=11]": 4.0,
-    "line-fill-width[13>=zoom>11]": 7.0,
-    "line-fill-width[17>zoom>13]": 12.0,
-    "line-fill-width[zoom>=17]": 15.0,
-    "line-fill-color": "#a74b05",
+    "line-fill-width[zoom<=11]": 4,
+    "line-fill-width[13>=zoom>11]": 7,
+    "line-fill-width[17>zoom>13]": 12,
+    "line-fill-width[zoom>=17]": 15,
+    "line-fill-color": "#a745",
     "line-fill-style": "solid"
 	},
 	"highway.residential": {
@@ -103,9 +96,9 @@
 	},
   "historic.*": {
 		"point-size": 5,
-		"point-fill-color": "#e0205a",
+		"point-fill-color": "#e05a",
 		"point-stroke-color": "",
-    "area-fill-color": "#e0205a"
+    "area-fill-color": "#e05a"
 	},
   "landuse.industrial": {
 		"point-size": 5,
@@ -115,9 +108,9 @@
 	},
   "landuse.military": {
 		"point-size": 5,
-		"point-fill-color": "#0b0b07",
+		"point-fill-color": "#0b07",
 		"point-stroke-color": "",
-    "area-fill-color": "#0b0b07"
+    "area-fill-color": "#0b07"
 	},
   "leisure.*": {
 		"point-size": 5,
@@ -129,7 +122,7 @@
 		"point-size": 5,
 		"point-fill-color": "#228b22",
 		"point-stroke-color": "",
-    "line-fill-width": 9.0,
+    "line-fill-width": 9,
     "line-fill-color": "#228b22",
     "line-fill-style": "solid",
     "area-fill-color": "#228b22"
@@ -150,40 +143,40 @@
 		"point-size": 2,
 		"point-fill-color": "#5d5d5d",
 		"point-stroke-color": "",
-    "line-fill-width[zoom<10]": 1.0,
-    "line-fill-width[zoom>=10]": 2.0,
+    "line-fill-width[zoom<10]": 1,
+    "line-fill-width[zoom>=10]": 2,
     "line-fill-color": "#5d5d5d",
     "line-fill-style": "dash",
     "line-stroke-dash-length": "long",
-    "line-stroke-dash-gap": 0.5,
+    "line-stroke-dash-gap": 50,
     "line-stroke-color": "#228b22",
-    "line-stroke-width": 0.0,
+    "line-stroke-width": 0,
     "line-stroke-style": "dash",
     "line-stroke-dash-color": "",
     "line-stroke-dash-length": "long",
-    "line-stroke-dash-gap": 0.5,
+    "line-stroke-dash-gap": 50,
     "area-fill-color": "#5d5d5d"
 	},
   "public_transport.station": {
-		"point-size": 25,
+		"point-size": 15,
 		"point-fill-color": "#30243c",
 		"point-stroke-color": "",
     "area-fill-color": "#30243c"
 	},
   "railway.*": {
-    "line-fill-width[16>zoom>=10]": 4.0,
-    "line-fill-width[zoom>=16]": 15.0,
-    "line-fill-width[zoom<10]": 3.0,
+    "line-fill-width[16>zoom>=10]": 4,
+    "line-fill-width[zoom>=16]": 15,
+    "line-fill-width[zoom<10]": 3,
     "line-fill-color": "#eee8aa",
     "line-fill-style": "dash",
     "line-stroke-dash-length": "long",
-    "line-stroke-dash-gap": 0.5,
+    "line-stroke-dash-gap": 50,
     "line-stroke-color": "#5d5d5d",
-    "line-stroke-width": 1.0,
+    "line-stroke-width": 1,
     "line-stroke-style": "solid",
     "line-stroke-dash-color": "",
     "line-stroke-dash-length": "long",
-    "line-stroke-dash-gap": 0.5
+    "line-stroke-dash-gap": 50
   },
   "shop.*": {
 		"point-size": 5,
@@ -201,10 +194,10 @@
 		"point-size": 5,
 		"point-fill-color": "#a6a6f4",
 		"point-stroke-color": "",
-    "line-fill-width[zoom<=11]": 4.0,
-    "line-fill-width[13>=zoom>11]": 7.0,
-    "line-fill-width[17>zoom>13]": 12.0,
-    "line-fill-width[zoom>=17]": 15.0,
+    "line-fill-width[zoom<=11]": 4,
+    "line-fill-width[13>=zoom>11]": 7,
+    "line-fill-width[17>zoom>13]": 12,
+    "line-fill-width[zoom>=17]": 15,
     "line-fill-color": "#a6a6f4",
     "line-fill-style": "solid",
     "area-fill-color": "#a6a6f4"
