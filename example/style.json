@@ -48,6 +48,7 @@
     "line-fill-width[zoom>=10]": 4,
     "line-fill-color": "#aaaaaa",
     "line-fill-style": "dash",
+    "line-fill-dash-length": "short",
     "line-stroke-width": 0,
     "area-fill-color": "#aaaaaa"
 	},

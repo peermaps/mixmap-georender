@@ -8,11 +8,12 @@ module.exports = function (map) {
       frag: glsl`
         precision highp float;
         uniform sampler2D texture, styleTexture;
+        varying vec3 dd0;
         varying vec4 d0;
         uniform float featureCount;
         void main () {
-          if (d0.x < 0.1) discard;
-          gl_FragColor = vec4(d0.xyz, 1.0);
+          if (d0.x/255.0 < 0.1) discard;
+          gl_FragColor = vec4(d0.xyz/255.0, 1.0);
         }
       `,
       pickFrag: `
@@ -86,8 +87,8 @@ module.exports = function (map) {
         varying vec2 vdist;
         varying vec4 d0, d1, d2;
         void main () {
-          float d = step(d2.w/100.0, mod(length(vdist)*20.0, d2.z));
-          gl_FragColor = vec4(d1.xyz, min(d,step(0.1,d1.x)));
+          float d = step(d2.w/100.0, mod(length(vdist)*20.0, d2.z/10.0));
+          gl_FragColor = vec4(d1.xyz/255.0, min(d,step(0.1,d1.x)));
         }
       `,
       pickFrag: `
@@ -183,8 +184,8 @@ module.exports = function (map) {
         varying vec4 d0, d1, d2;
         #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
-          float d = step(d2.y/100.0, mod(length(vdist)*20.0, d2.x));
-          gl_FragColor = vec4(d0.xyz, min(d,step(0.1,d0.x)));
+          float d = step(d2.y/100.0, mod(length(vdist)*20.0, d2.x/10.0));
+          gl_FragColor = vec4(d0.xyz/255.0, min(d,step(0.1,d0.x)));
         }
       `,
       pickFrag: `
@@ -273,7 +274,7 @@ module.exports = function (map) {
         precision highp float;
         varying vec4 d0;
         void main () {
-          gl_FragColor = vec4(d0.xyz, 1.0);
+          gl_FragColor = vec4(d0.xyz/255.0, 1.0);
         }
       `,
       pickFrag: `

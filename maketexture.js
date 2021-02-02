@@ -27,7 +27,7 @@ module.exports = function (styleProps) {
 
   var data = new Float32Array(arrLength)
   var offset = 0
-  for (var y = zoomStart; y <= zoomEnd; y++) {
+  for (var y = zoomStart; y <= zoomEnd; y++) { //point
     for (var x = 0; x < styleCount; x++) {
       var a = parseHex(getStyle(styleProps, styleFeatures[x], "point-fill-color", y))
       data[offset++] = a[0] //r
@@ -36,7 +36,7 @@ module.exports = function (styleProps) {
       data[offset++] = getStyle(styleProps, styleFeatures[x], "point-size", y)
     }
   }
-  for (var y = zoomStart; y <= zoomEnd; y++) {
+  for (var y = zoomStart; y <= zoomEnd; y++) { //line
     for (var x = 0; x < styleCount; x++) {
       var b = parseHex(getStyle(styleProps, styleFeatures[x], "line-fill-color", y))
       data[offset++] = b[0] //r
@@ -64,7 +64,7 @@ module.exports = function (styleProps) {
       else data[offset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-dash-gap", y)
     }
   }
-  for (var y = zoomStart; y <= zoomEnd; y++) {
+  for (var y = zoomStart; y <= zoomEnd; y++) { //area
     for (var x = 0; x < styleCount; x++) {
       var d = parseHex(getStyle(styleProps, styleFeatures[x], "area-fill-color", y))
       data[offset++] = d[0] //r
@@ -83,20 +83,20 @@ module.exports = function (styleProps) {
 }
 
 function parseHex (hex) {
-  return hex.match(/([0-9a-f]{2})/ig).map(s => parseInt(s,16)/255)
+  return hex.match(/([0-9a-f]{2})/ig).map(s => parseInt(s,16))
 }
 
 function parseLineStyle (styleProps, type, property) {
   var style = getStyle(styleProps, type, `line-${property}-style`)
-  var dashLength = 1.0
+  var dashLength = 10
   var x = getStyle(styleProps, type, `line-${property}-dash-length`)
 
-  if (x === "short") dashLength = 1.0
-  if (x === "medium") dashLength = 1.5
-  if (x === "long") dashLength = 2.0
+  if (x === "short") dashLength = 10
+  if (x === "medium") dashLength = 15
+  if (x === "long") dashLength = 20
 
-  if (style === "solid") return 1.0 
-  if (style === "dot") return 0.6
+  if (style === "solid") return 10 
+  if (style === "dot") return 6
   if (style === "dash") return dashLength
   else return 0
 }
