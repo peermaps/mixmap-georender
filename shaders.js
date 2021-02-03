@@ -12,8 +12,8 @@ module.exports = function (map) {
         varying vec4 d0;
         uniform float featureCount;
         void main () {
-          if (d0.x/255.0 < 0.1) discard;
-          gl_FragColor = vec4(d0.xyz/255.0, 1.0);
+          if (d0.x < 0.1) discard;
+          gl_FragColor = vec4(d0.xyz, 1.0);
         }
       `,
       pickFrag: `
@@ -42,7 +42,7 @@ module.exports = function (map) {
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
-          ));
+          )) * vec4(1,1,1,255);
           vec2 p = position.xy + offset;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
@@ -88,7 +88,7 @@ module.exports = function (map) {
         varying vec4 d0, d1, d2;
         void main () {
           float d = step(d2.w/100.0, mod(length(vdist)*20.0, d2.z/10.0));
-          gl_FragColor = vec4(d1.xyz/255.0, min(d,step(0.1,d1.x)));
+          gl_FragColor = vec4(d1.xyz, min(d,step(0.1,d1.x)));
         }
       `,
       pickFrag: `
@@ -118,17 +118,17 @@ module.exports = function (map) {
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
-          ));
+          )) * vec4(1,1,1,255);
           d1 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (1.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
-          ));
+          )) * vec4(1,1,1,255);
           d2 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (2.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
-          ));
+          )) * 255.0;
           vec2 p = position.xy + offset;
           vec2 m = (d0.w+2.0*d1.w)/size;
           vnorm = normalize(normal)*m;
@@ -185,7 +185,7 @@ module.exports = function (map) {
         #pragma glslify: hsl2rgb = require('glsl-hsl2rgb')
         void main () {
           float d = step(d2.y/100.0, mod(length(vdist)*20.0, d2.x/10.0));
-          gl_FragColor = vec4(d0.xyz/255.0, min(d,step(0.1,d0.x)));
+          gl_FragColor = vec4(d0.xyz, min(d,step(0.1,d0.x)));
         }
       `,
       pickFrag: `
@@ -215,17 +215,17 @@ module.exports = function (map) {
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
-          ));
+          )) * vec4(1,1,1,255);
           d1 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (1.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
-          ));
+          )) * vec4(1,1,1,255);
           d2 = texture2D(styleTexture, vec2(
             vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
             ((floor(zoom)-zoomStart)/zoomCount + (2.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
-          ));
+          )) * 255.0;
           vec2 p = position.xy + offset;
           vnorm = normalize(normal)*(d0.w/size);
           vdist = vec2(
@@ -274,7 +274,7 @@ module.exports = function (map) {
         precision highp float;
         varying vec4 d0;
         void main () {
-          gl_FragColor = vec4(d0.xyz/255.0, 1.0);
+          gl_FragColor = vec4(d0.xyz, 1.0);
         }
       `,
       pickFrag: `

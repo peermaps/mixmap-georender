@@ -25,7 +25,7 @@ module.exports = function (styleProps) {
     [r1, 1]
   ]
 
-  var data = new Float32Array(arrLength)
+  var data = new Uint8Array(arrLength)
   var offset = 0
   for (var y = zoomStart; y <= zoomEnd; y++) { //point
     for (var x = 0; x < styleCount; x++) {
