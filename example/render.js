@@ -21,7 +21,8 @@ var draw = {
 }
 
 var buffers = []
-xhr.get('./example/alexlabelbuf3', function(err, resp) {
+//xhr.get('./example/alexlabelbuf3', function(err, resp) {
+xhr.get('./example/alexrelatbuf1', function(err, resp) {
   resp.body.split('\n').forEach(function(line) {
     if (line.length !== 0) {
       buffers.push(Buffer.from(line, 'base64'))

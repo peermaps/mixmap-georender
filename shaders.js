@@ -39,7 +39,7 @@ module.exports = function (map) {
           vindex = index;
           float n = 1.0;
           d0 = texture2D(styleTexture, vec2(
-            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
+            vfeatureType/featureCount+0.5/featureCount,
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
           )) * vec4(1,1,1,255);
@@ -115,17 +115,17 @@ module.exports = function (map) {
           vindex = index;
           float n = 3.0;
           d0 = texture2D(styleTexture, vec2(
-            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
+            vfeatureType/featureCount+0.5/featureCount,
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
           )) * vec4(1,1,1,255);
           d1 = texture2D(styleTexture, vec2(
-            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
+            vfeatureType/featureCount+0.5/featureCount,
             ((floor(zoom)-zoomStart)/zoomCount + (1.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
           )) * vec4(1,1,1,255);
           d2 = texture2D(styleTexture, vec2(
-            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
+            vfeatureType/featureCount+0.5/featureCount,
             ((floor(zoom)-zoomStart)/zoomCount + (2.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
           )) * 255.0;
@@ -212,17 +212,17 @@ module.exports = function (map) {
           vindex = index;
           float n = 3.0;
           d0 = texture2D(styleTexture, vec2(
-            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
+            vfeatureType/featureCount+0.5/featureCount,
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
           )) * vec4(1,1,1,255);
           d1 = texture2D(styleTexture, vec2(
-            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
+            vfeatureType/featureCount+0.5/featureCount,
             ((floor(zoom)-zoomStart)/zoomCount + (1.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
           )) * vec4(1,1,1,255);
           d2 = texture2D(styleTexture, vec2(
-            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
+            vfeatureType/featureCount+0.5/featureCount,
             ((floor(zoom)-zoomStart)/zoomCount + (2.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
           )) * 255.0;
@@ -300,7 +300,7 @@ module.exports = function (map) {
           vindex = index;
           float n = 1.0;
           d0 = texture2D(styleTexture, vec2(
-            vfeatureType/(featureCount-1.0)+0.5/(featureCount-1.0),
+            vfeatureType/featureCount+0.5/featureCount,
             ((floor(zoom)-zoomStart)/zoomCount + (0.0*2.0+1.0)/(n*zoomCount*2.0))
               * (texRange.y-texRange.x) + texRange.x
           ));
