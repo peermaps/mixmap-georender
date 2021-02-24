@@ -11,9 +11,9 @@ module.exports = function (styleProps) {
   var styleFeatures = Object.keys(featureList)
   var lw
   var heights = {
-    point: zoomCount,
-    line: 3*zoomCount,
-    area: zoomCount
+    point: 2*zoomCount,
+    line: 4*zoomCount,
+    area: 2*zoomCount
   }
   var totalHeight = heights.point + heights.line + heights.area
   var arrLength = 4*styleCount*totalHeight
@@ -33,7 +33,13 @@ module.exports = function (styleProps) {
       data[offset++] = a[0] //r
       data[offset++] = a[1] //g
       data[offset++] = a[2] //b
+      data[offset++] = 0 //a
+    }
+    for (var x = 0; x < styleCount; x++) {
       data[offset++] = getStyle(styleProps, styleFeatures[x], "point-size", y)
+      data[offset++] = getStyle(styleProps, styleFeatures[x], "point-zindex", y)
+      data[offset++] = 0
+      data[offset++] = 0
     }
   }
   for (var y = zoomStart; y <= zoomEnd; y++) { //line
@@ -42,14 +48,14 @@ module.exports = function (styleProps) {
       data[offset++] = b[0] //r
       data[offset++] = b[1] //g
       data[offset++] = b[2] //b
-      data[offset++] = getStyle(styleProps, styleFeatures[x], "line-fill-width", y)
-    }
+      data[offset++] = 0 //a
+      }
     for (var x = 0; x < styleCount; x++) {
       var c = parseHex(getStyle(styleProps, styleFeatures[x], "line-stroke-color", y))
       data[offset++] = c[0] //r
       data[offset++] = c[1] //g
       data[offset++] = c[2] //b
-      data[offset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-width", y)
+      data[offset++] = 0 //a
     }
     for (var x = 0; x < styleCount; x++) {
       data[offset++] = parseLineStyle(styleProps, styleFeatures[x], 'fill')
@@ -63,6 +69,12 @@ module.exports = function (styleProps) {
       }
       else data[offset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-dash-gap", y)
     }
+    for (var x = 0; x < styleCount; x++) {
+      data[offset++] = getStyle(styleProps, styleFeatures[x], "line-fill-width", y)
+      data[offset++] = getStyle(styleProps, styleFeatures[x], "line-stroke-width", y)
+      data[offset++] = getStyle(styleProps, styleFeatures[x], "line-zindex", y)
+      data[offset++] = 0
+      }
   }
   for (var y = zoomStart; y <= zoomEnd; y++) { //area
     for (var x = 0; x < styleCount; x++) {
@@ -71,6 +83,12 @@ module.exports = function (styleProps) {
       data[offset++] = d[1] //g
       data[offset++] = d[2] //b
       data[offset++] = 0 //a
+    }
+    for (var x = 0; x < styleCount; x++) {
+      data[offset++] = getStyle(styleProps, styleFeatures[x], "area-zindex", y)
+      data[offset++] = 0
+      data[offset++] = 0
+      data[offset++] = 0
     }
   }
   return { 

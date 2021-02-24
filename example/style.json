@@ -7,6 +7,9 @@
 	"aeroway.aerodrome": {
     "area-fill-color": "#d3d3d3"
 	},
+  "aeroway.helipad": {
+    "area-fill-color": "#a38c95"
+  },
 	"amenity.*": {
 		"point-size": 5,
 		"point-fill-color": "#00ff",
@@ -39,9 +42,9 @@
   },
   "building.*": {
 		"point-size": 5,
-		"point-fill-color": "#5309",
+		"point-fill-color": "#a66a6a",
 		"point-stroke-color": "",
-    "area-fill-color": "#5309"
+    "area-fill-color": "#a66a6a"
 	},
   "communication.line": {
     "line-fill-width[zoom<10]": 3,
@@ -52,6 +55,9 @@
     "line-stroke-width": 0,
     "area-fill-color": "#aaaaaa"
 	},
+  "highway.*": {
+    "line-zindex": 6.0
+  },
   "highway.footway": {
     "line-fill-width[16>zoom>=10]": 3,
     "line-fill-width[zoom>=16]": 5,
@@ -105,20 +111,30 @@
 		"point-size": 5,
 		"point-fill-color": "#cbcba8",
 		"point-stroke-color": "",
+		"line-fill-color": "#cbcba8",
     "area-fill-color": "#cbcba8"
 	},
+  "landuse.landfill": {
+    "area-fill-color": "#988c60"
+  },
   "landuse.military": {
 		"point-size": 5,
-		"point-fill-color": "#0b07",
+		"point-fill-color": "#514147",
 		"point-stroke-color": "",
-    "area-fill-color": "#0b07"
+    "area-fill-color": "#514147"
 	},
   "leisure.*": {
 		"point-size": 5,
-		"point-fill-color": "#2f5a92",
+		"point-fill-color": "#ddfecd",
 		"point-stroke-color": "",
-    "area-fill-color": "#5f9ea0"
+    "area-fill-color": "#ddfecd"
 	},
+  "man_made.breakwater": {
+    "line-fill-width": 4,
+    "line-fill-style": "solid",
+    "line-fill-color": "#53675f",
+    "area-fill-color": "#53675f"
+  },
   "man_made.bridge": {
 		"point-size": 5,
 		"point-fill-color": "#228b22",
@@ -126,13 +142,27 @@
     "line-fill-width": 9,
     "line-fill-color": "#228b22",
     "line-fill-style": "solid",
-    "area-fill-color": "#228b22"
+    "area-fill-color": "#228b22",
+    "zindex": 4.0
 	},
+  "man_made.pier": {
+    "line-fill-width": 3,
+    "line-fill-style": "solid",
+    "line-fill-color": "#2f3b37",
+    "area-fill-color": "#2f3b37"
+  },
+  "natural.beach": {
+    "area-fill-color": "#ffff9d"
+  },
+  "natural.coastline": {
+    "area-fill-color": "#adbdb7"
+  },
   "natural.water": {
 		"point-size": 2,
 		"point-fill-color": "#9bb2f2",
 		"point-stroke-color": "",
-    "area-fill-color": "#9bb2f2"
+    "area-fill-color": "#9bb2f2",
+    "zindex": 3.0
 	},
   "natural.wood": {
 		"point-size": 5,
@@ -140,6 +170,9 @@
 		"point-stroke-color": "",
     "area-fill-color": "#228b22"
 	},
+  "place.neighbourhood": {
+    "zindex": 1.0
+  },
   "power.*": {
 		"point-size": 2,
 		"point-fill-color": "#5d5d5d",
@@ -173,7 +206,7 @@
     "line-stroke-dash-length": "long",
     "line-stroke-dash-gap": 50,
     "line-stroke-color": "#5d5d5d",
-    "line-stroke-width": 1,
+    "line-stroke-width": 2,
     "line-stroke-style": "solid",
     "line-stroke-dash-color": "",
     "line-stroke-dash-length": "long",
@@ -191,6 +224,9 @@
 		"point-stroke-color": "",
     "area-fill-color": "#a8a8cb"
 	},
+  "tourism.hotel": {
+    "area-fill-color": "#bdadb3"
+  },
   "waterway.*": {
 		"point-size": 5,
 		"point-fill-color": "#a6a6f4",
@@ -202,5 +238,9 @@
     "line-fill-color": "#a6a6f4",
     "line-fill-style": "solid",
     "area-fill-color": "#a6a6f4"
-	}
+	},
+  "waterway.drain": {
+    "line-fill-width": 3,
+    "line-zindex": 4.0
+  }
 }

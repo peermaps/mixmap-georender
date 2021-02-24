@@ -4,7 +4,7 @@
   "stroke-width": "",
   "icon": "",
   "icon-display-style": "",
-  "point-size": 20,
+  "point-size": 0,
   "point-fill-color": "#1f5a92",
   "point-stroke-color": "",
   "point-stroke-width": "",
@@ -26,5 +26,8 @@
   "label-fill-color": "",
   "label-stroke-color": "",
   "label-stroke-width": "",
-  "label-style": ""
+  "label-style": "",
+  "point-zindex": 7.0,
+  "line-zindex": 5.0,
+  "area-zindex": 2.0
 }  
