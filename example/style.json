@@ -16,11 +16,79 @@
 		"point-stroke-color": "",
     "area-fill-color": "#21abcd"
 	},
+  "amenity.bus_station": {
+    "point-fill-color": "#adc9cb",
+    "line-fill-color": "#adc9cb",
+    "area-fill-color": "#adc9cb"
+  },
   "amenity.cafe": {
 		"point-size": 5,
 		"point-fill-color": "#2f5a92",
 		"point-stroke-color": ""
 	},
+  "amenity.college": {
+    "point-fill-color": "#b59260",
+    "line-fill-color": "#b59260",
+    "area-fill-color": "#b59260"
+  },
+  "amenity.community_centre": {
+    "point-fill-color": "#b56083",
+    "line-fill-color": "#b56083",
+    "area-fill-color": "#b56083"
+  },
+  "amenity.embassy": {
+    "point-fill-color": "#d9bf9e",
+    "line-fill-color": "#d9bf9e",
+    "area-fill-color": "#d9bf9e"
+  },
+  "amenity.fuel": {
+    "point-fill-color": "#320032",
+    "line-fill-color": "#320032",
+    "area-fill-color": "#320032"
+  },
+  "amenity.hospital": {
+    "point.fill-color": "#ffafaf",
+    "line-fill-color": "#ffafaf",
+    "area-fill-color": "#ffafaf"
+  },
+  "amenity.library": {
+    "point-fill-color": "#dfbeb0",
+    "line-fill-color": "#dfbeb0",
+    "area-fill-color": "#dfbeb0"
+  },
+  "amenity.parking": {
+    "area-fill-color": "#a4afbb"
+  },
+  "amenity.place_of_worship": {
+    "point-fill-color": "#60aeb5",
+    "line-fill-color": "#60aeb5",
+    "area-fill-color": "#60aeb5"
+  },
+  "amenity.police": {
+    "point-fill-color": "#736e67",
+    "line-fill-color": "#736e67",
+    "area-fill-color": "#736e67"
+  },
+  "amenity.post_office": {
+    "point-fill-color": "#540065",
+    "line-fill-color": "#540065",
+    "area-fill-color": "#540065"
+  },
+  "amenity.prison": {
+    "point-fill-color": "#4e5f69",
+    "line-fill-color": "#4e5f69",
+    "area-fill-color": "#4e5f69"
+  },
+  "amenity.school": {
+    "point-fill-color": "#e4d8c6",
+    "line-fill-color": "#e4d8c6",
+    "area-fill-color": "#e4d8c6"
+  },
+  "amenity.university": {
+    "point-fill-color": "#b59260",
+    "line-fill-color": "#b59260",
+    "area-fill-color": "#b59260"
+  },
   "border_type.baseline": {
     "line-fill-width[zoom<10]": 3,
     "line-fill-width[zoom>=10]": 4,
@@ -44,8 +112,14 @@
 		"point-size": 5,
 		"point-fill-color": "#a66a6a",
 		"point-stroke-color": "",
-    "area-fill-color": "#a66a6a"
+    "area-fill-color": "#a66a6a",
+    "area-zindex": 5.0
 	},
+  "building.hospital": {
+    "point.fill-color": "#ffafaf",
+    "line-fill-color": "#ffafaf",
+    "area-fill-color": "#ffafaf"
+  },
   "communication.line": {
     "line-fill-width[zoom<10]": 3,
     "line-fill-width[zoom>=10]": 4,
@@ -102,11 +176,17 @@
     "line-stroke-color": "#a48f7d"
 	},
   "historic.*": {
-		"point-size": 5,
-		"point-fill-color": "#e05a",
+		"point-size": 10,
+		"point-fill-color": "#ff7e68",
 		"point-stroke-color": "",
-    "area-fill-color": "#e05a"
+    "area-fill-color": "#ff7e68",
+    "area-zindex": 4.0
 	},
+  "landuse.cemetery": {
+    "point-fill-color": "#8cbe6f",
+    "line-fill-color": "#8cbe6f",
+    "area-fill-color": "#8cbe6f"
+  },
   "landuse.industrial": {
 		"point-size": 5,
 		"point-fill-color": "#cbcba8",
@@ -129,6 +209,10 @@
 		"point-stroke-color": "",
     "area-fill-color": "#ddfecd"
 	},
+  "leisure.pitch": {
+    "area-fill-color": "#7fc2ac",
+    "area-zindex": 7.0
+  },
   "man_made.breakwater": {
     "line-fill-width": 4,
     "line-fill-style": "solid",
@@ -151,6 +235,11 @@
     "line-fill-color": "#2f3b37",
     "area-fill-color": "#2f3b37"
   },
+  "man_made.wastewater_plant": {
+    "point-fill-color": "#779eb6",
+    "line-fill-color": "#779eb6",
+    "area-fill-color": "#779eb6"
+  },
   "natural.beach": {
     "area-fill-color": "#ffff9d"
   },
@@ -162,8 +251,11 @@
 		"point-fill-color": "#9bb2f2",
 		"point-stroke-color": "",
     "area-fill-color": "#9bb2f2",
-    "zindex": 3.0
+    "zindex": 4.0
 	},
+  "natural.wetland": {
+    "area-fill-color": "#5b863f"
+  },
   "natural.wood": {
 		"point-size": 5,
 		"point-fill-color": "#228b22",
@@ -226,6 +318,19 @@
 	},
   "tourism.hotel": {
     "area-fill-color": "#bdadb3"
+  },
+  "tourism.museum": {
+    "point-fill-color": "#d4c0a3",
+    "line-fill-color": "#d4c0a3",
+    "area-fill-color": "#d4c0a3"
+  },
+  "water.basin": {
+    "area-fill-color": "#92a9cc",
+    "area-zindex": 4.0
+  },
+  "water.pond": {
+    "area-fill-color": "#92a9cc",
+    "area-zindex": 4.0
   },
   "waterway.*": {
 		"point-size": 5,
