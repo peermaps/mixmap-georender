@@ -42,32 +42,35 @@ var ready = function (props) {
   map.draw()
 }
 
-var buffers = []
-//xhr.get('./example/alexlabelbuf3', function(err, resp) {
-xhr.get('./example/alexrelatbuf1', function(err, resp) {
-  resp.body.split('\n').forEach(function(line) {
-    if (line.length !== 0) {
-      buffers.push(Buffer.from(line, 'base64'))
-    }
-  })
-
-  require('resl')({
-    manifest: {
-      texture: {
-        type: 'image',
-        src: './texture.png',
-        parser: function (data) {
-          return map.regl.texture({
-            data: data
-          })
-        }
+require('resl')({
+  manifest: {
+    texture: {
+      type: 'image',
+      src: './texture.png',
+      parser: function (data) {
+        return map.regl.texture({
+          data: data
+        })
       }
     },
-    onDone: function ({texture}) {
-      var props = prepare(decode(buffers), texture)
-      ready(props)
+    buffers: {
+      type: 'text',
+      src: './example/alexrelatbuf1',
+      parser: function (data) {
+        var buffers = []
+        data.split('\n').forEach(function(line) {
+          if (line.length !== 0) {
+            buffers.push(Buffer.from(line, 'base64'))
+          }
+        })
+        return buffers
+      }
     }
-  })
+  },
+  onDone: function ({texture, buffers}) {
+    var props = prepare(decode(buffers), texture)
+    ready(props)
+  }
 })
 
 window.addEventListener('keydown', function (ev) {
