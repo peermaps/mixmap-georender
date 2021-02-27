@@ -1,9 +1,9 @@
 var featureList = require('georender-pack/features.json')
-var texProps = require('./lib/tex-props.js')()
+var settings = require('georender-style2png/settings.js')()
 var styleCount = Object.keys(featureList).length
 
-var zoomStart = texProps.zoomStart
-var zoomEnd = texProps.zoomEnd //inclusive
+var zoomStart = settings.zoomStart
+var zoomEnd = settings.zoomEnd //inclusive
 var zoomCount = zoomEnd - zoomStart + 1
 
 module.exports = function (decoded, tex) {
@@ -44,7 +44,7 @@ module.exports = function (decoded, tex) {
       styleCount,
       texWidth: tex.width,
       texHeight: tex.height,
-      texRange: texProps.ranges[0],
+      texRange: settings.ranges[0],
       zoomStart,
       zoomEnd,
       zoomCount
@@ -62,7 +62,7 @@ module.exports = function (decoded, tex) {
       styleCount,
       texWidth: tex.width,
       texHeight: tex.height,
-      texRange: texProps.ranges[1],
+      texRange: settings.ranges[1],
       zoomStart,
       zoomEnd,
       zoomCount,
@@ -81,7 +81,7 @@ module.exports = function (decoded, tex) {
       styleCount,
       texWidth: tex.width,
       texHeight: tex.height,
-      texRange: texProps.ranges[1],
+      texRange: settings.ranges[1],
       zoomStart,
       zoomEnd,
       zoomCount,
@@ -100,7 +100,7 @@ module.exports = function (decoded, tex) {
       styleCount,
       texWidth: tex.width,
       texHeight: tex.height,
-      texRange: texProps.ranges[2],
+      texRange: settings.ranges[2],
       zoomStart,
       zoomEnd,
       zoomCount
