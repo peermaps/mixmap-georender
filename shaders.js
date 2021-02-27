@@ -2,7 +2,6 @@ var glsl = require('glslify')
 var size = [0,0]
 
 module.exports = function (map) {
-  var styleTextureCache = {}
   return {
     points: {
       frag: glsl`
@@ -63,7 +62,7 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
-        styleTexture: styleTexture('points'),
+        styleTexture: map.prop('style'),
         zoomStart: map.prop('zoomStart'),
         zoomCount: map.prop('zoomCount'),
         texRange: map.prop('texRange'),
@@ -162,7 +161,7 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
-        styleTexture: styleTexture('lineStroke'),
+        styleTexture: map.prop('style'),
         featureCount: map.prop('styleCount'),
         zoomStart: map.prop('zoomStart'),
         zoomCount: map.prop('zoomCount'),
@@ -263,7 +262,7 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
-        styleTexture: styleTexture('lineFill'),
+        styleTexture: map.prop('style'),
         featureCount: map.prop('styleCount'),
         zoomStart: map.prop('zoomStart'),
         zoomCount: map.prop('zoomCount'),
@@ -340,7 +339,7 @@ module.exports = function (map) {
           return size
         },
         featureCount: map.prop('styleCount'),
-        styleTexture: styleTexture('areas'),
+        styleTexture: map.prop('style'),
         zoomStart: map.prop('zoomStart'),
         zoomCount: map.prop('zoomCount'),
         texRange: map.prop('texRange')
@@ -374,20 +373,6 @@ module.exports = function (map) {
       },
 			elements: map.prop('cells'),
 			depth: { enable: false }
-    }
-  }
-  function styleTexture () {
-    var name = 'default'
-    return function (context, props) {
-      if (!styleTextureCache[name]) {
-        console.log(props)
-        styleTextureCache[name] = map.regl.texture({
-          data: props.style,
-          width: props.texWidth,
-          height: props.texHeight
-        })
-      }
-      return styleTextureCache[name]
     }
   }
 }

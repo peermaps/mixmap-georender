@@ -1,13 +1,12 @@
-var makeTex = require('./maketexture.js')
 var featureList = require('georender-pack/features.json')
+var texProps = require('./lib/tex-props.js')()
 var styleCount = Object.keys(featureList).length
 
-var zoomStart = 1
-var zoomEnd = 21 //inclusive
+var zoomStart = texProps.zoomStart
+var zoomEnd = texProps.zoomEnd //inclusive
 var zoomCount = zoomEnd - zoomStart + 1
 
-module.exports = function (decoded, styleProps) {
-  var tex = makeTex(styleProps)
+module.exports = function (decoded, tex) {
   var pointIndexes = makeIndexes(decoded.point.ids)
   var lineIndexes = makeIndexes(decoded.line.ids)
   var areaIndexes = makeIndexes(decoded.area.ids)
@@ -41,11 +40,11 @@ module.exports = function (decoded, styleProps) {
       idToIndex: pointIndexes.idToIndex,
       id: decoded.point.ids,
       labels: decoded.point.labels,
-      style: tex.data,
+      style: tex,
       styleCount,
       texWidth: tex.width,
       texHeight: tex.height,
-      texRange: tex.ranges[0],
+      texRange: texProps.ranges[0],
       zoomStart,
       zoomEnd,
       zoomCount
@@ -59,12 +58,11 @@ module.exports = function (decoded, styleProps) {
       normals: decoded.line.normals,
       id: decoded.line.ids,
       labels: decoded.line.labels,
-      style: tex.data,
+      style: tex,
       styleCount,
       texWidth: tex.width,
       texHeight: tex.height,
-      texRange: tex.ranges[1],
-      zindex: 2.0,
+      texRange: texProps.ranges[1],
       zoomStart,
       zoomEnd,
       zoomCount,
@@ -79,12 +77,11 @@ module.exports = function (decoded, styleProps) {
       normals: decoded.line.normals,
       id: decoded.line.ids,
       labels: decoded.line.labels,
-      style: tex.data,
+      style: tex,
       styleCount,
       texWidth: tex.width,
       texHeight: tex.height,
-      texRange: tex.ranges[1],
-      zindex: 3.0,
+      texRange: texProps.ranges[1],
       zoomStart,
       zoomEnd,
       zoomCount,
@@ -99,15 +96,14 @@ module.exports = function (decoded, styleProps) {
       idToIndex: areaIndexes.idToIndex,
       cells: decoded.area.cells,
       labels: decoded.area.labels,
-      style: tex.data,
+      style: tex,
       styleCount,
       texWidth: tex.width,
       texHeight: tex.height,
-      texRange: tex.ranges[2],
+      texRange: texProps.ranges[2],
       zoomStart,
       zoomEnd,
-      zoomCount,
-      zindex: 1.0,
+      zoomCount
     }
   }
 }

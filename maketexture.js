@@ -1,29 +1,21 @@
 var featureList = require('georender-pack/features.json')
 var defaults = require('./defaults.json')
 var evalExpr = require('./lib/expr.js')
-var zoomStart = 1
-var zoomEnd = 21 //inclusive
-var zoomCount = zoomEnd - zoomStart + 1
 var styleCount = Object.keys(featureList).length
+var texProps = require('./lib/tex-props.js')()
+var zoomStart = texProps.zoomStart
+var zoomEnd = texProps.zoomEnd //inclusive
 
 module.exports = function (styleProps) {
   preProcess(styleProps)
   var styleFeatures = Object.keys(featureList)
   var lw
-  var heights = {
-    point: 2*zoomCount,
-    line: 4*zoomCount,
-    area: 2*zoomCount
-  }
+  var heights = texProps.heights
   var totalHeight = heights.point + heights.line + heights.area
   var arrLength = 4*styleCount*totalHeight
   var r0 = heights.point/totalHeight
   var r1 = (heights.point + heights.line)/totalHeight
-  var ranges = [
-    [0, r0],
-    [r0, r1],
-    [r1, 1]
-  ]
+  var ranges = texProps.ranges
 
   var data = new Uint8Array(arrLength)
   var offset = 0
@@ -94,9 +86,7 @@ module.exports = function (styleProps) {
   return { 
     data,
     width: styleCount,
-    height: totalHeight,
-    heights,
-    ranges
+    height: totalHeight
   }
 }
 

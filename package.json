@@ -11,6 +11,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "fast-png": "^5.0.3",
     "georender-pack": "^1.0.1",
     "glsl-hsl2rgb": "^1.1.0",
     "glslify": "^7.0.0",

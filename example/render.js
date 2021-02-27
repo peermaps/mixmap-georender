@@ -28,7 +28,6 @@ xhr.get('./example/alexrelatbuf1', function(err, resp) {
       buffers.push(Buffer.from(line, 'base64'))
     }
   })
-  var props = prepare(decode(buffers), require('./style.json'))
   window.addEventListener('click', function (ev) {
     map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
       if (data[2] === 0.0) {
@@ -40,15 +39,31 @@ xhr.get('./example/alexrelatbuf1', function(err, resp) {
       else if (data[2] === 1.0) {
         console.log(data[1], props.area.indexToId[data[0]])
       }
-      else console.log(data)
+      console.log(data)
     })
   })
 
-  draw.point.props.push(props.point)
-  draw.lineFill.props.push(props.lineFill)
-  draw.lineStroke.props.push(props.lineStroke)
-  draw.area.props.push(props.area)
-  map.draw()
+  require('resl')({
+    manifest: {
+      texture: {
+        type: 'image',
+        src: './texture.png',
+        parser: function (data) {
+          return map.regl.texture({
+            data: data
+          })
+        }
+      }
+    },
+    onDone: function ({texture}) {
+      var props = prepare(decode(buffers), texture)
+      draw.point.props.push(props.point)
+      draw.lineFill.props.push(props.lineFill)
+      draw.lineStroke.props.push(props.lineStroke)
+      draw.area.props.push(props.area)
+      map.draw()
+    }
+  })
 })
 
 window.addEventListener('keydown', function (ev) {
