@@ -20,14 +20,7 @@ var draw = {
   point: map.createDraw(geoRender.points),
 }
 
-var buffers = []
-//xhr.get('./example/alexlabelbuf3', function(err, resp) {
-xhr.get('./example/alexrelatbuf1', function(err, resp) {
-  resp.body.split('\n').forEach(function(line) {
-    if (line.length !== 0) {
-      buffers.push(Buffer.from(line, 'base64'))
-    }
-  })
+var ready = function (props) {
   window.addEventListener('click', function (ev) {
     map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
       if (data[2] === 0.0) {
@@ -41,6 +34,21 @@ xhr.get('./example/alexrelatbuf1', function(err, resp) {
       }
       console.log(data)
     })
+  })
+  draw.point.props.push(props.point)
+  draw.lineFill.props.push(props.lineFill)
+  draw.lineStroke.props.push(props.lineStroke)
+  draw.area.props.push(props.area)
+  map.draw()
+}
+
+var buffers = []
+//xhr.get('./example/alexlabelbuf3', function(err, resp) {
+xhr.get('./example/alexrelatbuf1', function(err, resp) {
+  resp.body.split('\n').forEach(function(line) {
+    if (line.length !== 0) {
+      buffers.push(Buffer.from(line, 'base64'))
+    }
   })
 
   require('resl')({
@@ -57,11 +65,7 @@ xhr.get('./example/alexrelatbuf1', function(err, resp) {
     },
     onDone: function ({texture}) {
       var props = prepare(decode(buffers), texture)
-      draw.point.props.push(props.point)
-      draw.lineFill.props.push(props.lineFill)
-      draw.lineStroke.props.push(props.lineStroke)
-      draw.area.props.push(props.area)
-      map.draw()
+      ready(props)
     }
   })
 })
