@@ -1,6 +1,6 @@
 # mixmap-georender
 
-a mixmap layer for rendering peermaps georender data.
+a mixmap layer for rendering peermaps georender data
 
 # example
 
@@ -71,7 +71,16 @@ document.body.appendChild(mix.render())
 document.body.appendChild(map.render({ width: window.innerWidth, height: window.innerHeight }))
 ```
 
-to run example, [details about getting the style.png and kharkiv buf file]
+to run example:
+* clone the repo from https://github.com/peermaps/mixmap-georender/
+* navigate to the folder where the package was cloned and run `npm install`
+* navigate to the `example` directory and run `wget https://kitties.neocities.org/mixmap-georender/kharkiv https://kitties.neocities.org/mixmap-georender/style.png`
+* if those files downloaded successfully, do `npm run example`.
+* you should see output like `Server running at http://192.168.129.29:9966/`. in the browser, navigate to that url.
+
+(the directions above assume that you have node.js and npm installed. instructions are for usage on the command line.)
+
+[see a live demo of this example](https://kitties.neocities.org/mixmap-georender/kharkivdemo.html)
 
 # api
 
@@ -89,7 +98,7 @@ create a new instance of mixmap-georender. `map` is a
 ## prepare(decoded, texture)
 
 given `decoded`, an object created by [georender-pack
-decode](https://github.com/peermaps/georender-pack/#decode) and a style texture,
+decode](https://github.com/peermaps/georender-pack/#decode), and a style texture,
 return an object that you can pass to `map.draw()`.
 
 the texture used here is created with

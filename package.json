@@ -1,30 +1,26 @@
 {
   "name": "mixmap-georender",
   "version": "1.0.0",
-  "description": "",
+  "description": "a mixmap layer for rendering peermaps georender data",
   "main": "index.js",
   "scripts": {
     "test": "tape test/*.js",
-    "watch": "budo index.js -- -t glslify",
     "example": "budo ./example/render.js -- -t glslify"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "fast-png": "^5.0.3",
     "georender-pack": "^2.1.3",
-    "georender-style2png": "^1.0.0",
+    "georender-style2png": "^1.0.1",
     "glsl-georender-style-texture": "^1.0.1",
     "glsl-hsl2rgb": "^1.1.0",
     "glslify": "^7.0.0",
-    "hex-to-rgb": "^1.0.1",
     "mixmap": "^1.5.1",
-    "regl": "^1.3.11",
-    "resl": "^1.0.3",
-    "xhr": "^2.5.0"
+    "regl": "^1.3.11"
   },
   "devDependencies": {
     "budo": "^11.6.2",
-    "tape": "^5.1.1"
+    "tape": "^5.1.1",
+    "resl": "^1.0.3"
   }
 }
