@@ -73,8 +73,8 @@ document.body.appendChild(map.render({ width: window.innerWidth, height: window.
 
 to run example:
 * clone the repo from https://github.com/peermaps/mixmap-georender/
-* navigate to the folder where the package was cloned and run `npm install`
-* navigate to the `example` directory and run `wget https://kitties.neocities.org/mixmap-georender/kharkiv https://kitties.neocities.org/mixmap-georender/style.png`
+* navigate to the folder where the package was cloned and do `npm install`.
+* do `npm run download`. this should download the files `kharkiv` and `style.png` into the `example` directory.
 * if those files downloaded successfully, do `npm run example`.
 * you should see output like `Server running at http://192.168.129.29:9966/`. in the browser, navigate to that url.
 

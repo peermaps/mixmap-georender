@@ -38,7 +38,9 @@ require('resl')({
     buffers: {
       type: 'binary',
       src: './example/kharkiv',
-      parser: function (data) { return lpb.decode(Buffer.from(data)) }
+      parser: function (data) { 
+        return lpb.decode(Buffer.from(data))
+      }
     }
   },
   onDone: function ({texture, buffers}) {

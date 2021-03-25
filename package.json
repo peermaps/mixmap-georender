@@ -1,11 +1,15 @@
 {
   "name": "mixmap-georender",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "a mixmap layer for rendering peermaps georender data",
   "main": "index.js",
   "scripts": {
     "test": "tape test/*.js",
-    "example": "budo ./example/render.js -- -t glslify"
+    "example": "budo ./example/render.js",
+    "download": "wget https://kitties.neocities.org/mixmap-georender/kharkiv https://kitties.neocities.org/mixmap-georender/style.png -P ./example/"
+  },
+  "browserify": {
+    "transform": [ "glslify" ]
   },
   "author": "",
   "license": "MIT",
@@ -13,7 +17,6 @@
     "georender-pack": "^2.1.3",
     "georender-style2png": "^1.0.1",
     "glsl-georender-style-texture": "^1.0.1",
-    "glsl-hsl2rgb": "^1.1.0",
     "glslify": "^7.0.0",
     "mixmap": "^1.5.1",
     "regl": "^1.3.11"
