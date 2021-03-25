@@ -6,10 +6,10 @@ module.exports = function (map) {
     points: {
       frag: glsl`
         precision highp float;
-        varying vec4 v_color;
+        varying vec4 vcolor;
         void main () {
-          if (v_color.x < 0.1) discard;
-          gl_FragColor = vec4(v_color);
+          if (vcolor.x < 0.1) discard;
+          gl_FragColor = vec4(vcolor);
         }
       `,
       pickFrag: `
@@ -22,21 +22,20 @@ module.exports = function (map) {
       `,
       vert: glsl`
         precision highp float;
-        #pragma glslify: Point = require('./point.h');
-        #pragma glslify: point_init = require('./point.glsl');
+        #pragma glslify: Point = require('glsl-georender-style-texture/point.h');
+        #pragma glslify: readPoint = require('glsl-georender-style-texture/point.glsl');
         uniform sampler2D styleTexture;
         attribute vec2 position;
         attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zoom;
-        varying float vfeatureType, vindex, zindex, v_size;
-        varying vec4 v_color;
+        varying float vfeatureType, vindex, zindex;
+        varying vec4 vcolor;
         void main () {
           vfeatureType = featureType;
-          Point point = point_init(styleTexture, featureType, zoom, featureCount);
-          v_color = point.color;
-          v_size = point.size;
+          Point point = readPoint(styleTexture, featureType, zoom, featureCount);
+          vcolor = point.color;
           vindex = index;
           zindex = point.zindex;
           vec2 p = position.xy + offset;
@@ -44,7 +43,7 @@ module.exports = function (map) {
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             1.0/(1.0+zindex), 1);
-          gl_PointSize = v_size;
+          gl_PointSize = point.size;
         }
       `,
       uniforms: {
@@ -78,11 +77,12 @@ module.exports = function (map) {
         precision highp float;
         uniform vec2 size;
         varying vec2 vdist;
-        varying float v_strokestyle, v_strokedashgap;
-        varying vec4 v_strokecolor;
+        varying float vstrokeStyle, vstrokeDashGap;
+        varying vec4 vstrokeColor;
         void main () {
-          float d = step(v_strokedashgap/100.0, mod(length(vdist)*20.0, v_strokestyle/10.0));
-          gl_FragColor = vec4(v_strokecolor.xyz, v_strokecolor.w/100.0 * min(d,step(0.1,v_strokecolor.x)));
+          float d = step(vstrokeDashGap/100.0, mod(length(vdist)*20.0, vstrokeStyle/10.0));
+          gl_FragColor = vec4(vstrokeColor.xyz, vstrokeColor.w/100.0 *
+          min(d,step(0.1,vstrokeColor.x)));
         }
       `,
       pickFrag: `
@@ -95,27 +95,27 @@ module.exports = function (map) {
       `,
       vert: glsl`
         precision highp float;
-        #pragma glslify: Line = require('./line.h');
-        #pragma glslify: line_init = require('./line.glsl');
+        #pragma glslify: Line = require('glsl-georender-style-texture/line.h');
+        #pragma glslify: readLine = require('glsl-georender-style-texture/line.glsl');
         attribute vec2 position, normal, dist;
         attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zoom;
         uniform sampler2D styleTexture;
-        varying float vfeatureType, vindex, zindex, v_strokestyle, v_strokedashgap;
+        varying float vfeatureType, vindex, zindex, vstrokeStyle, vstrokeDashGap;
         varying vec2 vpos, vnorm, vdist;
-        varying vec4 v_strokecolor;
+        varying vec4 vstrokeColor;
         void main () {
           vfeatureType = featureType;
-          Line line = line_init(styleTexture, featureType, zoom, featureCount);
-          v_strokecolor = line.strokecolor;
-          v_strokestyle = line.strokestyle;
-          v_strokedashgap = line.strokedashgap;
+          Line line = readLine(styleTexture, featureType, zoom, featureCount);
+          vstrokeColor = line.strokeColor;
+          vstrokeStyle = line.strokeStyle;
+          vstrokeDashGap = line.strokeDashGap;
           vindex = index;
           zindex = line.zindex;
           vec2 p = position.xy + offset;
-          vec2 m = (line.fillwidth+2.0*line.strokewidth)/size;
+          vec2 m = (line.fillWidth+2.0*line.strokeWidth)/size;
           vnorm = normalize(normal)*m;
           vdist = vec2(
             (dist.x / (viewbox.z - viewbox.x) * 2.0 - 1.0) * aspect,
@@ -160,12 +160,13 @@ module.exports = function (map) {
     lineFill: {
       frag: glsl`
         precision highp float;
-        varying float v_fillstyle, v_filldashgap;
+        varying float vfillStyle, vfillDashGap;
         varying vec2 vdist;
-        varying vec4 v_fillcolor;
+        varying vec4 vfillColor;
         void main () {
-          float d = step(v_filldashgap/100.0, mod(length(vdist)*20.0, v_fillstyle/10.0));
-          gl_FragColor = vec4(v_fillcolor.xyz, v_fillcolor.w/100.0 * min(d,step(0.1,v_fillcolor.x)));
+          float d = step(vfillDashGap/100.0, mod(length(vdist)*20.0, vfillStyle/10.0));
+          gl_FragColor = vec4(vfillColor.xyz, vfillColor.w/100.0 *
+          min(d,step(0.1,vfillColor.x)));
         }
       `,
       pickFrag: `
@@ -178,27 +179,27 @@ module.exports = function (map) {
       `,
       vert: glsl`
         precision highp float;
-        #pragma glslify: Line = require('./line.h');
-        #pragma glslify: line_init = require('./line.glsl');
+        #pragma glslify: Line = require('glsl-georender-style-texture/line.h');
+        #pragma glslify: readLine = require('glsl-georender-style-texture/line.glsl');
         attribute vec2 position, normal, dist;
         attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zoom;
         uniform sampler2D styleTexture;
-        varying float vfeatureType, vindex, zindex, v_fillstyle, v_filldashgap;
+        varying float vfeatureType, vindex, zindex, vfillStyle, vfillDashGap;
         varying vec2 vpos, vnorm, vdist;
-        varying vec4 v_fillcolor;
+        varying vec4 vfillColor;
         void main () {
           vfeatureType = featureType;
-          Line line = line_init(styleTexture, featureType, zoom, featureCount);
-          v_fillcolor = line.fillcolor;
-          v_fillstyle = line.fillstyle;
-          v_filldashgap = line.filldashgap;
+          Line line = readLine(styleTexture, featureType, zoom, featureCount);
+          vfillColor = line.fillColor;
+          vfillStyle = line.fillStyle;
+          vfillDashGap = line.fillDashGap;
           vindex = index;
           zindex = line.zindex + 0.1;
           vec2 p = position.xy + offset;
-          vnorm = normalize(normal)*(line.fillwidth/size);
+          vnorm = normalize(normal)*(line.fillWidth/size);
           vdist = vec2(
             (dist.x / (viewbox.z - viewbox.x) * 2.0 - 1.0) * aspect,
             (dist.y / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect
@@ -242,9 +243,9 @@ module.exports = function (map) {
     areas: {
       frag: glsl`
         precision highp float;
-        varying vec4 v_color;
+        varying vec4 vcolor;
         void main () {
-          gl_FragColor = vec4(v_color);
+          gl_FragColor = vec4(vcolor);
         }
       `,
       pickFrag: `
@@ -257,8 +258,8 @@ module.exports = function (map) {
       `,
       vert: glsl`
         precision highp float;
-        #pragma glslify: Area = require('./area.h');
-        #pragma glslify: area_init = require('./area.glsl');
+        #pragma glslify: Area = require('glsl-georender-style-texture/area.h');
+        #pragma glslify: readArea = require('glsl-georender-style-texture/area.glsl');
         attribute vec2 position;
         attribute float featureType, index;
         uniform vec4 viewbox;
@@ -266,11 +267,11 @@ module.exports = function (map) {
         uniform float aspect, featureCount, zoom, zoomStart, zoomCount;
         uniform sampler2D styleTexture;
         varying float vfeatureType, vindex, zindex;
-        varying vec4 v_color;
+        varying vec4 vcolor;
         void main () {
           vfeatureType = featureType;
-          Area area = area_init(styleTexture, featureType, zoom, featureCount);
-          v_color = area.color;
+          Area area = readArea(styleTexture, featureType, zoom, featureCount);
+          vcolor = area.color;
           vindex = index;
           zindex = area.zindex;
           vec2 p = position.xy + offset;

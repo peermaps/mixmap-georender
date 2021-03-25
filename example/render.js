@@ -2,11 +2,13 @@ var mixmap = require('mixmap')
 var regl = require('regl')
 var prepare = require('../prepare.js')
 var decode = require('georender-pack/decode')
-var xhr = require('xhr')
+var lpb = require('length-prefixed-buffers')
  
-var mix = mixmap(regl, { extensions: ['oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend'] })
+var mix = mixmap(regl, { extensions: [
+  'oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend' ] })
 var map = mix.create({ 
-  viewbox: [+29.9, +31.1, +30.1, +31.3],
+  //viewbox: [+29.9, +31.1, +30.1, +31.3],
+  viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
   //backgroundColor: [1.0, 0.5, 0.5, 1.0],
   pickfb: { colorFormat: 'rgba', colorType: 'float32' }
@@ -54,16 +56,11 @@ require('resl')({
       }
     },
     buffers: {
-      type: 'text',
-      src: './example/alexrelatbuf1',
+      type: 'binary',
+      src: './example/kharkivsmlpb',
       parser: function (data) {
-        var buffers = []
-        data.split('\n').forEach(function(line) {
-          if (line.length !== 0) {
-            buffers.push(Buffer.from(line, 'base64'))
-          }
-        })
-        return buffers
+        var buf = Buffer.from(data)
+        return lpb.decode(buf)
       }
     }
   },
