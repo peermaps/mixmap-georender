@@ -5,7 +5,7 @@ var decode = require('georender-pack/decode')
 var lpb = require('length-prefixed-buffers')
  
 var mix = mixmap(regl, { extensions: [
-  'oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend' ] })
+  'oes_element_index_uint', 'oes_texture_float','EXT_float_blend' ] })
 var map = mix.create({ 
   viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
   backgroundColor: [0.82, 0.85, 0.99, 1.0],

@@ -41,13 +41,7 @@ module.exports = function (decoded, tex) {
       id: decoded.point.ids,
       labels: decoded.point.labels,
       style: tex,
-      styleCount,
-      texWidth: tex.width,
-      texHeight: tex.height,
-      texRange: settings.ranges[0],
-      zoomStart,
-      zoomEnd,
-      zoomCount
+      styleCount
     },
     lineStroke: {
       positions: decoded.line.positions,
@@ -60,12 +54,6 @@ module.exports = function (decoded, tex) {
       labels: decoded.line.labels,
       style: tex,
       styleCount,
-      texWidth: tex.width,
-      texHeight: tex.height,
-      texRange: settings.ranges[1],
-      zoomStart,
-      zoomEnd,
-      zoomCount,
       distances,
     },
     lineFill: {
@@ -79,12 +67,6 @@ module.exports = function (decoded, tex) {
       labels: decoded.line.labels,
       style: tex,
       styleCount,
-      texWidth: tex.width,
-      texHeight: tex.height,
-      texRange: settings.ranges[1],
-      zoomStart,
-      zoomEnd,
-      zoomCount,
       distances,
     },
     area: {
@@ -97,13 +79,7 @@ module.exports = function (decoded, tex) {
       cells: decoded.area.cells,
       labels: decoded.area.labels,
       style: tex,
-      styleCount,
-      texWidth: tex.width,
-      texHeight: tex.height,
-      texRange: settings.ranges[2],
-      zoomStart,
-      zoomEnd,
-      zoomCount
+      styleCount
     }
   }
 }

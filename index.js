@@ -53,9 +53,6 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
-        zoomStart: map.prop('zoomStart'),
-        zoomCount: map.prop('zoomCount'),
-        texRange: map.prop('texRange'),
         featureCount: map.prop('styleCount')
       },
       attributes: {
@@ -136,10 +133,7 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
-        featureCount: map.prop('styleCount'),
-        zoomStart: map.prop('zoomStart'),
-        zoomCount: map.prop('zoomCount'),
-        texRange: map.prop('texRange')
+        featureCount: map.prop('styleCount')
       },
       attributes: {
         position: map.prop('positions'),
@@ -219,10 +213,7 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
-        featureCount: map.prop('styleCount'),
-        zoomStart: map.prop('zoomStart'),
-        zoomCount: map.prop('zoomCount'),
-        texRange: map.prop('texRange')
+        featureCount: map.prop('styleCount')
       },
       attributes: {
         position: map.prop('positions'),
@@ -245,7 +236,7 @@ module.exports = function (map) {
         precision highp float;
         varying vec4 vcolor;
         void main () {
-          gl_FragColor = vec4(vcolor);
+          gl_FragColor = vec4(vcolor.xyz, 0.2);
         }
       `,
       pickFrag: `
@@ -263,8 +254,8 @@ module.exports = function (map) {
         attribute vec2 position;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size, texRange;
-        uniform float aspect, featureCount, zoom, zoomStart, zoomCount;
+        uniform vec2 offset, size;
+        uniform float aspect, featureCount, zoom;
         uniform sampler2D styleTexture;
         varying float vfeatureType, vindex, zindex;
         varying vec4 vcolor;
@@ -288,10 +279,7 @@ module.exports = function (map) {
           return size
         },
         featureCount: map.prop('styleCount'),
-        styleTexture: map.prop('style'),
-        zoomStart: map.prop('zoomStart'),
-        zoomCount: map.prop('zoomCount'),
-        texRange: map.prop('texRange')
+        styleTexture: map.prop('style')
       },
       attributes: {
         position: map.prop('positions'),
@@ -303,10 +291,10 @@ module.exports = function (map) {
       blend: {
         enable: true,
         func: {
-          src: 'src alpha',
-          dst: 'one minus src alpha',
-          rgb: 'add',
-          alpha: 'max'
+          srcRGB: 'one minus constant color',
+          dstRGB: 'constant color',
+          srcAlpha: 'src alpha saturate',
+          dstAlpha: 'one minus src alpha' 
         }
       }
     },
