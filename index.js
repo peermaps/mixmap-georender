@@ -53,7 +53,7 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
-        featureCount: map.prop('styleCount')
+        featureCount: map.prop('featureCount')
       },
       attributes: {
         position: map.prop('positions'),
@@ -133,7 +133,7 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
-        featureCount: map.prop('styleCount')
+        featureCount: map.prop('featureCount')
       },
       attributes: {
         position: map.prop('positions'),
@@ -213,7 +213,7 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
-        featureCount: map.prop('styleCount')
+        featureCount: map.prop('featureCount')
       },
       attributes: {
         position: map.prop('positions'),
@@ -278,7 +278,7 @@ module.exports = function (map) {
           size[1] = context.viewportHeight
           return size
         },
-        featureCount: map.prop('styleCount'),
+        featureCount: map.prop('featureCount'),
         styleTexture: map.prop('style')
       },
       attributes: {

@@ -1,6 +1,7 @@
 var mixmap = require('mixmap')
 var regl = require('regl')
 var prepare = require('../prepare.js')
+var getImageData = require('./getimagedata.js')
 var decode = require('georender-pack/decode')
 var lpb = require('length-prefixed-buffers')
  
@@ -18,10 +19,12 @@ var draw = {
   lineStroke: map.createDraw(geoRender.lineStroke),
   lineFill: map.createDraw(geoRender.lineFill),
   point: map.createDraw(geoRender.points),
+  pointT: map.createDraw(geoRender.points),
 }
 
 var ready = function (props) {
   draw.point.props.push(props.point)
+  draw.pointT.props.push(props.pointT)
   draw.lineFill.props.push(props.lineFill)
   draw.lineStroke.props.push(props.lineStroke)
   draw.area.props.push(props.area)
@@ -33,7 +36,7 @@ require('resl')({
     texture: {
       type: 'image',
       src: './example/style.png',
-      parser: function (data) { return map.regl.texture({ data }) }
+      parser: function (data) { return data }
     },
     buffers: {
       type: 'binary',
@@ -44,7 +47,9 @@ require('resl')({
     }
   },
   onDone: function ({texture, buffers}) {
-    ready(prepare(decode(buffers), texture))
+    var prep = prepare(getImageData(texture), map.regl.texture(texture), decode(buffers), 14)
+    ready(prep.start(14))
+    //ready(prep.update(14))
   }
 })
 
