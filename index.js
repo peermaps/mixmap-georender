@@ -66,7 +66,12 @@ module.exports = function (map) {
       },
       blend: {
         enable: true,
-        func: { src: 'src alpha', dst: 'one minus src alpha' }
+        func: {
+          srcRGB: 'src alpha',
+          srcAlpha: 1,
+          dstRGB: 'one minus src alpha',
+          dstAlpha: 1
+        }
       }
     },
     lineStroke: {
@@ -148,7 +153,12 @@ module.exports = function (map) {
       },
       blend: {
         enable: true,
-        func: { src: 'src alpha', dst: 'one minus src alpha' }
+        func: {
+          srcRGB: 'src alpha',
+          srcAlpha: 1,
+          dstRGB: 'one minus src alpha',
+          dstAlpha: 1
+        }
       }
     },
     lineFill: {
@@ -228,7 +238,12 @@ module.exports = function (map) {
       },
       blend: {
         enable: true,
-        func: { src: 'src alpha', dst: 'one minus src alpha' }
+        func: {
+          srcRGB: 'src alpha',
+          srcAlpha: 1,
+          dstRGB: 'one minus src alpha',
+          dstAlpha: 1
+        }
       }
     },
     areas: {
@@ -236,7 +251,7 @@ module.exports = function (map) {
         precision highp float;
         varying vec4 vcolor;
         void main () {
-          gl_FragColor = vec4(vcolor.xyz, 0.2);
+          gl_FragColor = vec4(vcolor.xyz, 1.0);
         }
       `,
       pickFrag: `
@@ -291,10 +306,10 @@ module.exports = function (map) {
       blend: {
         enable: true,
         func: {
-          srcRGB: 'one minus constant color',
-          dstRGB: 'constant color',
-          srcAlpha: 'src alpha saturate',
-          dstAlpha: 'one minus src alpha' 
+          srcRGB: 'src alpha',
+          srcAlpha: 1,
+          dstRGB: 'one minus src alpha',
+          dstAlpha: 1
         }
       }
     },

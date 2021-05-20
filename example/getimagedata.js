@@ -1,6 +1,6 @@
 module.exports = function getImageData (image) {
-  var width = 1241
-  var height = 168
+  var width = image.width
+  var height = image.height
   var canvas = document.createElement('canvas')
   canvas.width = width
   canvas.height = height 
