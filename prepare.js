@@ -1,15 +1,14 @@
 var partition = require('partition-array')
-var getPixels = require('get-pixels-updated')
 var featureList = require('georender-pack/features.json')
 var featureCount = featureList.length
 
 module.exports = Prepare
 
-function Prepare(stylePixels, texture, decoded, zoom) {
-  if (!(this instanceof Prepare)) return new Prepare(stylePixels, texture, decoded)
-  this.style = texture
-  this.pixels = stylePixels
-  this.data = decoded
+function Prepare(opts) {
+  if (!(this instanceof Prepare)) return new Prepare(opts)
+  this.style = opts.styleTexture
+  this.pixels = opts.stylePixels
+  this.data = opts.decoded
   this.indexes = {
     point: new Uint32Array(this.data.point.types.length),
     line: new Uint32Array(this.data.line.types.length),
@@ -156,7 +155,6 @@ Prepare.prototype._splitSort = function (key, zoom) {
     var index = (x + y * featureCount)*4 + 3
     return self.pixels[index] < 100
   })
-  console.log(key, splitT)
   this.indexes[tkey] = this.indexes[key].subarray(0, splitT)
   this.indexes[pkey] = this.indexes[key].subarray(splitT)
   this.indexes[tkey].sort(function (a, b) {
@@ -202,52 +200,6 @@ Prepare.prototype.update = function (zoom) {
   var self = this
   this._splitSort('point', zoom)
   this._splitSort('line', zoom)
-  /*
-  var splitP = partition(this.indexes.point, function (i) {
-    var x = self.data.point.types[i]
-    var y = zoom * 2
-    var index = (x + y * featureCount)*4 + 3
-    return self.pixels[index] < 100
-  })
-  this.indexes.pointT = this.indexes.point.subarray(0, splitP-1)
-  this.indexes.pointP = this.indexes.point.subarray(splitP)
-  this.indexes.pointT.sort(function (a, b) {
-    var xa = self.data.point.types[a]
-    var xb = self.data.point.types[b]
-    var zindexa = self.pixels[(xa + (zoom * 2 + 1) * featureCount)*4 + 1]
-    var zindexb = self.pixels[(xb + (zoom * 2 + 1) * featureCount)*4 + 1]
-    return zindexa - zindexb
-  })
-  self.props.pointT.id = []
-  self.props.pointT.types = []
-  self.props.pointT.positions = []
-  self.props.pointP.id = []
-  self.props.pointP.types = []
-  self.props.pointP.positions = []
-  var j=0
-  for (var i=0; i<self.indexes.pointT.length; i++) {
-    self.props.pointT.id.push(self.data.point.ids[self.indexes.pointT[i]])
-    self.props.pointT.types.push(self.data.point.types[self.indexes.pointT[i]])
-    self.props.pointT.positions.push(self.data.point.positions[self.indexes.pointT[i]*2])
-    self.props.pointT.positions.push(self.data.point.positions[self.indexes.pointT[i]*2+1])
-  }
-  for (var i=0; i<self.indexes.pointP.length; i++) {
-    self.props.pointP.id.push(self.data.point.ids[self.indexes.pointP[i]])
-    self.props.pointP.types.push(self.data.point.types[self.indexes.pointP[i]])
-    self.props.pointP.positions.push(self.data.point.positions[self.indexes.pointP[i]*2])
-    self.props.pointP.positions.push(self.data.point.positions[self.indexes.pointP[i]*2+1])
-  }
-  */
-  /*
-  for (var i=0; i<this.indexes.pointT.length; i++) {
-    var index = this.indexes.pointT[i]
-    var type = self.data.point.types[index]
-    var x = type
-    var y = zoom * 2 + 1
-    var pindex = (x + y * featureCount)*4 + 1
-    var zindex = self.pixels[pindex]
-  }
-  */
   return this.props
 }
 

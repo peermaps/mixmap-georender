@@ -1,15 +1,14 @@
 var mixmap = require('mixmap')
 var regl = require('regl')
 var prepare = require('../prepare.js')
-var getImageData = require('./getimagedata.js')
+var getImagePixels = require('get-image-pixels')
 var decode = require('georender-pack/decode')
 var lpb = require('length-prefixed-buffers')
  
 var mix = mixmap(regl, { extensions: [
   'oes_element_index_uint', 'oes_texture_float','EXT_float_blend' ] })
 var map = mix.create({ 
-  //viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
-  viewbox: [+29.9, +31.1, +30.1, +31.3],
+  viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
   pickfb: { colorFormat: 'rgba', colorType: 'float32' }
 })
@@ -25,29 +24,31 @@ var draw = {
   pointT: map.createDraw(geoRender.points),
 }
 
-var ready = function (props) {
-  window.addEventListener('click', function (ev) {
-    map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
-      if (data[2] === 0.0) {
-        console.log(data[1], props.point.indexToId[data[0]])
-      }
-      else if (data[2] === 0.5) {
-        console.log(data[1], props.lineT.indexToId[data[0]])
-      }
-      else if (data[2] === 1.0) {
-        console.log(data[1], props.area.indexToId[data[0]])
-      }
-      console.log(data)
-    })
+function ready({texture, buffers}) {
+  var prep = prepare({
+    stylePixels: getImagePixels(texture),
+    styleTexture: map.regl.texture(texture),
+    decoded: decode(buffers),
   })
-  draw.point.props.push(props.pointP)
-  draw.pointT.props.push(props.pointT)
-  draw.lineFill.props.push(props.lineP)
-  draw.lineStroke.props.push(props.lineP)
-  draw.lineFillT.props.push(props.lineT)
-  draw.lineStrokeT.props.push(props.lineT)
-  draw.area.props.push(props.area)
-  map.draw()
+  var zoom = Math.round(map.getZoom())
+  var props = null
+  update(zoom)
+  map.on('viewbox', function () {
+    var z = Math.round(map.getZoom())
+    if (zoom !== z) update(z)
+    zoom = z
+  })
+  function update(zoom) {
+    props = prep.update(zoom)
+    draw.point.props = [props.pointP]
+    draw.pointT.props = [props.pointT]
+    draw.lineFill.props = [props.lineP]
+    draw.lineStroke.props = [props.lineP]
+    draw.lineFillT.props = [props.lineT]
+    draw.lineStrokeT.props = [props.lineT]
+    draw.area.props = [props.area]
+    map.draw()
+  }
 }
 
 require('resl')({
@@ -59,17 +60,17 @@ require('resl')({
     },
     buffers: {
       type: 'binary',
-      //src: './example/alexandrialpb',
-      src: './example/alexandrialpb' || location.search.slice(1),
+      src: './example/kharkiv' || location.search.slice(1),
       parser: function (data) { 
         return lpb.decode(Buffer.from(data))
       }
     }
   },
-  onDone: function ({texture, buffers}) {
-    var prep = prepare(getImageData(texture), map.regl.texture(texture), decode(buffers), 14)
-    ready(prep.update(14))
-  }
+  onDone: ready
+})
+
+window.addEventListener('resize', function (ev) {
+  map.resize(window.innerWidth, window.innerHeight)
 })
 
 window.addEventListener('keydown', function (ev) {
@@ -82,9 +83,5 @@ window.addEventListener('keydown', function (ev) {
   }
 })
 
-window.addEventListener('resize', function (ev) {
-  map.resize(window.innerWidth, window.innerHeight)
-})
- 
 document.body.appendChild(mix.render())
 document.body.appendChild(map.render({ width: window.innerWidth, height: window.innerHeight }))

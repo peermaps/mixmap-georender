@@ -314,22 +314,22 @@ module.exports = function (map) {
       }
     },
     labels: {
-			frag: `
-			precision mediump float;
-			void main () {
-				gl_FragColor = vec4(0,0,1,1);
-			}`,
-			vert: `
-			precision mediump float;
-			attribute vec2 position;
-			void main () {
-				gl_Position = vec4(position.xy*vec2(1,-1)*0.2, 0, 1);
-			}`,
-			attributes: {
-				position: map.prop('positions')
+      frag: `
+      precision mediump float;
+      void main () {
+        gl_FragColor = vec4(0,0,1,1);
+      }`,
+      vert: `
+      precision mediump float;
+      attribute vec2 position;
+      void main () {
+        gl_Position = vec4(position.xy*vec2(1,-1)*0.2, 0, 1);
+      }`,
+      attributes: {
+        position: map.prop('positions')
       },
-			elements: map.prop('cells'),
-			depth: { enable: false }
+      elements: map.prop('cells'),
+      depth: { enable: false }
     }
   }
 }
