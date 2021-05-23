@@ -7,7 +7,7 @@ a mixmap layer for rendering peermaps georender data
 ```js
 var mixmap = require('mixmap')
 var regl = require('regl')
-var prepare = require('../prepare.js')
+var prepare = require('mixmap-georender/prepare.js')
 var getImagePixels = require('get-image-pixels')
 var decode = require('georender-pack/decode')
 var lpb = require('length-prefixed-buffers')
@@ -19,7 +19,7 @@ var map = mix.create({
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
   pickfb: { colorFormat: 'rgba', colorType: 'float32' }
 })
-var geoRender = require('mixmap-georender')(map)
+var geoRender = require('mixmap-georender/index.js')(map)
 
 var draw = {
   area: map.createDraw(geoRender.areas),
@@ -31,11 +31,11 @@ var draw = {
   pointT: map.createDraw(geoRender.points),
 }
 
-function ready({texture, buffers}) {
+function ready({style, decoded}) {
   var prep = prepare({
-    stylePixels: getImagePixels(texture),
-    styleTexture: map.regl.texture(texture),
-    decoded: decode(buffers),
+    stylePixels: getImagePixels(style),
+    styleTexture: map.regl.texture(style),
+    decoded
   })
   var zoom = Math.round(map.getZoom())
   var props = null
@@ -60,17 +60,14 @@ function ready({texture, buffers}) {
 
 require('resl')({
   manifest: {
-    texture: {
+    style: {
       type: 'image',
-      src: './example/style.png',
-      parser: function (data) { return data }
+      src: './example/style.png'
     },
-    buffers: {
+    decoded: {
       type: 'binary',
       src: './example/kharkiv' || location.search.slice(1),
-      parser: function (data) { 
-        return lpb.decode(Buffer.from(data))
-      }
+      parser: data => decode(lpb.decode(Buffer.from(data)))
     }
   },
   onDone: ready
@@ -145,7 +142,7 @@ decode](https://github.com/peermaps/georender-pack/#decode)
 [georender-style2png](https://www.npmjs.com/package/georender-style2png).
 * `opts.stylePixels` is the pixel data of the style texture. in the example we use
 [get-image-pixels](https://www.npmjs.com/package/get-image-pixels) to get the
-opts.pixel data out of the texture created with [georender-style2png](https://www.npmjs.com/package/georender-style2png).
+data out of the texture created with [georender-style2png](https://www.npmjs.com/package/georender-style2png).
 
 ## var props = prep.update(zoom)
 

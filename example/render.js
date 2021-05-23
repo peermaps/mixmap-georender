@@ -24,11 +24,11 @@ var draw = {
   pointT: map.createDraw(geoRender.points),
 }
 
-function ready({texture, buffers}) {
+function ready({style, decoded}) {
   var prep = prepare({
-    stylePixels: getImagePixels(texture),
-    styleTexture: map.regl.texture(texture),
-    decoded: decode(buffers),
+    stylePixels: getImagePixels(style),
+    styleTexture: map.regl.texture(style),
+    decoded
   })
   var zoom = Math.round(map.getZoom())
   var props = null
@@ -53,17 +53,14 @@ function ready({texture, buffers}) {
 
 require('resl')({
   manifest: {
-    texture: {
+    style: {
       type: 'image',
-      src: './example/style.png',
-      parser: function (data) { return data }
+      src: './example/style.png'
     },
-    buffers: {
+    decoded: {
       type: 'binary',
       src: './example/kharkiv' || location.search.slice(1),
-      parser: function (data) { 
-        return lpb.decode(Buffer.from(data))
-      }
+      parser: data => decode(lpb.decode(Buffer.from(data)))
     }
   },
   onDone: ready
