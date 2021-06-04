@@ -138,7 +138,19 @@ function Prepare(opts) {
       id: this.data.area.ids,
       indexToId: areaIndexes.indexToId,
       idToIndex: areaIndexes.idToIndex,
-      cells: this.data.area.cells,
+      cells: null,
+      labels: this.data.area.labels,
+      style: this.style,
+      featureCount
+    },
+    areaP: {
+      positions: this.data.area.positions,
+      types: this.data.area.types,
+      indexes: areaIndexes.indexes,
+      id: this.data.area.ids,
+      indexToId: areaIndexes.indexToId,
+      idToIndex: areaIndexes.idToIndex,
+      cells: null,
       labels: this.data.area.labels,
       style: this.style,
       featureCount
@@ -150,11 +162,10 @@ Prepare.prototype._splitSort = function (key, zoom) {
   var tkey = key+'T'
   var pkey = key+'P'
   var splitT = partition(this.indexes[key], function (i) {
-    var x = self.data[key].types[i]
-    var y = zoom * 2
-    var index = (x + y * featureCount)*4 + 3
-    return self.pixels[index] < 100
+    var opacity = getOpacity(self.data[key].types[i], zoom, self.pixels)
+    return opacity < 100
   })
+
   this.indexes[tkey] = this.indexes[key].subarray(0, splitT)
   this.indexes[pkey] = this.indexes[key].subarray(splitT)
   this.indexes[tkey].sort(function (a, b) {
@@ -174,7 +185,6 @@ Prepare.prototype._splitSort = function (key, zoom) {
     self.props[tkey].normals = []
     self.props[pkey].normals = []
   }
-  var j=0
   for (var i=0; i<self.indexes[tkey].length; i++) {
     self.props[tkey].id.push(self.data[key].ids[self.indexes[tkey][i]])
     self.props[tkey].types.push(self.data[key].types[self.indexes[tkey][i]])
@@ -196,10 +206,30 @@ Prepare.prototype._splitSort = function (key, zoom) {
     }
   }
 }
+Prepare.prototype._splitSortArea = function (key, zoom) {
+  var self = this
+  var tkey = key+'T'
+  var pkey = key+'P'
+  self.props[tkey].cells = []
+  self.props[pkey].cells = []
+  var cells = self.data[key].cells
+  for (var i=0; i<cells.length; i+=3) {
+    var type = self.data[key].types[cells[i]]
+    var opacity = getOpacity(type, zoom, self.pixels)
+    if (opacity < 100) {
+      self.props[tkey].cells.push(cells[i], cells[i+1], cells[i+2])
+    }
+    else {
+      self.props[pkey].cells.push(cells[i], cells[i+1], cells[i+2])
+    }
+  }
+}
+
 Prepare.prototype.update = function (zoom) {
   var self = this
   this._splitSort('point', zoom)
   this._splitSort('line', zoom)
+  this._splitSortArea('area', zoom)
   return this.props
 }
 
@@ -223,4 +253,10 @@ function makeIndexes (ids) {
     idToIndex: idToIndex,
     indexToId: indexToId
   }
+}
+
+function getOpacity (type, zoom, pixels) {
+  var y = zoom * 2
+  var index = (type + y * featureCount)*4 + 3
+  return pixels[index]
 }

@@ -82,5 +82,20 @@ window.addEventListener('keydown', function (ev) {
   }
 })
 
+window.addEventListener('click', function (ev) {
+  map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
+    if (data[2] === 0.0) {
+      console.log(data[1], props.point.indexToId[data[0]])
+    }
+    else if (data[2] === 1.0) {
+      console.log(data[1], props.lineT.indexToId[data[0]])
+    }
+    else if (data[2] === 2.0) {
+      console.log(data[1], props.area.indexToId[data[0]])
+    }
+    console.log(data)
+  })
+})
+
 document.body.appendChild(mix.render())
 document.body.appendChild(map.render({ width: window.innerWidth, height: window.innerHeight }))

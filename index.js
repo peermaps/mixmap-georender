@@ -92,7 +92,7 @@ module.exports = function (map) {
         varying float vfeatureType, vindex;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vfeatureType, 0.5, 1.0);
+          gl_FragColor = vec4(vindex, vfeatureType, 1.0, 1.0);
         }
       `,
       vert: glsl`
@@ -178,7 +178,7 @@ module.exports = function (map) {
         varying float vfeatureType, vindex;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vfeatureType, 0.5, 1.0);
+          gl_FragColor = vec4(vindex, vfeatureType, 1.0, 1.0);
         }
       `,
       vert: glsl`
@@ -251,7 +251,7 @@ module.exports = function (map) {
         precision highp float;
         varying vec4 vcolor;
         void main () {
-          gl_FragColor = vec4(vcolor.xyz, 1.0);
+          gl_FragColor = vec4(vcolor);
         }
       `,
       pickFrag: `
@@ -259,7 +259,7 @@ module.exports = function (map) {
         varying float vfeatureType, vindex;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vfeatureType, 1.0, 1.0);
+          gl_FragColor = vec4(vindex, vfeatureType, 2.0, 1.0);
         }
       `,
       vert: glsl`
