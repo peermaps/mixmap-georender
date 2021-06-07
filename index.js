@@ -8,16 +8,18 @@ module.exports = function (map) {
         precision highp float;
         varying vec4 vcolor;
         void main () {
-          if (vcolor.x < 0.1) discard;
-          gl_FragColor = vec4(vcolor);
+          gl_FragColor = vcolor;
         }
       `,
       pickFrag: `
         precision highp float;
-        varying float vfeatureType, vindex;
+        varying float vft, vindex;
+        //varying vec4 vcolor;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vfeatureType, 0.0, 1.0);
+          //opacity = vcolor.w
+          //gl_FragColor = vec4(vindex, vft, 0.0, 1.0+opacity);
+          gl_FragColor = vec4(vindex, vft, 0.0, 1.0);
         }
       `,
       vert: glsl`
@@ -30,10 +32,10 @@ module.exports = function (map) {
         uniform vec4 viewbox;
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zoom;
-        varying float vfeatureType, vindex, zindex;
+        varying float vft, vindex, zindex;
         varying vec4 vcolor;
         void main () {
-          vfeatureType = featureType;
+          vft = featureType;
           Point point = readPoint(styleTexture, featureType, zoom, featureCount);
           vcolor = point.color;
           vindex = index;
@@ -79,20 +81,19 @@ module.exports = function (map) {
         precision highp float;
         uniform vec2 size;
         varying vec2 vdist;
-        varying float vstrokeStyle, vstrokeDashGap;
-        varying vec4 vstrokeColor;
+        varying float vstyle, vdashgap;
+        varying vec4 vcolor;
         void main () {
-          float d = step(vstrokeDashGap/100.0, mod(length(vdist)*20.0, vstrokeStyle/10.0));
-          gl_FragColor = vec4(vstrokeColor.xyz, vstrokeColor.w/100.0 *
-          min(d,step(0.1,vstrokeColor.x)));
+          float d = step(vdashgap/100.0, mod(length(vdist)*20.0, vstyle/10.0));
+          gl_FragColor = vec4(vcolor.xyz, vcolor.w * min(d,step(0.1,vcolor.x)));
         }
       `,
       pickFrag: `
         precision highp float;
-        varying float vfeatureType, vindex;
+        varying float vft, vindex;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vfeatureType, 1.0, 1.0);
+          gl_FragColor = vec4(vindex, vft, 2.0, 1.0);
         }
       `,
       vert: glsl`
@@ -105,15 +106,15 @@ module.exports = function (map) {
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zoom;
         uniform sampler2D styleTexture;
-        varying float vfeatureType, vindex, zindex, vstrokeStyle, vstrokeDashGap;
+        varying float vft, vindex, zindex, vstyle, vdashgap;
         varying vec2 vpos, vnorm, vdist;
-        varying vec4 vstrokeColor;
+        varying vec4 vcolor;
         void main () {
-          vfeatureType = featureType;
+          vft = featureType;
           Line line = readLine(styleTexture, featureType, zoom, featureCount);
-          vstrokeColor = line.strokeColor;
-          vstrokeStyle = line.strokeStyle;
-          vstrokeDashGap = line.strokeDashGap;
+          vcolor = line.strokeColor;
+          vstyle = line.strokeStyle;
+          vdashgap = line.strokeDashGap;
           vindex = index;
           zindex = line.zindex;
           vec2 p = position.xy + offset;
@@ -164,21 +165,20 @@ module.exports = function (map) {
     lineFill: {
       frag: glsl`
         precision highp float;
-        varying float vfillStyle, vfillDashGap;
+        varying float vstyle, vdashgap;
         varying vec2 vdist;
-        varying vec4 vfillColor;
+        varying vec4 vcolor;
         void main () {
-          float d = step(vfillDashGap/100.0, mod(length(vdist)*20.0, vfillStyle/10.0));
-          gl_FragColor = vec4(vfillColor.xyz, vfillColor.w/100.0 *
-          min(d,step(0.1,vfillColor.x)));
+          float d = step(vdashgap/100.0, mod(length(vdist)*20.0, vstyle/10.0));
+          gl_FragColor = vec4(vcolor.xyz, vcolor.w * min(d,step(0.1,vcolor.x)));
         }
       `,
       pickFrag: `
         precision highp float;
-        varying float vfeatureType, vindex;
+        varying float vft, vindex;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vfeatureType, 1.0, 1.0);
+          gl_FragColor = vec4(vindex, vft, 2.0, 1.0);
         }
       `,
       vert: glsl`
@@ -191,15 +191,15 @@ module.exports = function (map) {
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zoom;
         uniform sampler2D styleTexture;
-        varying float vfeatureType, vindex, zindex, vfillStyle, vfillDashGap;
+        varying float vft, vindex, zindex, vstyle, vdashgap;
         varying vec2 vpos, vnorm, vdist;
-        varying vec4 vfillColor;
+        varying vec4 vcolor;
         void main () {
-          vfeatureType = featureType;
+          vft = featureType;
           Line line = readLine(styleTexture, featureType, zoom, featureCount);
-          vfillColor = line.fillColor;
-          vfillStyle = line.fillStyle;
-          vfillDashGap = line.fillDashGap;
+          vcolor = line.fillColor;
+          vstyle = line.fillStyle;
+          vdashgap = line.fillDashGap;
           vindex = index;
           zindex = line.zindex + 0.1;
           vec2 p = position.xy + offset;
@@ -251,15 +251,15 @@ module.exports = function (map) {
         precision highp float;
         varying vec4 vcolor;
         void main () {
-          gl_FragColor = vec4(vcolor);
+          gl_FragColor = vcolor;
         }
       `,
       pickFrag: `
         precision highp float;
-        varying float vfeatureType, vindex;
+        varying float vft, vindex;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vfeatureType, 2.0, 1.0);
+          gl_FragColor = vec4(vindex, vft, 4.0, 1.0);
         }
       `,
       vert: glsl`
@@ -272,10 +272,10 @@ module.exports = function (map) {
         uniform vec2 offset, size;
         uniform float aspect, featureCount, zoom;
         uniform sampler2D styleTexture;
-        varying float vfeatureType, vindex, zindex;
+        varying float vft, vindex, zindex;
         varying vec4 vcolor;
         void main () {
-          vfeatureType = featureType;
+          vft = featureType;
           Area area = readArea(styleTexture, featureType, zoom, featureCount);
           vcolor = area.color;
           vindex = index;
