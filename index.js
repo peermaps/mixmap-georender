@@ -14,12 +14,11 @@ module.exports = function (map) {
       pickFrag: `
         precision highp float;
         varying float vft, vindex;
-        //varying vec4 vcolor;
+        varying vec4 vcolor;
         uniform float featureCount;
         void main () {
-          //opacity = vcolor.w
-          //gl_FragColor = vec4(vindex, vft, 0.0, 1.0+opacity);
-          gl_FragColor = vec4(vindex, vft, 0.0, 1.0);
+          float opacity = floor(min(vcolor.w, 1.0));
+          gl_FragColor = vec4(vindex, vft, opacity, 1.0);
         }
       `,
       vert: glsl`
@@ -91,9 +90,11 @@ module.exports = function (map) {
       pickFrag: `
         precision highp float;
         varying float vft, vindex;
+        varying vec4 vcolor;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vft, 2.0, 1.0);
+          float opacity = floor(min(vcolor.w, 1.0));
+          gl_FragColor = vec4(vindex, vft, 2.0+opacity, 1.0);
         }
       `,
       vert: glsl`
@@ -176,9 +177,11 @@ module.exports = function (map) {
       pickFrag: `
         precision highp float;
         varying float vft, vindex;
+        varying vec4 vcolor;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vft, 2.0, 1.0);
+          float opacity = floor(min(vcolor.w, 1.0));
+          gl_FragColor = vec4(vindex, vft, 2.0+opacity, 1.0);
         }
       `,
       vert: glsl`
@@ -257,9 +260,11 @@ module.exports = function (map) {
       pickFrag: `
         precision highp float;
         varying float vft, vindex;
+        varying vec4 vcolor;
         uniform float featureCount;
         void main () {
-          gl_FragColor = vec4(vindex, vft, 4.0, 1.0);
+          float opacity = floor(min(vcolor.w, 1.0));
+          gl_FragColor = vec4(vindex, vft, 4.0+opacity, 1.0);
         }
       `,
       vert: glsl`

@@ -8,8 +8,8 @@ var lpb = require('length-prefixed-buffers')
 var mix = mixmap(regl, { extensions: [
   'oes_element_index_uint', 'oes_texture_float','EXT_float_blend' ] })
 var map = mix.create({ 
-  //viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
-  viewbox: [+29.9, +31.1, +30.1, +31.3],
+  viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
+  //viewbox: [+29.9, +31.1, +30.1, +31.3],
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
   pickfb: { colorFormat: 'rgba', colorType: 'float32' }
 })
@@ -30,6 +30,8 @@ function ready({style, decoded}) {
   var prep = prepare({
     stylePixels: getImagePixels(style),
     styleTexture: map.regl.texture(style),
+    zoomStart: 1,
+    zoomEnd: 21,
     decoded
   })
   var zoom = Math.round(map.getZoom())
@@ -57,10 +59,19 @@ function ready({style, decoded}) {
       if (data[2] === 0.0) {
         console.log(data[1], props.pointP.indexToId[data[0]])
       }
+      else if (data[2] === 1.0) {
+        console.log(data[1], props.pointP.indexToId[data[0]])
+      }
       else if (data[2] === 2.0) {
+        console.log(data[1], props.lineT.indexToId[data[0]])
+      }
+      else if (data[2] === 3.0) {
         console.log(data[1], props.lineP.indexToId[data[0]])
       }
       else if (data[2] === 4.0) {
+        console.log(data[1], props.areaT.indexToId[data[0]])
+      }
+      else if (data[2] === 5.0) {
         console.log(data[1], props.areaP.indexToId[data[0]])
       }
       console.log(data)
@@ -77,8 +88,8 @@ require('resl')({
     },
     decoded: {
       type: 'binary',
-      //src: './example/kharkiv' || location.search.slice(1),
-      src: './example/alexandrialpb' || location.search.slice(1),
+      src: './example/kharkiv' || location.search.slice(1),
+      //src: './example/alexandrialpb' || location.search.slice(1),
       parser: data => decode(lpb.decode(Buffer.from(data)))
     }
   },

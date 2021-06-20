@@ -9,6 +9,7 @@ function Prepare(opts) {
   this.style = opts.styleTexture
   this.pixels = opts.stylePixels
   this.data = opts.decoded
+  this.zoomCount = opts.zoomEnd - opts.zoomStart
   this.indexes = {
     point: new Uint32Array(this.data.point.types.length),
     line: new Uint32Array(this.data.line.types.length),
@@ -26,7 +27,7 @@ function Prepare(opts) {
   var pointIndexes = makeIndexes(this.data.point.ids)
   var lineIndexes = makeIndexes(this.data.line.ids)
   var areaIndexes = makeIndexes(this.data.area.ids)
-  var distances = [0,0]
+  this.distances = [0,0]
   var distx = 0
   var disty = 0
   var lids = this.data.line.ids
@@ -44,7 +45,7 @@ function Prepare(opts) {
       distx = 0
       disty = 0
     }
-    distances.push(distx, disty)
+    this.distances.push(distx, disty)
   }
   this.props = {
     point: {
@@ -85,39 +86,39 @@ function Prepare(opts) {
       types: null,
       id: null,
       normals: this.data.line.normals,
+      distances: this.distances,
       indexes: lineIndexes.indexes,
       indexToId: lineIndexes.indexToId,
       idToIndex: lineIndexes.idToIndex,
       labels: this.data.line.labels,
       style: this.style,
       featureCount,
-      distances,
     },
     lineT: {
       positions: null,
       types: null,
       id: null,
       normals: null,
+      distances: null,
       indexes: lineIndexes.indexes,
       indexToId: lineIndexes.indexToId,
       idToIndex: lineIndexes.idToIndex,
       labels: this.data.line.labels,
       style: this.style,
-      featureCount,
-      distances,
+      featureCount
     },
     lineP: {
       positions: null,
       types: null,
       id: null,
       normals: null,
+      distances: null,
       indexes: lineIndexes.indexes,
       indexToId: lineIndexes.indexToId,
       idToIndex: lineIndexes.idToIndex,
       labels: this.data.line.labels,
       style: this.style,
-      featureCount,
-      distances,
+      featureCount
     },
     area: {
       positions: this.data.area.positions,
@@ -162,7 +163,7 @@ Prepare.prototype._splitSort = function (key, zoom) {
   var tkey = key+'T'
   var pkey = key+'P'
   var splitT = partition(this.indexes[key], function (i) {
-    var opacity = getOpacity(self.data[key].types[i], zoom, self.pixels)
+    var opacity = self.getOpacity(key, self.data[key].types[i], zoom)
     return opacity < 100
   })
 
@@ -185,6 +186,10 @@ Prepare.prototype._splitSort = function (key, zoom) {
     self.props[tkey].normals = []
     self.props[pkey].normals = []
   }
+  if (self.props[key].distances) {
+    self.props[tkey].distances = []
+    self.props[pkey].distances = []
+  }
   for (var i=0; i<self.indexes[tkey].length; i++) {
     self.props[tkey].id.push(self.data[key].ids[self.indexes[tkey][i]])
     self.props[tkey].types.push(self.data[key].types[self.indexes[tkey][i]])
@@ -194,15 +199,23 @@ Prepare.prototype._splitSort = function (key, zoom) {
       self.props[tkey].normals.push(self.data[key].normals[self.indexes[tkey][i]*2])
       self.props[tkey].normals.push(self.data[key].normals[self.indexes[tkey][i]*2+1])
     }
+    if (self.props[key].distances) {
+      self.props[tkey].distances.push(self.distances[self.indexes[tkey][i]*2])
+      self.props[tkey].distances.push(self.distances[self.indexes[tkey][i]*2+1])
+    }
   }
   for (var i=0; i<self.indexes[pkey].length; i++) {
     self.props[pkey].id.push(self.data[key].ids[self.indexes[pkey][i]])
     self.props[pkey].types.push(self.data[key].types[self.indexes[pkey][i]])
     self.props[pkey].positions.push(self.data[key].positions[self.indexes[pkey][i]*2])
     self.props[pkey].positions.push(self.data[key].positions[self.indexes[pkey][i]*2+1])
-    if (self.props[key].normals) {
+    if (self.props[pkey].normals) {
       self.props[pkey].normals.push(self.data[key].normals[self.indexes[pkey][i]*2])
       self.props[pkey].normals.push(self.data[key].normals[self.indexes[pkey][i]*2+1])
+    }
+    if (self.props[pkey].distances) {
+      self.props[pkey].distances.push(self.distances[self.indexes[pkey][i]*2])
+      self.props[pkey].distances.push(self.distances[self.indexes[pkey][i]*2+1])
     }
   }
 }
@@ -215,7 +228,7 @@ Prepare.prototype._splitSortArea = function (key, zoom) {
   var cells = self.data[key].cells
   for (var i=0; i<cells.length; i+=3) {
     var type = self.data[key].types[cells[i]]
-    var opacity = getOpacity(type, zoom, self.pixels)
+    var opacity = self.getOpacity(key, type, zoom)
     if (opacity < 100) {
       self.props[tkey].cells.push(cells[i], cells[i+1], cells[i+2])
     }
@@ -231,6 +244,20 @@ Prepare.prototype.update = function (zoom) {
   this._splitSort('line', zoom)
   this._splitSortArea('area', zoom)
   return this.props
+}
+
+Prepare.prototype.getOpacity = function (key, type, zoom) {
+  if (key === 'point') {
+    var y = zoom * 2
+  }
+  else if (key === 'line') {
+    var y = zoom * 2 + this.zoomCount * 2
+  }
+  else if (key === 'area') {
+    var y = zoom * 2 + this.zoomCount * 2 + this.zoomCount * 4
+  }
+  var index = (type + y * featureCount)*4 + 3
+  return this.pixels[index]
 }
 
 function makeIndexes (ids) { 
@@ -255,8 +282,3 @@ function makeIndexes (ids) {
   }
 }
 
-function getOpacity (type, zoom, pixels) {
-  var y = zoom * 2
-  var index = (type + y * featureCount)*4 + 3
-  return pixels[index]
-}
