@@ -29,6 +29,8 @@ function ready({style, decoded}) {
   var prep = prepare({
     stylePixels: getImagePixels(style),
     styleTexture: map.regl.texture(style),
+    zoomStart: 1,
+    zoomEnd: 21,
     decoded
   })
   var zoom = Math.round(map.getZoom())
