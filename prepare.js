@@ -63,9 +63,9 @@ function Prepare(opts) {
       positions: null,
       types: null,
       id: null,
-      indexes: pointIndexes.indexes,
-      indexToId: pointIndexes.indexToId,
-      idToIndex: pointIndexes.idToIndex,
+      indexes: null,
+      indexToId: null,
+      idToIndex: null,
       labels: this.data.point.labels,
       style: this.style,
       featureCount
@@ -74,9 +74,9 @@ function Prepare(opts) {
       positions: null,
       types: null,
       id: null,
-      indexes: pointIndexes.indexes,
-      indexToId: pointIndexes.indexToId,
-      idToIndex: pointIndexes.idToIndex,
+      indexes: null,
+      indexToId: null,
+      idToIndex: null,
       labels: this.data.point.labels,
       style: this.style,
       featureCount
@@ -100,9 +100,9 @@ function Prepare(opts) {
       id: null,
       normals: null,
       distances: null,
-      indexes: lineIndexes.indexes,
-      indexToId: lineIndexes.indexToId,
-      idToIndex: lineIndexes.idToIndex,
+      indexes: null,
+      indexToId: null,
+      idToIndex: null,
       labels: this.data.line.labels,
       style: this.style,
       featureCount
@@ -113,9 +113,9 @@ function Prepare(opts) {
       id: null,
       normals: null,
       distances: null,
-      indexes: lineIndexes.indexes,
-      indexToId: lineIndexes.indexToId,
-      idToIndex: lineIndexes.idToIndex,
+      indexes: null,
+      indexToId: null,
+      idToIndex: null,
       labels: this.data.line.labels,
       style: this.style,
       featureCount
@@ -218,6 +218,14 @@ Prepare.prototype._splitSort = function (key, zoom) {
       self.props[pkey].distances.push(self.distances[self.indexes[pkey][i]*2+1])
     }
   }
+  var tindexes = makeIndexes(self.props[tkey].id)
+  var pindexes = makeIndexes(self.props[pkey].id)
+  self.props[tkey].indexes = tindexes.indexes
+  self.props[tkey].indexToId = tindexes.indexToId
+  self.props[tkey].idToIndex = tindexes.idToIndex
+  self.props[pkey].indexes = pindexes.indexes
+  self.props[pkey].indexToId = pindexes.indexToId
+  self.props[pkey].idToIndex = pindexes.idToIndex
 }
 Prepare.prototype._splitSortArea = function (key, zoom) {
   var self = this
@@ -281,4 +289,3 @@ function makeIndexes (ids) {
     indexToId: indexToId
   }
 }
-

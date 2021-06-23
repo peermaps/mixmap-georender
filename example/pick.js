@@ -57,7 +57,7 @@ function ready({style, decoded}) {
   window.addEventListener('click', function (ev) {
     map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
       if (data[2] === 0.0) {
-        console.log(data[1], props.pointP.indexToId[data[0]])
+        console.log(data[1], props.pointT.indexToId[data[0]])
       }
       else if (data[2] === 1.0) {
         console.log(data[1], props.pointP.indexToId[data[0]])
