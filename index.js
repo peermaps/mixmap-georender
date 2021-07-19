@@ -78,13 +78,20 @@ module.exports = function (map) {
     lineStroke: {
       frag: glsl`
         precision highp float;
+        uniform vec4 viewbox;
         uniform vec2 size;
+        uniform float aspect;
         varying vec2 vdist;
-        varying float vstyle, vdashgap;
+        varying float vdashLength, vdashGap;
         varying vec4 vcolor;
         void main () {
-          float d = step(vdashgap/100.0, mod(length(vdist)*20.0, vstyle/10.0));
-          gl_FragColor = vec4(vcolor.xyz, vcolor.w * min(d,step(0.1,vcolor.x)));
+          vec2 vb = vec2(viewbox.z-viewbox.x, viewbox.w-viewbox.y);
+          vec2 s = vec2(size.x, size.y*aspect);
+          float t = length(vdist*s/vb);
+          float d = vdashLength;
+          float g = vdashGap;
+          float x = 1.0 - step(d, mod(t, d+g));
+          gl_FragColor = vec4(vcolor.xyz, vcolor.w * x);
         }
       `,
       pickFrag: `
@@ -107,24 +114,21 @@ module.exports = function (map) {
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zoom;
         uniform sampler2D styleTexture;
-        varying float vft, vindex, zindex, vstyle, vdashgap;
+        varying float vft, vindex, zindex, vdashLength, vdashGap;
         varying vec2 vpos, vnorm, vdist;
         varying vec4 vcolor;
         void main () {
           vft = featureType;
           Line line = readLine(styleTexture, featureType, zoom, featureCount);
           vcolor = line.strokeColor;
-          vstyle = line.strokeStyle;
-          vdashgap = line.strokeDashGap;
+          vdashLength = line.strokeDashLength;
+          vdashGap = line.strokeDashGap;
           vindex = index;
           zindex = line.zindex;
           vec2 p = position.xy + offset;
           vec2 m = (line.fillWidth+2.0*line.strokeWidth)/size;
           vnorm = normalize(normal)*m;
-          vdist = vec2(
-            (dist.x / (viewbox.z - viewbox.x) * 2.0 - 1.0) * aspect,
-            (dist.y / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect
-          );
+          vdist = dist;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
@@ -166,19 +170,31 @@ module.exports = function (map) {
     lineFill: {
       frag: glsl`
         precision highp float;
-        varying float vstyle, vdashgap;
+        uniform vec4 viewbox;
+        uniform vec2 size;
+        uniform float aspect;
+        varying float vdashLength, vdashGap;
         varying vec2 vdist;
         varying vec4 vcolor;
         void main () {
-          float d = step(vdashgap/100.0, mod(length(vdist)*20.0, vstyle/10.0));
-          gl_FragColor = vec4(vcolor.xyz, vcolor.w * min(d,step(0.1,vcolor.x)));
+          vec2 vb = vec2(viewbox.z-viewbox.x, viewbox.w-viewbox.y);
+          vec2 s = vec2(size.x, size.y*aspect);
+          float t = length(vdist*s/vb);
+          float d = vdashLength;
+          float g = vdashGap;
+          float x = 1.0 - step(d, mod(t, d+g));
+          gl_FragColor = vec4(vcolor.xyz, vcolor.w * x);
+          //gl_FragColor = vec4(mix(vec3(0,1,0), vec3(1,0,0), x), 1.0);
         }
       `,
       pickFrag: `
         precision highp float;
-        varying float vft, vindex;
+        uniform vec4 viewbox;
+        uniform vec2 size;
+        varying float vft, vindex, vdashLength, vdashGap;
         varying vec4 vcolor;
         uniform float featureCount;
+        varying vec2 vdist;
         void main () {
           float opacity = floor(min(vcolor.w, 1.0));
           gl_FragColor = vec4(vindex, vft, 2.0+opacity, 1.0);
@@ -194,23 +210,20 @@ module.exports = function (map) {
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zoom;
         uniform sampler2D styleTexture;
-        varying float vft, vindex, zindex, vstyle, vdashgap;
+        varying float vft, vindex, zindex, vdashLength, vdashGap;
         varying vec2 vpos, vnorm, vdist;
         varying vec4 vcolor;
         void main () {
           vft = featureType;
           Line line = readLine(styleTexture, featureType, zoom, featureCount);
           vcolor = line.fillColor;
-          vstyle = line.fillStyle;
-          vdashgap = line.fillDashGap;
+          vdashLength = line.fillDashLength;
+          vdashGap = line.fillDashGap;
           vindex = index;
           zindex = line.zindex + 0.1;
           vec2 p = position.xy + offset;
           vnorm = normalize(normal)*(line.fillWidth/size);
-          vdist = vec2(
-            (dist.x / (viewbox.z - viewbox.x) * 2.0 - 1.0) * aspect,
-            (dist.y / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect
-          );
+          vdist = dist;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
