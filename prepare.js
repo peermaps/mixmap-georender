@@ -164,7 +164,7 @@ Prepare.prototype._splitSort = function (key, zoom) {
   var pkey = key+'P'
   var splitT = partition(this.indexes[key], function (i) {
     var opacity = self.getOpacity(key, self.data[key].types[i], zoom)
-    return opacity < 100
+    return opacity > 100
   })
 
   this.indexes[tkey] = this.indexes[key].subarray(0, splitT)
