@@ -26,7 +26,7 @@ module.exports = function (map) {
         #pragma glslify: Point = require('glsl-georender-style-texture/point.h');
         #pragma glslify: readPoint = require('glsl-georender-style-texture/point.glsl');
         uniform sampler2D styleTexture;
-        attribute vec2 position;
+        attribute vec2 position, ioffset;
         attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
@@ -39,12 +39,11 @@ module.exports = function (map) {
           vcolor = point.color;
           vindex = index;
           zindex = point.zindex;
-          vec2 p = position.xy + offset;
+          vec2 p = position.xy*0.000001*point.size + offset + ioffset;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             1.0/(1.0+zindex), 1);
-          gl_PointSize = point.size;
         }
       `,
       uniforms: {
@@ -57,14 +56,23 @@ module.exports = function (map) {
         featureCount: map.prop('featureCount')
       },
       attributes: {
-        position: map.prop('positions'),
-        featureType: map.prop('types'),
-        index: map.prop('indexes')
+        position: [-1.0,1.0,1.0,1.0,1.0,-1.0,-1.0,-1.0],
+        ioffset: {
+          buffer: map.prop('positions'),
+          divisor: 1
+        },
+        featureType: {
+          buffer: map.prop('types'),
+          divisor: 1
+        },
+        index: {
+          buffer: map.prop('indexes'),
+          divisor: 1
+        }
       },
-      primitive: "points",
-      count: function (context, props) {
-        return props.positions.length/2
-      },
+      elements: [[0,1,2], [2,3,0]],
+      primitive: "triangles",
+      instances: (context, props) =>  props.positions.length/2,
       blend: {
         enable: true,
         func: {
