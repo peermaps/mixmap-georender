@@ -14,11 +14,13 @@ module.exports = function (map) {
       pickFrag: `
         precision highp float;
         varying float vft, vindex;
+        varying vec2 vp;
         varying vec4 vcolor;
         uniform float featureCount;
         void main () {
           float opacity = floor(min(vcolor.w, 1.0));
-          gl_FragColor = vec4(vindex, vft, opacity, 1.0);
+          //gl_FragColor = vec4(vindex, vft, opacity, 1.0);
+          gl_FragColor = vec4(vp, opacity, 1.0);
         }
       `,
       vert: glsl`
@@ -30,8 +32,9 @@ module.exports = function (map) {
         attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
-        uniform float featureCount, aspect, zoom;
+        uniform float featureCount, aspect, zoom, vw, vh;
         varying float vft, vindex, zindex;
+        varying vec2 vp;
         varying vec4 vcolor;
         void main () {
           vft = featureType;
@@ -39,7 +42,27 @@ module.exports = function (map) {
           vcolor = point.color;
           vindex = index;
           zindex = point.zindex;
-          vec2 p = position.xy*0.000001*point.size + offset + ioffset;
+          //vec2 pp = vec2(
+          //  (position.x*point.size)*(viewbox.z-viewbox.x)/vw,
+          //  (position.y*point.size)*(viewbox.w-viewbox.y)/vw
+          //); 
+          //vec2 p = (position.xy*point.size)/(vec2(vh,vw)/(viewbox.w-viewbox.y))+ offset + ioffset;
+          float a = (viewbox.z-viewbox.x)*point.size*0.001 > 0.000005 ?
+          position.x*((viewbox.z-viewbox.x)*point.size*0.001) :
+          position.x*((viewbox.z-viewbox.x)*point.size*0.005);
+          float b = (viewbox.w-viewbox.y)*point.size*0.001 > 0.000003 ?
+          position.y*((viewbox.w-viewbox.y)*point.size*0.001) :
+          position.y*((viewbox.w-viewbox.y)*point.size*0.003);
+          float c = a > 0.000005 ? a : position.x*((viewbox.z-viewbox.x)*point.size*0.004);
+          float d = b > 0.000003 ? b : position.y*((viewbox.w-viewbox.y)*point.size*0.004);
+          vec2 pp = vec2(c,d);
+          //vec2 pp = vec2(
+          //  position.x*(viewbox.z-viewbox.x)*point.size*0.001,
+          //  position.y*(viewbox.w-viewbox.y)*point.size*0.001
+          //); 
+          vec2 p = pp + offset + ioffset;
+          //vp = vec2((p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect); 
+          vp = pp;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
@@ -53,7 +76,16 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
-        featureCount: map.prop('featureCount')
+        featureCount: map.prop('featureCount'),
+				aspect: function (context) {
+					return context.viewportWidth / context.viewportHeight
+				},
+			  vw: function (context) {
+          return context.viewportWidth
+        },
+			  vh: function (context) {
+          return context.viewportHeight
+        },
       },
       attributes: {
         position: [-1.0,1.0,1.0,1.0,1.0,-1.0,-1.0,-1.0],
