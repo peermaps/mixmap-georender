@@ -42,26 +42,24 @@ module.exports = function (map) {
           vcolor = point.color;
           vindex = index;
           zindex = point.zindex;
-          //vec2 pp = vec2(
-          //  (position.x*point.size)*(viewbox.z-viewbox.x)/vw,
-          //  (position.y*point.size)*(viewbox.w-viewbox.y)/vw
-          //); 
-          //vec2 p = (position.xy*point.size)/(vec2(vh,vw)/(viewbox.w-viewbox.y))+ offset + ioffset;
-          float a = (viewbox.z-viewbox.x)*point.size*0.001 > 0.000005 ?
-          position.x*((viewbox.z-viewbox.x)*point.size*0.001) :
-          position.x*((viewbox.z-viewbox.x)*point.size*0.005);
-          float b = (viewbox.w-viewbox.y)*point.size*0.001 > 0.000003 ?
-          position.y*((viewbox.w-viewbox.y)*point.size*0.001) :
-          position.y*((viewbox.w-viewbox.y)*point.size*0.003);
-          float c = a > 0.000005 ? a : position.x*((viewbox.z-viewbox.x)*point.size*0.004);
-          float d = b > 0.000003 ? b : position.y*((viewbox.w-viewbox.y)*point.size*0.004);
+          float a = (viewbox.z-viewbox.x)*point.size*0.1;
+          float b = (viewbox.w-viewbox.y)*point.size*0.1;
+          float c = step(0.0, a)*step(a, 0.00009)*(position.x*0.054*(a+0.00001)) +
+            step(0.0001, a)*step(a, 0.00017)*(position.x*0.019*a) +
+            step(0.00018, a)*step(a, 0.0003)*(position.x*0.02*a) +
+            step(0.00031, a)*step(a, 1.0)*(position.x*0.01*a);
+          float d = step(0.0, b)*step(b, 0.00009)*(position.y*0.054*(b+0.00001)) +
+            step(0.0001, b)*step(b, 0.00017)*(position.y*0.019*b) +
+            step(0.00018, b)*step(b, 0.00019)*(position.y*0.02*b) +
+            step(0.0002, b)*step(b, 1.0)*(position.y*0.01*b);
+          //float c = a > 0.000005 ? position.x*((viewbox.z-viewbox.x)*point.size*0.001) : position.x*((viewbox.z-viewbox.x)*point.size*0.005);
+          //float d = b > 0.000003 ? position.y*((viewbox.w-viewbox.y)*point.size*0.001) : position.y*((viewbox.w-viewbox.y)*point.size*0.003);
           vec2 pp = vec2(c,d);
           //vec2 pp = vec2(
-          //  position.x*(viewbox.z-viewbox.x)*point.size*0.001,
-          //  position.y*(viewbox.w-viewbox.y)*point.size*0.001
+          //  position.x*(viewbox.z-viewbox.x)*point.size*0.0005,
+          //  position.y*(viewbox.w-viewbox.y)*point.size*0.0005
           //); 
           vec2 p = pp + offset + ioffset;
-          //vp = vec2((p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect); 
           vp = pp;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
