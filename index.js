@@ -42,16 +42,16 @@ module.exports = function (map) {
           vcolor = point.color;
           vindex = index;
           zindex = point.zindex;
-          float a = (viewbox.z-viewbox.x)*point.size*0.1;
-          float b = (viewbox.w-viewbox.y)*point.size*0.1;
-          float c = step(0.0, a)*step(a, 0.00009)*(position.x*0.054*(a+0.00001)) +
-            step(0.0001, a)*step(a, 0.00017)*(position.x*0.019*a) +
-            step(0.00018, a)*step(a, 0.0003)*(position.x*0.02*a) +
-            step(0.00031, a)*step(a, 1.0)*(position.x*0.01*a);
-          float d = step(0.0, b)*step(b, 0.00009)*(position.y*0.054*(b+0.00001)) +
-            step(0.0001, b)*step(b, 0.00017)*(position.y*0.019*b) +
-            step(0.00018, b)*step(b, 0.00019)*(position.y*0.02*b) +
-            step(0.0002, b)*step(b, 1.0)*(position.y*0.01*b);
+          float a = (viewbox.z-viewbox.x)*point.size;
+          float b = (viewbox.w-viewbox.y)*point.size;
+          float c = step(0.0, a)*step(a, 0.0009)*(position.x*0.054*(a+0.0001)) +
+            step(0.001, a)*step(a, 0.0017)*(position.x*0.019*a) +
+            step(0.0018, a)*step(a, 0.003)*(position.x*0.02*a) +
+            step(0.0031, a)*step(a, 1.0)*(position.x*0.01*a);
+          float d = step(0.0, b)*step(b, 0.0009)*(position.y*0.054*(b+0.0001)) +
+            step(0.001, b)*step(b, 0.0017)*(position.y*0.019*b) +
+            step(0.0018, b)*step(b, 0.0019)*(position.y*0.02*b) +
+            step(0.002, b)*step(b, 1.0)*(position.y*0.01*b);
           //float c = a > 0.000005 ? position.x*((viewbox.z-viewbox.x)*point.size*0.001) : position.x*((viewbox.z-viewbox.x)*point.size*0.005);
           //float d = b > 0.000003 ? position.y*((viewbox.w-viewbox.y)*point.size*0.001) : position.y*((viewbox.w-viewbox.y)*point.size*0.003);
           vec2 pp = vec2(c,d);
@@ -86,7 +86,7 @@ module.exports = function (map) {
         },
       },
       attributes: {
-        position: [-1.0,1.0,1.0,1.0,1.0,-1.0,-1.0,-1.0],
+        position: [-0.1,0.1,0.1,0.1,0.1,-0.1,-0.1,-0.1],
         ioffset: {
           buffer: map.prop('positions'),
           divisor: 1
