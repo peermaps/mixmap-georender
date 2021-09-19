@@ -6,13 +6,15 @@ var decode = require('georender-pack/decode')
 var lpb = require('length-prefixed-buffers')
  
 var mix = mixmap(regl, { extensions: [
-  'oes_element_index_uint', 'oes_texture_float','EXT_float_blend' ] })
+  'oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend',
+  'angle_instanced_arrays'] })
 var map = mix.create({ 
   viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
   //viewbox: [+29.9, +31.1, +30.1, +31.3],
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
   pickfb: { colorFormat: 'rgba', colorType: 'float32' }
 })
+window.map = map
 var geoRender = require('../index.js')(map)
 
 var draw = {
@@ -25,6 +27,7 @@ var draw = {
   point: map.createDraw(geoRender.points),
   pointT: map.createDraw(geoRender.points),
 }
+window.draw = draw
 
 function ready({style, decoded}) {
   var prep = prepare({
@@ -37,6 +40,13 @@ function ready({style, decoded}) {
   var zoom = Math.round(map.getZoom())
   var props = null
   update(zoom)
+  /*
+  var point = function (x, y, vb) {
+    var a = (x - vb[0])/(vb[2] - vb[0])*2-1 
+    var b = (y - vb[1])/(vb[3] - vb[1])*2-1
+    return [a,b]
+  }
+  */
   map.on('viewbox', function () {
     var z = Math.round(map.getZoom())
     if (zoom !== z) update(z)
@@ -55,6 +65,7 @@ function ready({style, decoded}) {
     map.draw()
   }
   window.addEventListener('click', function (ev) {
+    console.log(ev.offsetX, ev.offsetY)
     map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
       if (data[2] === 0.0) {
         console.log(data[1], props.pointT.indexToId[data[0]])
@@ -74,7 +85,7 @@ function ready({style, decoded}) {
       else if (data[2] === 5.0) {
         console.log(data[1], props.areaP.indexToId[data[0]])
       }
-      console.log(data)
+      //console.log(data)
     })
   })
 }
@@ -105,8 +116,10 @@ window.addEventListener('keydown', function (ev) {
     map.setZoom(Math.min(6,Math.round(map.getZoom()+1)))
   } else if (ev.code === 'Minus') {
     map.setZoom(map.getZoom()-1)
+    console.log(map.getZoom())
   } else if (ev.code === 'Equal') {
     map.setZoom(map.getZoom()+1)
+    console.log(map.getZoom())
   }
 })
 

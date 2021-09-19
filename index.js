@@ -41,13 +41,13 @@ module.exports = function (map) {
           vindex = index;
           zindex = point.zindex;
           vec2 p = offset + ioffset;
-          float psizex = 10.0 * point.size / size.x * (+1.0 - -1.0);
-          float psizey = 10.0 * point.size / size.y * (+1.0 - -1.0);
+          float psizex = 5.0 * point.size / size.x * 2.0;
+          float psizey = 5.0 * point.size / size.y * 2.0;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
-            1.0/(1.0+zindex), 1) + vec4(position.x*psizex,position.y*psizey,0,0);
-        }
+            1.0/(1.0+zindex), 1) + vec4(position.x * psizex, position.y * psizey, 0, 0);
+         }
       `,
       uniforms: {
         size: function (context) {
@@ -78,7 +78,9 @@ module.exports = function (map) {
       },
       elements: [[0,1,2], [2,3,0]],
       primitive: "triangles",
-      instances: (context, props) =>  props.positions.length/2,
+      instances: function (context, props) {
+        return props.positions.length/2
+      },
       blend: {
         enable: true,
         func: {
