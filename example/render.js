@@ -60,11 +60,11 @@ require('resl')({
   manifest: {
     style: {
       type: 'image',
-      src: './example/style.png'
+      src: 'style.png'
     },
     decoded: {
       type: 'binary',
-      src: './example/kharkiv' || location.search.slice(1),
+      src: 'kharkiv',
       parser: data => decode(lpb.decode(Buffer.from(data)))
     }
   },

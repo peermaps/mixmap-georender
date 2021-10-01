@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "tape test/*.js",
-    "example": "budo ./example/render.js",
+    "example": "budo example/render.js -d example",
     "download": "wget https://kitties.neocities.org/mixmap-georender/kharkiv https://kitties.neocities.org/mixmap-georender/style.png -P ./example/"
   },
   "browserify": {
