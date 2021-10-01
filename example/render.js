@@ -85,5 +85,6 @@ window.addEventListener('keydown', function (ev) {
   }
 })
 
+document.body.style = 'margin: 0px; overflow: hidden;'
 document.body.appendChild(mix.render())
 document.body.appendChild(map.render({ width: window.innerWidth, height: window.innerHeight }))
