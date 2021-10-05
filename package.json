@@ -16,6 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "bin-pack": "^1.0.2",
     "georender-pack": "^3.0.0",
     "glsl-georender-style-texture": "^2.0.1",
     "glslify": "^7.0.0",

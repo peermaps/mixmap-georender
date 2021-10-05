@@ -4,6 +4,7 @@ var prepare = require('../prepare.js')
 var getImagePixels = require('get-image-pixels')
 var decode = require('georender-pack/decode')
 var lpb = require('length-prefixed-buffers')
+var Text = require('../text.js')
  
 var mix = mixmap(regl, { extensions: [
   'oes_element_index_uint', 'oes_texture_float','EXT_float_blend',
@@ -24,6 +25,7 @@ var draw = {
   lineFillT: map.createDraw(geoRender.lineFill),
   point: map.createDraw(geoRender.points),
   pointT: map.createDraw(geoRender.points),
+  label: map.createDraw(geoRender.labels),
 }
 
 function ready({style, decoded}) {
@@ -36,10 +38,15 @@ function ready({style, decoded}) {
   })
   var zoom = Math.round(map.getZoom())
   var props = null
+  var text = new Text
   update(zoom)
   map.on('viewbox', function () {
     var z = Math.round(map.getZoom())
-    if (zoom !== z) update(z)
+    if (zoom !== z) {
+      update(z)
+    } else {
+      draw.label.props = [text.update(props, map)]
+    }
     zoom = z
   })
   function update(zoom) {
@@ -52,6 +59,7 @@ function ready({style, decoded}) {
     draw.lineStrokeT.props = [props.lineT]
     draw.area.props = [props.areaP]
     draw.areaT.props = [props.areaT]
+    draw.label.props = [text.update(props, map)]
     map.draw()
   }
 }
