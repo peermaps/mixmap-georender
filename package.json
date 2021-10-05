@@ -20,6 +20,7 @@
     "georender-pack": "^3.0.0",
     "glsl-georender-style-texture": "^2.0.1",
     "glslify": "^7.0.0",
+    "label-placement-engine": "^1.0.0",
     "partition-array": "^1.0.0"
   },
   "devDependencies": {
