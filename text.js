@@ -20,14 +20,15 @@ function Text(opts) {
   if (!opts) opts = {}
   if (!(this instanceof Text)) return new Text(opts)
 
-  this._font = opts.font || '14px helvetica, arial'
+  this._font = opts.font || '15px helvetica, arial'
   this._fillStyle = 'black'
   this._lineWidth = 4
   this._strokeStyle = 'white'
 
   this._canvas = opts.canvas || document.createElement('canvas')
+  this._texture = null
+  this._uvs = null
   this._ctx = this._canvas.getContext('2d')
-  this._scale = 
   this._labelEngine = LabelEngine({
     types: {
       bbox: labelPreset.bbox(),
@@ -70,8 +71,8 @@ Text.prototype.update = function (props, map) {
       var m = this._ctx.measureText(text)
       var widthPx = Math.ceil(m.actualBoundingBoxRight - m.actualBoundingBoxLeft) + pw
       var heightPx = Math.ceil(m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) + ph
-      var widthLon = widthPx * pxToLon
-      var heightLat = heightPx * pxToLat
+      var widthLon = (widthPx - pw) * pxToLon
+      var heightLat = (heightPx - ph) * pxToLat
       labels.push({
         type: 'point',
         point: [lon,lat],
@@ -87,8 +88,15 @@ Text.prototype.update = function (props, map) {
   }
   this._labelEngine.update(labels)
 
-  var uvs = new Float32Array(this._labelEngine.data.positions.length)
-  this._labelEngine.data.uvs = uvs
+  var uvs = null
+  if (this._uvs && this._uvs.length === this._labelEngine.data.positions.length) {
+    uvs = this._uvs
+  } else if (this._uvs && this._uvs.length > this._labelEngine.data.positions.length) {
+    uvs = this._uvs.subarray(0,this._labelEngine.data.positions.length)
+  } else {
+    uvs = new Float32Array(this._labelEngine.data.positions.length)
+    this._uvs = uvs
+  }
 
   var bins = []
   for (var i = 0; i < labels.length; i++) {
@@ -122,11 +130,15 @@ Text.prototype.update = function (props, map) {
     this._ctx.strokeText(text, x, y)
     this._ctx.fillText(text, x, y)
   }
-  this._labelEngine.data.texture = map.regl.texture(this._canvas)
+  if (!this._texture) {
+    this._texture = map.regl.texture(this._canvas)
+  } else {
+    this._texture(this._canvas)
+  }
   return {
     positions: this._labelEngine.data.positions,
-    uvs: this._labelEngine.data.uvs,
-    texture: this._labelEngine.data.texture,
+    uvs: uvs,
+    texture: this._texture,
     cells: this._labelEngine.data.cells,
     cell_count: this._labelEngine.count.cells,
   }
