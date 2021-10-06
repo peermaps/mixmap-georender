@@ -9,8 +9,8 @@ var mix = mixmap(regl, { extensions: [
   'oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend',
   'angle_instanced_arrays'] })
 var map = mix.create({ 
-  viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
-  //viewbox: [+29.9, +31.1, +30.1, +31.3],
+  //viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
+  viewbox: [+29.9, +31.1, +30.1, +31.3],
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
   pickfb: { colorFormat: 'rgba', colorType: 'float32' }
 })
@@ -20,6 +20,8 @@ var geoRender = require('../index.js')(map)
 var draw = {
   area: map.createDraw(geoRender.areas),
   areaT: map.createDraw(geoRender.areas),
+  areaborder: map.createDraw(geoRender.areaborders),
+  areaborderT: map.createDraw(geoRender.areaborders),
   lineStroke: map.createDraw(geoRender.lineStroke),
   lineFill: map.createDraw(geoRender.lineFill),
   lineStrokeT: map.createDraw(geoRender.lineStroke),
@@ -62,6 +64,8 @@ function ready({style, decoded}) {
     draw.lineStrokeT.props = [props.lineT]
     draw.area.props = [props.areaP]
     draw.areaT.props = [props.areaT]
+    draw.areaborder.props = [props.areaborderP]
+    draw.areaborderT.props = [props.areaborderT]
     map.draw()
   }
   window.addEventListener('click', function (ev) {
@@ -99,8 +103,8 @@ require('resl')({
     },
     decoded: {
       type: 'binary',
-      src: './example/kharkiv' || location.search.slice(1),
-      //src: './example/alexandrialpb' || location.search.slice(1),
+      //src: './example/kharkiv' || location.search.slice(1),
+      src: './example/alexandrialpb' || location.search.slice(1),
       parser: data => decode(lpb.decode(Buffer.from(data)))
     }
   },

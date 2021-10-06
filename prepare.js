@@ -13,7 +13,8 @@ function Prepare(opts) {
   this.indexes = {
     point: new Uint32Array(this.data.point.types.length),
     line: new Uint32Array(this.data.line.types.length),
-    area: new Uint32Array(this.data.area.types.length)
+    area: new Uint32Array(this.data.area.types.length),
+    areaborder: new Uint32Array(this.data.areaborder.types.length)
   }
   for (var i=0; i<this.indexes.point.length; i++) {
     this.indexes.point[i] = i 
@@ -24,29 +25,55 @@ function Prepare(opts) {
   for (var i=0; i<this.indexes.area.length; i++) {
     this.indexes.area[i] = i 
   }
+  for (var i=0; i<this.indexes.areaborder.length; i++) {
+    this.indexes.areaborder[i] = i
+  }
   var pointIndexes = makeIndexes(this.data.point.ids)
   var lineIndexes = makeIndexes(this.data.line.ids)
   var areaIndexes = makeIndexes(this.data.area.ids)
-  this.distances = [0,0]
-  var distx = 0
-  var disty = 0
+  var areaborderIndexes = makeIndexes(this.data.areaborder.ids)
+  this.ldistances = [0,0]
+  var ldistx = 0
+  var ldisty = 0
   var lids = this.data.line.ids
   var lposits = this.data.line.positions
   for (var i=0;i<lids.length-1;i++){
     if (lids[i] === lids[i+1]) {
-      distx += Math.abs(lposits[2*i] - lposits[2*i+2])
-      disty += Math.abs(lposits[2*i+1] - lposits[2*i+3])
+      ldistx += Math.abs(lposits[2*i] - lposits[2*i+2])
+      ldisty += Math.abs(lposits[2*i+1] - lposits[2*i+3])
     }
     else {
-      distx = 0
-      disty = 0
+      ldistx = 0
+      ldisty = 0
     }
-    if (isNaN(distx) || isNaN(disty)){
-      distx = 0
-      disty = 0
+    if (isNaN(ldistx) || isNaN(ldisty)){
+      ldistx = 0
+      ldisty = 0
     }
-    this.distances.push(distx, disty)
+    this.ldistances.push(ldistx, ldisty)
   }
+
+  this.aldistances = [0,0]
+  var aldistx = 0
+  var aldisty = 0
+  var alids = this.data.areaborder.ids
+  var alposits = this.data.areaborder.positions
+  for (var i=0;i<alids.length-1;i++){
+    if (alids[i] === alids[i+1]) {
+      aldistx += Math.abs(alposits[2*i] - alposits[2*i+2])
+      aldisty += Math.abs(alposits[2*i+1] - alposits[2*i+3])
+    }
+    else {
+      aldistx = 0
+      aldisty = 0
+    }
+    if (isNaN(aldistx) || isNaN(aldisty)){
+      aldistx = 0
+      aldisty = 0
+    }
+    this.aldistances.push(aldistx, aldisty)
+  }
+
   this.props = {
     point: {
       positions: null,
@@ -86,7 +113,7 @@ function Prepare(opts) {
       types: null,
       id: null,
       normals: this.data.line.normals,
-      distances: this.distances,
+      distances: this.ldistances,
       indexes: lineIndexes.indexes,
       indexToId: lineIndexes.indexToId,
       idToIndex: lineIndexes.idToIndex,
@@ -155,7 +182,46 @@ function Prepare(opts) {
       labels: this.data.area.labels,
       style: this.style,
       featureCount
-    }
+    },
+    areaborder: {
+      positions: null,
+      types: null,
+      id: null,
+      normals: this.data.areaborder.normals,
+      distances: this.aldistances,
+      //indexes: areaborderIndexes.indexes,
+      //indexToId: areaborderIndexes.indexToId,
+      //idToIndex: areaborderIndexes.idToIndex,
+      indexes: null,
+      indexToId: null,
+      idToIndex: null,
+      style: this.style,
+      featureCount,
+    },
+    areaborderT: {
+      positions: null,
+      types: null,
+      id: null,
+      normals: null,
+      distances: null,
+      indexes: null,
+      indexToId: null,
+      idToIndex: null,
+      style: this.style,
+      featureCount
+    },
+    areaborderP: {
+      positions: null,
+      types: null,
+      id: null,
+      normals: null,
+      distances: null,
+      indexes: null,
+      indexToId: null,
+      idToIndex: null,
+      style: this.style,
+      featureCount
+    },
   }
 }
 Prepare.prototype._splitSort = function (key, zoom) {
@@ -200,8 +266,14 @@ Prepare.prototype._splitSort = function (key, zoom) {
       self.props[tkey].normals.push(self.data[key].normals[self.indexes[tkey][i]*2+1])
     }
     if (self.props[key].distances) {
-      self.props[tkey].distances.push(self.distances[self.indexes[tkey][i]*2])
-      self.props[tkey].distances.push(self.distances[self.indexes[tkey][i]*2+1])
+      if (self.ldistances) {
+        self.props[tkey].distances.push(self.ldistances[self.indexes[tkey][i]*2])
+        self.props[tkey].distances.push(self.ldistances[self.indexes[tkey][i]*2+1])
+      }
+      if (self.aldistances) {
+        self.props[tkey].distances.push(self.aldistances[self.indexes[tkey][i]*2])
+        self.props[tkey].distances.push(self.aldistances[self.indexes[tkey][i]*2+1])
+      }
     }
   }
   for (var i=0; i<self.indexes[pkey].length; i++) {
@@ -214,10 +286,17 @@ Prepare.prototype._splitSort = function (key, zoom) {
       self.props[pkey].normals.push(self.data[key].normals[self.indexes[pkey][i]*2+1])
     }
     if (self.props[pkey].distances) {
-      self.props[pkey].distances.push(self.distances[self.indexes[pkey][i]*2])
-      self.props[pkey].distances.push(self.distances[self.indexes[pkey][i]*2+1])
+      if (self.ldistances) {
+        self.props[pkey].distances.push(self.ldistances[self.indexes[pkey][i]*2])
+        self.props[pkey].distances.push(self.ldistances[self.indexes[pkey][i]*2+1])
+      }
+      if (self.aldistances) {
+        self.props[pkey].distances.push(self.aldistances[self.indexes[pkey][i]*2])
+        self.props[pkey].distances.push(self.aldistances[self.indexes[pkey][i]*2+1])
+      }
     }
   }
+  //figure out area line indexes
   var tindexes = makeIndexes(self.props[tkey].id)
   var pindexes = makeIndexes(self.props[pkey].id)
   self.props[tkey].indexes = tindexes.indexes
@@ -250,6 +329,7 @@ Prepare.prototype.update = function (zoom) {
   var self = this
   this._splitSort('point', zoom)
   this._splitSort('line', zoom)
+  this._splitSort('areaborder', zoom)
   this._splitSortArea('area', zoom)
   return this.props
 }

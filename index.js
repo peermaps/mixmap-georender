@@ -347,6 +347,98 @@ module.exports = function (map) {
         }
       }
     },
+    areaborders: {
+      frag: glsl`
+        precision highp float;
+        uniform vec4 viewbox;
+        uniform vec2 size;
+        uniform float aspect;
+        varying vec2 vdist;
+        varying float vdashLength, vdashGap;
+        varying vec4 vcolor;
+        void main () {
+          vec2 vb = vec2(viewbox.z-viewbox.x, viewbox.w-viewbox.y);
+          vec2 s = vec2(size.x, size.y*aspect);
+          float t = length(vdist*s/vb);
+          float d = vdashLength;
+          float g = vdashGap;
+          float x = 1.0 - step(d, mod(t, d+g));
+          gl_FragColor = vec4(vcolor.xyz, vcolor.w * x);
+        }
+      `,
+      pickFrag: `
+        precision highp float;
+        varying float vft, vindex;
+        varying vec4 vcolor;
+        uniform float featureCount;
+        void main () {
+          float opacity = floor(min(vcolor.w, 1.0));
+          gl_FragColor = vec4(vindex, vft, 2.0+opacity, 1.0);
+        }
+      `,
+      vert: glsl`
+        precision highp float;
+        #pragma glslify: Areaborder = require('glsl-georender-style-texture/areaborder.h');
+        #pragma glslify: readAreaborder = require('glsl-georender-style-texture/areaborder.glsl');
+        attribute vec2 position, normal, dist;
+        attribute float featureType, index;
+        uniform vec4 viewbox;
+        uniform vec2 offset, size;
+        uniform float featureCount, aspect, zoom;
+        uniform sampler2D styleTexture;
+        varying float vft, vindex, zindex, vdashLength, vdashGap;
+        varying vec2 vpos, vnorm, vdist;
+        varying vec4 vcolor;
+        void main () {
+          vft = featureType;
+          Areaborder areaborder = readAreaborder(styleTexture, featureType, zoom, featureCount);
+          vcolor = areaborder.color;
+          vdashLength = areaborder.dashLength;
+          vdashGap = areaborder.dashGap;
+          vindex = index;
+          zindex = areaborder.zindex;
+          vec2 p = position.xy + offset;
+          vec2 m = areaborder.width/size;
+          vnorm = normalize(normal)*m;
+          vdist = dist;
+          gl_Position = vec4(
+            (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
+            ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
+            1.0/(1.0+zindex), 1);
+          vpos = gl_Position.xy;
+          gl_Position += vec4(vnorm, 0, 0);
+        }
+      `,
+      uniforms: {
+        size: function (context) {
+          size[0] = context.viewportWidth
+          size[1] = context.viewportHeight
+          return size
+        },
+        styleTexture: map.prop('style'),
+        featureCount: map.prop('featureCount')
+      },
+      attributes: {
+        position: map.prop('positions'),
+        featureType: map.prop('types'),
+        index: map.prop('indexes'),
+        normal: map.prop('normals'),
+        dist: map.prop('distances')
+      },
+      primitive: "triangle strip",
+      count: function (context, props) {
+        return props.positions.length/2
+      },
+      blend: {
+        enable: true,
+        func: {
+          srcRGB: 'src alpha',
+          srcAlpha: 1,
+          dstRGB: 'one minus src alpha',
+          dstAlpha: 1
+        }
+      }
+    },
     labels: {
       frag: `
       precision mediump float;
