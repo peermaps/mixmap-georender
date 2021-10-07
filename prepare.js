@@ -53,25 +53,25 @@ function Prepare(opts) {
     this.ldistances.push(ldistx, ldisty)
   }
 
-  this.aldistances = [0,0]
-  var aldistx = 0
-  var aldisty = 0
-  var alids = this.data.areaborder.ids
-  var alposits = this.data.areaborder.positions
-  for (var i=0;i<alids.length-1;i++){
-    if (alids[i] === alids[i+1]) {
-      aldistx += Math.abs(alposits[2*i] - alposits[2*i+2])
-      aldisty += Math.abs(alposits[2*i+1] - alposits[2*i+3])
+  this.abdistances = [0,0]
+  var abdistx = 0
+  var abdisty = 0
+  var abids = this.data.areaborder.ids
+  var abposits = this.data.areaborder.positions
+  for (var i=0;i<abids.length-1;i++){
+    if (abids[i] === abids[i+1]) {
+      abdistx += Math.abs(abposits[2*i] - abposits[2*i+2])
+      abdisty += Math.abs(abposits[2*i+1] - abposits[2*i+3])
     }
     else {
-      aldistx = 0
-      aldisty = 0
+      abdistx = 0
+      abdisty = 0
     }
-    if (isNaN(aldistx) || isNaN(aldisty)){
-      aldistx = 0
-      aldisty = 0
+    if (isNaN(abdistx) || isNaN(abdisty)){
+      abdistx = 0
+      abdisty = 0
     }
-    this.aldistances.push(aldistx, aldisty)
+    this.abdistances.push(abdistx, abdisty)
   }
 
   this.props = {
@@ -188,7 +188,7 @@ function Prepare(opts) {
       types: null,
       id: null,
       normals: this.data.areaborder.normals,
-      distances: this.aldistances,
+      distances: this.abdistances,
       //indexes: areaborderIndexes.indexes,
       //indexToId: areaborderIndexes.indexToId,
       //idToIndex: areaborderIndexes.idToIndex,
@@ -266,13 +266,13 @@ Prepare.prototype._splitSort = function (key, zoom) {
       self.props[tkey].normals.push(self.data[key].normals[self.indexes[tkey][i]*2+1])
     }
     if (self.props[key].distances) {
-      if (self.ldistances) {
-        self.props[tkey].distances.push(self.ldistances[self.indexes[tkey][i]*2])
-        self.props[tkey].distances.push(self.ldistances[self.indexes[tkey][i]*2+1])
+      if (key === 'line') {
+        self.props[tkey].distances.push(this.ldistances[self.indexes[tkey][i]*2])
+        self.props[tkey].distances.push(this.ldistances[self.indexes[tkey][i]*2+1])
       }
-      if (self.aldistances) {
-        self.props[tkey].distances.push(self.aldistances[self.indexes[tkey][i]*2])
-        self.props[tkey].distances.push(self.aldistances[self.indexes[tkey][i]*2+1])
+      else if (key === 'areaborder') {
+        self.props[tkey].distances.push(this.abdistances[self.indexes[tkey][i]*2])
+        self.props[tkey].distances.push(this.abistances[self.indexes[tkey][i]*2+1])
       }
     }
   }
@@ -285,14 +285,14 @@ Prepare.prototype._splitSort = function (key, zoom) {
       self.props[pkey].normals.push(self.data[key].normals[self.indexes[pkey][i]*2])
       self.props[pkey].normals.push(self.data[key].normals[self.indexes[pkey][i]*2+1])
     }
-    if (self.props[pkey].distances) {
-      if (self.ldistances) {
-        self.props[pkey].distances.push(self.ldistances[self.indexes[pkey][i]*2])
-        self.props[pkey].distances.push(self.ldistances[self.indexes[pkey][i]*2+1])
+    if (self.props[key].distances) {
+      if (key === 'line') {
+        self.props[pkey].distances.push(this.ldistances[self.indexes[pkey][i]*2])
+        self.props[pkey].distances.push(this.ldistances[self.indexes[pkey][i]*2+1])
       }
-      if (self.aldistances) {
-        self.props[pkey].distances.push(self.aldistances[self.indexes[pkey][i]*2])
-        self.props[pkey].distances.push(self.aldistances[self.indexes[pkey][i]*2+1])
+      else if (key === 'areaborder') {
+        self.props[pkey].distances.push(this.abdistances[self.indexes[pkey][i]*2])
+        self.props[pkey].distances.push(this.abdistances[self.indexes[pkey][i]*2+1])
       }
     }
   }
