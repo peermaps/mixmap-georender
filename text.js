@@ -40,6 +40,7 @@ function Text(opts) {
       }),
     }
   })
+  this._props = {}
 }
 
 Text.prototype.update = function (props, map) {
@@ -55,24 +56,24 @@ Text.prototype.update = function (props, map) {
     if (!/^point/.test(key)) continue
     var p = props[key]
     if (!p || !p.positions) continue
-    for (var id in p.labels) {
-      if (!p.labels.hasOwnProperty(id)) continue
-      if (!p.labels[id] || p.labels[id].length === 0) continue
+    for (var ix = 0; ix < p.id.length; ix++) {
+      var id = p.id[ix]
+      if (!p.labels.hasOwnProperty(id) || p.labels[id].length === 0) continue
       // only the first one right now
       var text = p.labels[id][0].replace(/^[^=]*=/,'')
-      var ix = p.idToIndex[id]
-      if (ix === undefined) continue
       var lon = p.positions[ix*2+0]
       var lat = p.positions[ix*2+1]
+      if (map.viewbox[0] > lon || lon > map.viewbox[2]) continue
+      if (map.viewbox[1] > lat || lat > map.viewbox[3]) continue
       var pxToLon = (map.viewbox[2]-map.viewbox[0]) / map._size[0]
       var pxToLat = (map.viewbox[3]-map.viewbox[1]) / map._size[1]
       var lonPx = lon / (map.viewbox[2]-map.viewbox[0]) * map._size[0]
       var latPx = lat / (map.viewbox[3]-map.viewbox[1]) * map._size[1]
       var m = this._ctx.measureText(text)
-      var widthPx = Math.ceil(m.actualBoundingBoxRight - m.actualBoundingBoxLeft) + pw
-      var heightPx = Math.ceil(m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) + ph
-      var widthLon = (widthPx - pw) * pxToLon
-      var heightLat = (heightPx - ph) * pxToLat
+      var widthPx = Math.ceil(m.actualBoundingBoxRight - m.actualBoundingBoxLeft)
+      var heightPx = Math.ceil(m.actualBoundingBoxAscent + m.actualBoundingBoxDescent)
+      var widthLon = (widthPx + pw + 1) * pxToLon
+      var heightLat = (heightPx + ph + 1) * pxToLat
       labels.push({
         type: 'point',
         point: [lon,lat],
@@ -102,30 +103,32 @@ Text.prototype.update = function (props, map) {
   for (var i = 0; i < labels.length; i++) {
     var x = labels[i]
     if (x.type === 'point' && this._labelEngine.visible[i] > 0.5) {
-      bins.push({ i, width: x.widthPx, height: x.heightPx })
+      bins.push({ i, width: x.widthPx+pw, height: x.heightPx+ph })
     }
   }
+  console.log('labels.length=',labels.length,'bins.length=',bins.length)
 
   var result = binPack(bins, { inPlace: true })
   this._canvas.width = Math.max(1, Math.ceil(result.width))
   this._canvas.height = Math.max(1, Math.ceil(result.height))
   this._setFont()
-  var w = Math.ceil(result.width - 1), h = Math.ceil(result.height - 1)
+  var cw = Math.ceil(result.width - 1), ch = Math.ceil(result.height - 1)
   for (var i = 0; i < bins.length; i++) {
     var r = bins[i]
     var start = this._labelEngine.offsets.positions[r.i*2+0]
     var end = this._labelEngine.offsets.positions[r.i*2+1]
+    var w = r.width, h = r.height
     var uvx = r.x - pw*0.5, uvy = r.y - ph*0.5
-    uvs[start+0] = uvx / w
-    uvs[start+1] = 1.0 - uvy / h
-    uvs[start+2] = (uvx + r.width) / w
-    uvs[start+3] = 1.0 - uvy / h
-    uvs[start+4] = (uvx + r.width) / w
-    uvs[start+5] = 1.0 - (uvy + r.height) / h
-    uvs[start+6] = uvx / w
-    uvs[start+7] = 1.0 - (uvy + r.height) / h
+    uvs[start+0] = uvx / cw
+    uvs[start+1] = 1.0 - uvy / ch
+    uvs[start+2] = (uvx + r.width) / cw
+    uvs[start+3] = 1.0 - uvy / ch
+    uvs[start+4] = (uvx + r.width) / cw
+    uvs[start+5] = 1.0 - (uvy + r.height) / ch
+    uvs[start+6] = uvx / cw
+    uvs[start+7] = 1.0 - (uvy + r.height) / ch
     var text = labels[r.i].text
-    var x = r.x
+    var x = r.x + pw*0.5
     var y = result.height - r.y - ph*0.5
     this._ctx.strokeText(text, x, y)
     this._ctx.fillText(text, x, y)
@@ -135,13 +138,12 @@ Text.prototype.update = function (props, map) {
   } else {
     this._texture(this._canvas)
   }
-  return {
-    positions: this._labelEngine.data.positions,
-    uvs: uvs,
-    texture: this._texture,
-    cells: this._labelEngine.data.cells,
-    cell_count: this._labelEngine.count.cells,
-  }
+  this._props.positions = this._labelEngine.data.positions
+  this._props.uvs = uvs
+  this._props.texture = this._texture
+  this._props.cells = this._labelEngine.data.cells
+  this._props.cell_count = this._labelEngine.count.cells
+  return this._props
 }
 
 Text.prototype._setFont = function () {
