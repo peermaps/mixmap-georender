@@ -57,9 +57,9 @@ module.exports = function (map) {
         },
         styleTexture: map.prop('style'),
         featureCount: map.prop('featureCount'),
-				aspect: function (context) {
-					return context.viewportWidth / context.viewportHeight
-				},
+        aspect: function (context) {
+          return context.viewportWidth / context.viewportHeight
+        },
       },
       attributes: {
         position: [-0.1,0.1,0.1,0.1,0.1,-0.1,-0.1,-0.1],
@@ -441,21 +441,48 @@ module.exports = function (map) {
     },
     labels: {
       frag: `
-      precision mediump float;
-      void main () {
-        gl_FragColor = vec4(0,0,1,1);
-      }`,
+        precision highp float;
+        varying vec2 vuv;
+        uniform sampler2D texture;
+        void main () {
+          vec4 c = texture2D(texture, vuv);
+          gl_FragColor = c;
+        }`,
       vert: `
-      precision mediump float;
-      attribute vec2 position;
-      void main () {
-        gl_Position = vec4(position.xy*vec2(1,-1)*0.2, 0, 1);
-      }`,
+        precision highp float;
+        attribute vec2 position, uv;
+        uniform vec4 viewbox;
+        uniform float aspect;
+        uniform vec2 offset, size;
+        varying vec2 vuv;
+        void main () {
+          vuv = uv;
+          vec2 p = position.xy + offset;
+          float zindex = 1000.0;
+          gl_Position = vec4(
+            (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
+            ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
+            1.0/(1.0+zindex), 1);
+        }
+      `,
+      uniforms: {
+        texture: map.prop('texture'),
+      },
       attributes: {
-        position: map.prop('positions')
+        position: map.prop('positions'),
+        uv: map.prop('uvs'),
       },
       elements: map.prop('cells'),
-      depth: { enable: false }
+      count: map.prop('cell_count'),
+      blend: {
+        enable: true,
+        func: {
+          srcRGB: 'src alpha',
+          srcAlpha: 1,
+          dstRGB: 'one minus src alpha',
+          dstAlpha: 1
+        }
+      },
     }
   }
 }
