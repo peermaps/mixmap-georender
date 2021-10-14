@@ -4,6 +4,7 @@ var prepare = require('../prepare.js')
 var getImagePixels = require('get-image-pixels')
 var decode = require('georender-pack/decode')
 var lpb = require('length-prefixed-buffers')
+var Text = require('../text.js')
  
 var mix = mixmap(regl, { extensions: [
   'oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend',
@@ -20,14 +21,15 @@ var geoRender = require('../index.js')(map)
 var draw = {
   area: map.createDraw(geoRender.areas),
   areaT: map.createDraw(geoRender.areas),
-  areaborder: map.createDraw(geoRender.areaborders),
-  areaborderT: map.createDraw(geoRender.areaborders),
+  areaBorder: map.createDraw(geoRender.areaborders),
+  areaBorderT: map.createDraw(geoRender.areaborders),
   lineStroke: map.createDraw(geoRender.lineStroke),
   lineFill: map.createDraw(geoRender.lineFill),
   lineStrokeT: map.createDraw(geoRender.lineStroke),
   lineFillT: map.createDraw(geoRender.lineFill),
   point: map.createDraw(geoRender.points),
   pointT: map.createDraw(geoRender.points),
+  label: map.createDraw(geoRender.labels),
 }
 window.draw = draw
 
@@ -41,17 +43,15 @@ function ready({style, decoded}) {
   })
   var zoom = Math.round(map.getZoom())
   var props = null
+  var text = new Text
   update(zoom)
-  /*
-  var point = function (x, y, vb) {
-    var a = (x - vb[0])/(vb[2] - vb[0])*2-1 
-    var b = (y - vb[1])/(vb[3] - vb[1])*2-1
-    return [a,b]
-  }
-  */
   map.on('viewbox', function () {
     var z = Math.round(map.getZoom())
-    if (zoom !== z) update(z)
+    if (zoom !== z) {
+      update(z)
+    } else {
+      draw.label.props = [text.update(props, map)]
+    }
     zoom = z
   })
   function update(zoom) {
@@ -64,8 +64,9 @@ function ready({style, decoded}) {
     draw.lineStrokeT.props = [props.lineT]
     draw.area.props = [props.areaP]
     draw.areaT.props = [props.areaT]
-    draw.areaborder.props = [props.areaborderP]
-    draw.areaborderT.props = [props.areaborderT]
+    draw.areaBorder.props = [props.areaborderP]
+    draw.areaBorderT.props = [props.areaborderT]
+    draw.label.props = [text.update(props, map)]
     map.draw()
   }
   window.addEventListener('click', function (ev) {
