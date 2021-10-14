@@ -9,12 +9,13 @@ function Prepare(opts) {
   this.style = opts.styleTexture
   this.pixels = opts.stylePixels
   this.data = opts.decoded
+  console.log(opts.decoded)
   this.zoomCount = opts.zoomEnd - opts.zoomStart
   this.indexes = {
     point: new Uint32Array(this.data.point.types.length),
     line: new Uint32Array(this.data.line.types.length),
     area: new Uint32Array(this.data.area.types.length),
-    areaborder: new Uint32Array(this.data.areaborder.types.length)
+    areaBorder: new Uint32Array(this.data.areaBorder.types.length)
   }
   for (var i=0; i<this.indexes.point.length; i++) {
     this.indexes.point[i] = i 
@@ -25,13 +26,13 @@ function Prepare(opts) {
   for (var i=0; i<this.indexes.area.length; i++) {
     this.indexes.area[i] = i 
   }
-  for (var i=0; i<this.indexes.areaborder.length; i++) {
-    this.indexes.areaborder[i] = i
+  for (var i=0; i<this.indexes.areaBorder.length; i++) {
+    this.indexes.areaBorder[i] = i
   }
   var pointIndexes = makeIndexes(this.data.point.ids)
   var lineIndexes = makeIndexes(this.data.line.ids)
   var areaIndexes = makeIndexes(this.data.area.ids)
-  var areaborderIndexes = makeIndexes(this.data.areaborder.ids)
+  var areaBorderIndexes = makeIndexes(this.data.areaBorder.ids)
   this.ldistances = [0,0]
   var ldistx = 0
   var ldisty = 0
@@ -56,8 +57,8 @@ function Prepare(opts) {
   this.abdistances = [0,0]
   var abdistx = 0
   var abdisty = 0
-  var abids = this.data.areaborder.ids
-  var abposits = this.data.areaborder.positions
+  var abids = this.data.areaBorder.ids
+  var abposits = this.data.areaBorder.positions
   for (var i=0;i<abids.length-1;i++){
     if (abids[i] === abids[i+1]) {
       abdistx += Math.abs(abposits[2*i] - abposits[2*i+2])
@@ -183,22 +184,22 @@ function Prepare(opts) {
       style: this.style,
       featureCount
     },
-    areaborder: {
+    areaBorder: {
       positions: null,
       types: null,
       id: null,
-      normals: this.data.areaborder.normals,
+      normals: this.data.areaBorder.normals,
       distances: this.abdistances,
-      //indexes: areaborderIndexes.indexes,
-      //indexToId: areaborderIndexes.indexToId,
-      //idToIndex: areaborderIndexes.idToIndex,
+      //indexes: areaBorderIndexes.indexes,
+      //indexToId: areaBorderIndexes.indexToId,
+      //idToIndex: areaBorderIndexes.idToIndex,
       indexes: null,
       indexToId: null,
       idToIndex: null,
       style: this.style,
       featureCount,
     },
-    areaborderT: {
+    areaBorderT: {
       positions: null,
       types: null,
       id: null,
@@ -210,7 +211,7 @@ function Prepare(opts) {
       style: this.style,
       featureCount
     },
-    areaborderP: {
+    areaBorderP: {
       positions: null,
       types: null,
       id: null,
@@ -228,6 +229,7 @@ Prepare.prototype._splitSort = function (key, zoom) {
   var self = this
   var tkey = key+'T'
   var pkey = key+'P'
+  if (key === 'areaBorder') console.log(self.data[key])
   var splitT = partition(this.indexes[key], function (i) {
     var opacity = self.getOpacity(key, self.data[key].types[i], zoom)
     return opacity > 100
@@ -270,7 +272,7 @@ Prepare.prototype._splitSort = function (key, zoom) {
         self.props[tkey].distances.push(this.ldistances[self.indexes[tkey][i]*2])
         self.props[tkey].distances.push(this.ldistances[self.indexes[tkey][i]*2+1])
       }
-      else if (key === 'areaborder') {
+      else if (key === 'areaBorder') {
         self.props[tkey].distances.push(this.abdistances[self.indexes[tkey][i]*2])
         self.props[tkey].distances.push(this.abistances[self.indexes[tkey][i]*2+1])
       }
@@ -290,7 +292,7 @@ Prepare.prototype._splitSort = function (key, zoom) {
         self.props[pkey].distances.push(this.ldistances[self.indexes[pkey][i]*2])
         self.props[pkey].distances.push(this.ldistances[self.indexes[pkey][i]*2+1])
       }
-      else if (key === 'areaborder') {
+      else if (key === 'areaBorder') {
         self.props[pkey].distances.push(this.abdistances[self.indexes[pkey][i]*2])
         self.props[pkey].distances.push(this.abdistances[self.indexes[pkey][i]*2+1])
       }
@@ -329,7 +331,7 @@ Prepare.prototype.update = function (zoom) {
   var self = this
   this._splitSort('point', zoom)
   this._splitSort('line', zoom)
-  this._splitSort('areaborder', zoom)
+  this._splitSort('areaBorder', zoom)
   this._splitSortArea('area', zoom)
   return this.props
 }
@@ -343,6 +345,9 @@ Prepare.prototype.getOpacity = function (key, type, zoom) {
   }
   else if (key === 'area') {
     var y = zoom * 2 + this.zoomCount * 2 + this.zoomCount * 4
+  }
+  else if (key === 'areaBorder') {
+    var y = zoom * 2 + this.zoomCount * 2 + this.zoomCount * 4 + this.zoomCount * 2
   }
   var index = (type + y * featureCount)*4 + 3
   return this.pixels[index]

@@ -19,8 +19,8 @@ var geoRender = require('../index.js')(map)
 var draw = {
   area: map.createDraw(geoRender.areas),
   areaT: map.createDraw(geoRender.areas),
-  areaBorder: map.createDraw(geoRender.areaborders),
-  areaBorderT: map.createDraw(geoRender.areaborders),
+  areaBorder: map.createDraw(geoRender.areaBorders),
+  areaBorderT: map.createDraw(geoRender.areaBorders),
   lineStroke: map.createDraw(geoRender.lineStroke),
   lineFill: map.createDraw(geoRender.lineFill),
   lineStrokeT: map.createDraw(geoRender.lineStroke),
@@ -51,6 +51,7 @@ function ready({style, decoded}) {
     }
     zoom = z
   })
+  console.log(props.areaBorderP)
   function update(zoom) {
     props = prep.update(zoom)
     draw.point.props = [props.pointP]
@@ -62,8 +63,8 @@ function ready({style, decoded}) {
     draw.area.props = [props.areaP]
     draw.areaT.props = [props.areaT]
     draw.label.props = [text.update(props, map)]
-    //draw.areaBorder.props = [props.areaBorderP]
-    //draw.areaBorderT.props = [props.areaBorderT]
+    draw.areaBorder.props = [props.areaBorderP]
+    draw.areaBorderT.props = [props.areaBorderT]
     map.draw()
   }
 }

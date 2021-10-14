@@ -347,7 +347,7 @@ module.exports = function (map) {
         }
       }
     },
-    areaborders: {
+    areaBorders: {
       frag: glsl`
         precision highp float;
         uniform vec4 viewbox;
@@ -378,8 +378,8 @@ module.exports = function (map) {
       `,
       vert: glsl`
         precision highp float;
-        #pragma glslify: Areaborder = require('glsl-georender-style-texture/areaborder.h');
-        #pragma glslify: readAreaborder = require('glsl-georender-style-texture/areaborder.glsl');
+        #pragma glslify: AreaBorder = require('glsl-georender-style-texture/areaborder.h');
+        #pragma glslify: readAreaBorder = require('glsl-georender-style-texture/areaborder.glsl');
         attribute vec2 position, normal, dist;
         attribute float featureType, index;
         uniform vec4 viewbox;
@@ -391,14 +391,14 @@ module.exports = function (map) {
         varying vec4 vcolor;
         void main () {
           vft = featureType;
-          Areaborder areaborder = readAreaborder(styleTexture, featureType, zoom, featureCount);
-          vcolor = areaborder.color;
-          vdashLength = areaborder.dashLength;
-          vdashGap = areaborder.dashGap;
+          AreaBorder areaBorder = readAreaBorder(styleTexture, featureType, zoom, featureCount);
+          vcolor = areaBorder.color;
+          vdashLength = areaBorder.dashLength;
+          vdashGap = areaBorder.dashGap;
           vindex = index;
-          zindex = areaborder.zindex;
+          zindex = areaBorder.zindex;
           vec2 p = position.xy + offset;
-          vec2 m = areaborder.width/size;
+          vec2 m = areaBorder.width/size;
           vnorm = normalize(normal)*m;
           vdist = dist;
           gl_Position = vec4(
