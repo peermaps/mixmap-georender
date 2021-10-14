@@ -51,7 +51,6 @@ function ready({style, decoded}) {
     }
     zoom = z
   })
-  console.log(props.areaBorderP)
   function update(zoom) {
     props = prep.update(zoom)
     draw.point.props = [props.pointP]

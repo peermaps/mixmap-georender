@@ -9,7 +9,6 @@ function Prepare(opts) {
   this.style = opts.styleTexture
   this.pixels = opts.stylePixels
   this.data = opts.decoded
-  console.log(opts.decoded)
   this.zoomCount = opts.zoomEnd - opts.zoomStart
   this.indexes = {
     point: new Uint32Array(this.data.point.types.length),
@@ -229,7 +228,6 @@ Prepare.prototype._splitSort = function (key, zoom) {
   var self = this
   var tkey = key+'T'
   var pkey = key+'P'
-  if (key === 'areaBorder') console.log(self.data[key])
   var splitT = partition(this.indexes[key], function (i) {
     var opacity = self.getOpacity(key, self.data[key].types[i], zoom)
     return opacity > 100
