@@ -6,7 +6,7 @@
   "scripts": {
     "test": "tape test/*.js",
     "example": "budo example/render.js -d example",
-    "download": "wget https://kitties.neocities.org/mixmap-georender/kharkiv https://kitties.neocities.org/mixmap-georender/style.png -P ./example/"
+    "download": "wget https://kitties.neocities.org/mixmap-georender/style.png -P ./example/ && peermaps query hyper://3dd1656d6408a718fae1117b5283fb18cb1f9139b892ce0f8cacbb6737ec1d67 -f lp --bbox=36.2146,49.9962,36.2404,50.0154 > ./example/kharkiv"
   },
   "browserify": {
     "transform": [
@@ -27,6 +27,7 @@
     "budo": "^11.6.2",
     "get-image-pixels": "^1.0.1",
     "length-prefixed-buffers": "^1.0.0",
+    "peermaps-node": "^3.0.2",
     "mixmap": "^1.5.1",
     "resl": "^1.0.3",
     "tape": "^5.1.1",
