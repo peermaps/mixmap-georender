@@ -106,7 +106,6 @@ Text.prototype.update = function (props, map) {
       bins.push({ i, width: x.widthPx+pw, height: x.heightPx+ph })
     }
   }
-  console.log('labels.length=',labels.length,'bins.length=',bins.length)
 
   var result = binPack(bins, { inPlace: true })
   this._canvas.width = Math.max(1, Math.ceil(result.width))
