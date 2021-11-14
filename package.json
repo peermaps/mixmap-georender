@@ -1,6 +1,6 @@
 {
   "name": "mixmap-georender",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "a mixmap layer for rendering peermaps georender data",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "bin-pack": "^1.0.2",
-    "georender-pack": "^4.0.0",
+    "georender-pack": "^4.1.0",
     "glsl-georender-style-texture": "^3.0.0",
     "glslify": "^7.0.0",
     "label-placement-engine": "^1.0.0",
