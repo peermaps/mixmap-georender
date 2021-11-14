@@ -3,7 +3,7 @@ var regl = require('regl')
 var prepare = require('../prepare.js')
 var getImagePixels = require('get-image-pixels')
 var decode = require('georender-pack/decode')
-var lpb = require('length-prefixed-buffers')
+var lpb = require('length-prefixed-buffers/without-count')
 var Text = require('../text.js')
  
 var mix = mixmap(regl, { extensions: [
@@ -27,7 +27,7 @@ var draw = {
   lineFillT: map.createDraw(geoRender.lineFill),
   point: map.createDraw(geoRender.points),
   pointT: map.createDraw(geoRender.points),
-  label: map.createDraw(geoRender.labels),
+  //label: map.createDraw(geoRender.labels),
 }
 
 function ready({style, decoded}) {
@@ -47,7 +47,7 @@ function ready({style, decoded}) {
     if (zoom !== z) {
       update(z)
     } else {
-      draw.label.props = [text.update(props, map)]
+      //draw.label.props = [text.update(props, map)]
     }
     zoom = z
   })
@@ -61,7 +61,7 @@ function ready({style, decoded}) {
     draw.lineStrokeT.props = [props.lineT]
     draw.area.props = [props.areaP]
     draw.areaT.props = [props.areaT]
-    draw.label.props = [text.update(props, map)]
+    //draw.label.props = [text.update(props, map)]
     draw.areaBorder.props = [props.areaBorderP]
     draw.areaBorderT.props = [props.areaBorderT]
     map.draw()
@@ -76,7 +76,7 @@ require('resl')({
     },
     decoded: {
       type: 'binary',
-      src: './example/kharkiv',
+      src: './example/kharkiv' || location.search.slice(1),
       parser: data => decode(lpb.decode(Buffer.from(data)))
     }
   },

@@ -3,15 +3,14 @@ var regl = require('regl')
 var prepare = require('../prepare.js')
 var getImagePixels = require('get-image-pixels')
 var decode = require('georender-pack/decode')
-var lpb = require('length-prefixed-buffers')
+var lpb = require('length-prefixed-buffers/without-count')
 var Text = require('../text.js')
  
 var mix = mixmap(regl, { extensions: [
-  'oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend',
-  'angle_instanced_arrays'] })
+  'oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend', 'angle_instanced_arrays'] })
 var map = mix.create({ 
-  //viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
-  viewbox: [+29.9, +31.1, +30.1, +31.3],
+  viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
+  //viewbox: [+29.9, +31.1, +30.1, +31.3],
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
   pickfb: { colorFormat: 'rgba', colorType: 'float32' }
 })
@@ -50,7 +49,7 @@ function ready({style, decoded}) {
     if (zoom !== z) {
       update(z)
     } else {
-      draw.label.props = [text.update(props, map)]
+      //draw.label.props = [text.update(props, map)]
     }
     zoom = z
   })
@@ -66,7 +65,7 @@ function ready({style, decoded}) {
     draw.areaT.props = [props.areaT]
     draw.areaBorder.props = [props.areaBorderP]
     draw.areaBorderT.props = [props.areaBorderT]
-    draw.label.props = [text.update(props, map)]
+    //draw.label.props = [text.update(props, map)]
     map.draw()
   }
   window.addEventListener('click', function (ev) {
@@ -90,7 +89,6 @@ function ready({style, decoded}) {
       else if (data[2] === 5.0) {
         console.log(data[1], props.areaP.indexToId[data[0]])
       }
-      //console.log(data)
     })
   })
 }
@@ -104,8 +102,8 @@ require('resl')({
     },
     decoded: {
       type: 'binary',
-      //src: './example/kharkiv' || location.search.slice(1),
-      src: './example/alexandrialpb' || location.search.slice(1),
+      src: './example/kharkiv' || location.search.slice(1),
+      //src: './example/alexandria' || location.search.slice(1),
       parser: data => decode(lpb.decode(Buffer.from(data)))
     }
   },
