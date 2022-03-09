@@ -1,4 +1,5 @@
 var partition = require('partition-array')
+var vec2 = require('gl-vec2')
 var featureList = require('georender-pack/features.json')
 var featureCount = featureList.length
 
@@ -37,6 +38,27 @@ function Prepare(opts) {
   var ldisty = 0
   var lids = this.data.line.ids
   var lposits = this.data.line.positions
+
+  var v0 = [0, 0]
+  var v1 = [0, 0]
+  var lcdist = []
+	var cd = 0
+	for (var i=0; i<lposits.length/2-1; i++) {
+		vec2.set(v0, lposits[2*i], lposits[2*i+1])
+		vec2.set(v1, lposits[2*(i+1)], lposits[2*(i+1)+1])
+		lcdist.push(cd)
+		cd+=vec2.dist(v0, v1)
+	}
+
+  var lbreaks = []
+	for (var i=0; i<lids.length-1; i++) {
+		if (lids[i] === lids[i+1]) {
+			lbreaks.push(1.0)
+		}
+		else lbreaks.push(0.0)
+	}
+	lbreaks.push(1.0)
+
   for (var i=0;i<lids.length-1;i++){
     if (lids[i] === lids[i+1]) {
       ldistx += Math.abs(lposits[2*i] - lposits[2*i+2])
@@ -114,6 +136,11 @@ function Prepare(opts) {
       id: null,
       normals: this.data.line.normals,
       distances: this.ldistances,
+      cdist: lcdist,
+			breaks: lbreaks,
+      period: 0.1,
+      width: 0.01,
+      duty: 0.3,
       indexes: lineIndexes.indexes,
       indexToId: lineIndexes.indexToId,
       idToIndex: lineIndexes.idToIndex,
@@ -127,6 +154,11 @@ function Prepare(opts) {
       id: null,
       normals: null,
       distances: null,
+      cdist: lcdist,
+			breaks: lbreaks,
+      period: 0.1,
+      width: 0.01,
+      duty: 0.3,
       indexes: null,
       indexToId: null,
       idToIndex: null,
@@ -140,6 +172,11 @@ function Prepare(opts) {
       id: null,
       normals: null,
       distances: null,
+      cdist: lcdist,
+			breaks: lbreaks,
+      period: 0.001,
+      width: 0.01,
+      duty: 0.5,
       indexes: null,
       indexToId: null,
       idToIndex: null,

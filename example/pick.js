@@ -61,6 +61,7 @@ function ready({style, decoded}) {
     draw.lineStroke.props = [props.lineP]
     draw.lineFillT.props = [props.lineT]
     draw.lineStrokeT.props = [props.lineT]
+    console.log(props.lineP)
     draw.area.props = [props.areaP]
     draw.areaT.props = [props.areaT]
     draw.areaBorder.props = [props.areaBorderP]

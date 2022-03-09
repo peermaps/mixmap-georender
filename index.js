@@ -188,11 +188,13 @@ module.exports = function (map) {
         precision highp float;
         uniform vec4 viewbox;
         uniform vec2 size;
-        uniform float aspect;
-        varying float vdashLength, vdashGap;
-        varying vec2 vdist;
+        uniform float aspect, width, period, duty;
+        varying float vdashLength, vdashGap, vdist, vcdist, vbreaks;
+        varying vec2 vuv;
+        //varying vec2 vdist;
         varying vec4 vcolor;
         void main () {
+          /*
           vec2 vb = vec2(viewbox.z-viewbox.x, viewbox.w-viewbox.y);
           vec2 s = vec2(size.x, size.y*aspect);
           float t = length(vdist*s/vb);
@@ -200,7 +202,18 @@ module.exports = function (map) {
           float g = vdashGap;
           float x = 1.0 - step(d, mod(t, d+g));
           gl_FragColor = vec4(vcolor.xyz, vcolor.w * x);
-          //gl_FragColor = vec4(mix(vec3(0,1,0), vec3(1,0,0), x), 1.0);
+          */
+          float freq = period;
+          float scap = step(vuv.x, 0.0);
+          float ecap = step(vdist, vuv.x);
+          float bcap = 1.0-scap*(1.0-ecap);
+          if (scap > 0.5 && length(vuv)*0.8 > width) discard;
+          vec2 buv = vec2(vdist,0);
+          if (ecap > 0.5 && distance(vuv,buv)*0.8 > width) discard;
+          float uu = mod((clamp(0.0, vcdist, vuv.x/2.0))/freq*0.5, 1.0);
+          float x = step(duty, uu);
+          if (vbreaks == 0.0) discard;
+          gl_FragColor = vec4(x, 0.0, 1.0, 1.0);
         }
       `,
       pickFrag: `
@@ -220,14 +233,14 @@ module.exports = function (map) {
         precision highp float;
         #pragma glslify: Line = require('glsl-georender-style-texture/line.h');
         #pragma glslify: readLine = require('glsl-georender-style-texture/line.glsl');
-        attribute vec2 position, normal, dist;
-        attribute float featureType, index;
+        attribute vec2 position, normal, dist, pointA, pointB;
+        attribute float featureType, index, cdist, breaks;
         uniform vec4 viewbox;
         uniform vec2 offset, size;
-        uniform float featureCount, aspect, zoom;
+        uniform float featureCount, aspect, zoom, width;
         uniform sampler2D styleTexture;
-        varying float vft, vindex, zindex, vdashLength, vdashGap;
-        varying vec2 vpos, vnorm, vdist;
+        varying float vft, vindex, zindex, vdashLength, vdashGap, vdist, vcdist, vbreaks;
+        varying vec2 vpos, vnorm, vuv;
         varying vec4 vcolor;
         void main () {
           vft = featureType;
@@ -237,15 +250,32 @@ module.exports = function (map) {
           vdashGap = line.fillDashGap;
           vindex = index;
           zindex = line.zindex + 0.1;
-          vec2 p = position.xy + offset;
           vnorm = normalize(normal)*(line.fillWidth/size);
-          vdist = dist;
+					vec2 n = normalize(vec2(pointA.y-pointB.y, pointB.x-pointA.x));
+					vec2 d = normalize(pointA-pointB);
+					vdist = distance(pointA,pointB);
+					vuv = vec2(
+						mix(-width, vdist+width, position.x*0.5+0.5),
+						mix(-width, width, position.y*0.5+0.5)
+					);
+					vec2 na = mix(-n,n,position.y*0.5+0.5);
+					vec2 nb = mix(n,-n,position.y*0.5+0.5);
+					vec2 p = mix(
+						pointA+(d+na)*width*0.005,
+						pointB-(d+nb)*width*0.005,
+						position.x*0.5+0.5 
+					);
+					vcdist = cdist;
+					vbreaks = breaks;
+
+          //vec2 p = position.xy + offset;
+          //vdist = dist;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             1.0/(1.0+zindex), 1);
           vpos = gl_Position.xy;
-          gl_Position += vec4(vnorm, 0, 0);
+          //gl_Position += vec4(vnorm, 0, 0);
         }
       `,
       uniforms: {
@@ -255,18 +285,49 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
-        featureCount: map.prop('featureCount')
+        featureCount: map.prop('featureCount'),
+        width: map.prop('width'),
+        period: map.prop('period'),
+        duty: map.prop('duty'),
       },
       attributes: {
-        position: map.prop('positions'),
+        //position: map.prop('positions'),
+        position: [-1,-1, -1,1, 1,1, 1,-1],
         featureType: map.prop('types'),
         index: map.prop('indexes'),
         normal: map.prop('normals'),
-        dist: map.prop('distances')
+        dist: map.prop('distances'),
+        pointA: {
+          buffer: map.prop('positions'),
+          divisor: 1,
+          offset: 0
+        },
+        pointB: {
+          buffer: map.prop('positions'),
+          divisor: 1,
+          offset: 8
+        },
+        cdist: {
+          buffer: map.prop('cdist'),
+          divisor: 1,
+          offset: 0
+        },
+        breaks: {
+          buffer: map.prop('breaks'),
+          divisor: 1,
+          offset: 0
+        },
       },
+      /*
       primitive: "triangle strip",
-      count: function (context, props) {
+      count: function(context, props) {
         return props.positions.length/2
+      },
+      */
+      elements: [0,1,2, 2,3,0],
+      primitive: "triangles",
+      instances:  function(context, props) {
+        return props.positions.length/2-1
       },
       blend: {
         enable: true,
