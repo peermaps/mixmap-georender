@@ -461,7 +461,7 @@ module.exports = function (map) {
           float zindex = 1000.0;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
-            ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
+            (p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0,
             1.0/(1.0+zindex), 1);
         }
       `,
