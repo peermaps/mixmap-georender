@@ -49,7 +49,7 @@ Text.prototype.update = function (props, map) {
   var viewboxHeightLat = map.viewbox[3] - map.viewbox[1]
   var labels = []
   labels.push({ type: 'bbox', bounds: map.viewbox })
-  var ph = 4, pw = 4
+  var ph = 8, pw = 8
   for (var key in props) {
     if (!props.hasOwnProperty(key)) continue
     var type = labelTypes[key]
@@ -70,10 +70,10 @@ Text.prototype.update = function (props, map) {
       var lonPx = lon / (map.viewbox[2]-map.viewbox[0]) * map._size[0]
       var latPx = lat / (map.viewbox[3]-map.viewbox[1]) * map._size[1]
       var m = this._ctx.measureText(text)
-      var widthPx = Math.ceil(m.actualBoundingBoxRight - m.actualBoundingBoxLeft)
+      var widthPx = Math.ceil(m.actualBoundingBoxRight + m.actualBoundingBoxLeft)
       var heightPx = Math.ceil(m.actualBoundingBoxAscent + m.actualBoundingBoxDescent)
-      var widthLon = (widthPx + pw + 1) * pxToLon * 1.8
-      var heightLat = (heightPx + ph + 1) * pxToLat * 1.8
+      var widthLon = (widthPx + pw) * pxToLon * 1.8
+      var heightLat = (heightPx + ph) * pxToLat * 1.8
       labels.push({
         type: 'point',
         point: [lon,lat],
@@ -128,7 +128,7 @@ Text.prototype.update = function (props, map) {
     uvs[start+7] = 1.0 - (uvy + r.height) / ch
     var text = labels[r.i].text
     var x = r.x + pw*0.5
-    var y = result.height - r.y - ph*1.5
+    var y = result.height - r.y - ph*0.5
     this._ctx.strokeText(text, x, y)
     this._ctx.fillText(text, x, y)
   }
