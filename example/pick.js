@@ -55,6 +55,7 @@ function ready({style, decoded}) {
   })
   function update(zoom) {
     props = prep.update(zoom)
+    //console.log('areaP props: ', props.areaP.indexes, 'areaT props: ', props.areaT.indexes)
     draw.point.props = [props.pointP]
     draw.pointT.props = [props.pointT]
     draw.lineFill.props = [props.lineP]
@@ -69,30 +70,37 @@ function ready({style, decoded}) {
     map.draw()
   }
   window.addEventListener('click', function (ev) {
-    console.log(ev.offsetX, ev.offsetY)
+    //console.log(ev.offsetX, ev.offsetY)
     var pickProps = { 
-      x: ev.offsetX,
+      x: ev.offsetX*2, //multiply by 2 b/c width is twice as long
       y: ev.offsetY,
       width: 2,
     }
     map.pick(pickProps, function (err, data) {
-      if (data[2] === 0.0) {
-        console.log(data[1], props.pointT.indexToId[data[0]])
+      cdata = data[0]*256*256 + data[1]*256 + data[2]
+      //console.log('data: ', data, 'cdata: ', cdata)
+      if (data[4] === 0.0) {
+        console.log('point: ', 'index :', cdata, 'id: ', Math.floor(props.pointT.indexToId[cdata]/3))
       }
-      else if (data[2] === 1.0) {
-        console.log(data[1], props.pointP.indexToId[data[0]])
+      else if (data[4] === 1.0) {
+        console.log('point: ', 'index :', cdata, 'id: ', Math.floor(props.pointP.indexToId[cdata]/3))
+        //console.log(data[1], props.pointP.indexToId[data[0]])
       }
-      else if (data[2] === 2.0) {
-        console.log(data[1], props.lineT.indexToId[data[0]])
+      else if (data[4] === 2.0) {
+        console.log('line: ', 'index :', cdata, 'id: ', Math.floor(props.lineT.indexToId[cdata]/3))
+        //console.log(data[1], props.lineT.indexToId[data[0]])
       }
-      else if (data[2] === 3.0) {
-        console.log(data[1], props.lineP.indexToId[data[0]])
+      else if (data[4] === 3.0) {
+        console.log('line: ', 'index :', cdata, 'id: ', Math.floor(props.lineP.indexToId[cdata]/3))
+        //console.log(data[1], props.lineP.indexToId[data[0]])
       }
-      else if (data[2] === 4.0) {
-        console.log(data[1], props.areaT.indexToId[data[0]])
+      else if (data[4] === 4.0) {
+        console.log('area: ', 'index :', cdata, 'id: ', Math.floor(props.areaP.indexToId[cdata]/3))
+        //console.log(data[1], props.areaT.indexToId[data[0]])
       }
-      else if (data[2] === 5.0) {
-        console.log(data[1], props.areaP.indexToId[data[0]])
+      else if (data[4] === 5.0) {
+        console.log('area: ', 'index :', cdata, 'id: ', Math.floor(props.areaT.indexToId[cdata]/3))
+        //console.log(data[1], props.areaP.indexToId[data[0]])
       }
     })
   })

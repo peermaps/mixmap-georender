@@ -306,6 +306,7 @@ Prepare.prototype._splitSort = function (key, zoom) {
   self.props[pkey].indexToId = pindexes.indexToId
   self.props[pkey].idToIndex = pindexes.idToIndex
 }
+
 Prepare.prototype._splitSortArea = function (key, zoom) {
   var self = this
   var tkey = key+'T'
