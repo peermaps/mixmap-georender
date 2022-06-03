@@ -26,7 +26,8 @@ module.exports = function (map) {
             mod(vindex, 256.0),
             255.0) / 255.0;
           float opacity = floor(min(vcolor.w, 1.0));
-          vec4 pix2 = vec4((0.0+opacity)/255.0, 0.0, 0.0, 1.0);
+          //vec4 pix2 = vec4((0.0+opacity)/255.0, 0.0, 0.0, 1.0);
+          vec4 pix2 = vec4(10.0/255.0, 0.0, 0.0, 1.0);
           gl_FragColor = mix(pix1, pix2, step(1.0, n));
           /*
           float opacity = floor(min(vcolor.w, 1.0));
