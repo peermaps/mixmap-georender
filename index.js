@@ -43,15 +43,15 @@ module.exports = function (map) {
         attribute vec2 position, ioffset;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size;
+        uniform vec2 offset, size, imageSize;
         uniform float featureCount, aspect, zoom;
         varying float vft, vindex, zindex;
         varying vec2 vpos;
         varying vec4 vcolor;
         void main () {
           vft = featureType;
-          Point point = readPoint(styleTexture, featureType, zoom, featureCount);
-          vcolor = point.color;
+          Point point = readPoint(styleTexture, featureType, zoom, featureCount, imageSize);
+          vcolor = point.fillColor;
           vindex = index;
           zindex = point.zindex;
           vec2 p = offset + ioffset;
@@ -71,6 +71,7 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
+        imageSize: map.prop('imageSize'),
         featureCount: map.prop('featureCount'),
         aspect: function (context) {
           return context.viewportWidth / context.viewportHeight
@@ -170,7 +171,7 @@ module.exports = function (map) {
           vindex = index;
           zindex = line.zindex;
           vec2 p = position.xy + offset;
-          vec2 m = (line.fillWidth+2.0*line.strokeWidth)/size;
+          vec2 m = (line.fillWidth+2.0*line.strokeWidthInner)/size;
           vnorm = normalize(normal)*m;
           vdist = dist;
           gl_Position = vec4(
@@ -457,7 +458,7 @@ module.exports = function (map) {
           vindex = index;
           zindex = areaBorder.zindex;
           vec2 p = position.xy + offset;
-          vec2 m = areaBorder.width/size;
+          vec2 m = areaBorder.widthInner/size;
           vnorm = normalize(normal)*m;
           vdist = dist;
           gl_Position = vec4(

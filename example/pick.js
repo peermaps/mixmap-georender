@@ -38,6 +38,7 @@ function ready({style, decoded}) {
     styleTexture: map.regl.texture(style),
     zoomStart: 1,
     zoomEnd: 21,
+    imageSize: [style.width, style.height],
     decoded
   })
   var zoom = Math.round(map.getZoom())
@@ -55,7 +56,7 @@ function ready({style, decoded}) {
   })
   function update(zoom) {
     props = prep.update(zoom)
-    //console.log('areaP props: ', props.areaP.indexes, 'areaT props: ', props.areaT.indexes)
+    console.log('props: ', props)
     draw.point.props = [props.pointP]
     draw.pointT.props = [props.pointT]
     draw.lineFill.props = [props.lineP]
@@ -71,13 +72,20 @@ function ready({style, decoded}) {
   }
   window.addEventListener('click', function (ev) {
     //console.log(ev.offsetX, ev.offsetY)
+    var sampleWidth = 9
+    var sampleHeight = 9
     var pickProps = { 
-      x: ev.offsetX*2, //multiply by 2 b/c width is twice as long
-      y: ev.offsetY,
-      width: 2,
+      x: (ev.offsetX-Math.floor(sampleWidth/2))*2, //multiply by 2 b/c width is twice as long
+      y: ev.offsetY-Math.floor(sampleHeight/2),
+      width: sampleWidth*2,
+      height: sampleHeight
     }
+    //frequency map. key = id, value = number of times it appears in result
     map.pick(pickProps, function (err, data) {
-      cdata = data[0]*256*256 + data[1]*256 + data[2]
+      var cdata = data[0]*256*256 + data[1]*256 + data[2]
+      for (var i=0; i<data.length; i+=8) {
+        console.log(data[i+4])
+      }
       //console.log('data: ', data, 'cdata: ', cdata)
       if (data[4] === 0.0) {
         console.log('point: ', 'index :', cdata, 'id: ', Math.floor(props.pointT.indexToId[cdata]/3))
@@ -111,7 +119,7 @@ require('resl')({
   manifest: {
     style: {
       type: 'image',
-      src: './example/style2.png'
+      src: './example/style6.png'
     },
     decoded: {
       type: 'binary',
@@ -125,7 +133,6 @@ require('resl')({
 
 window.addEventListener('resize', function (ev) {
   map.resize(window.innerWidth, window.innerHeight)
-  //do i have to do something with picksize here?
 })
 
 window.addEventListener('keydown', function (ev) {

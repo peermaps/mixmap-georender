@@ -9,8 +9,8 @@ function Prepare(opts) {
   this.style = opts.styleTexture
   this.pixels = opts.stylePixels
   this.data = opts.decoded
-  console.log('data: ', this.data)
   this.zoomCount = opts.zoomEnd - opts.zoomStart
+  this.imageSize = opts.imageSize
   this.indexes = {
     point: new Uint32Array(this.data.point.types.length),
     line: new Uint32Array(this.data.line.types.length),
@@ -85,6 +85,7 @@ function Prepare(opts) {
       idToIndex: pointIndexes.idToIndex,
       labels: this.data.point.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     pointT: {
@@ -96,6 +97,7 @@ function Prepare(opts) {
       idToIndex: null,
       labels: this.data.point.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     pointP: {
@@ -107,6 +109,7 @@ function Prepare(opts) {
       idToIndex: null,
       labels: this.data.point.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     line: {
