@@ -72,7 +72,7 @@ require('resl')({
   manifest: {
     style: {
       type: 'image',
-      src: './example/style.png'
+      src: './example/style7.png'
     },
     decoded: {
       type: 'binary',
