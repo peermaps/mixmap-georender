@@ -272,7 +272,7 @@ Prepare.prototype._splitSort = function (key, zoom) {
       }
       else if (key === 'areaBorder') {
         self.props[tkey].distances.push(this.abdistances[self.indexes[tkey][i]*2])
-        self.props[tkey].distances.push(this.abistances[self.indexes[tkey][i]*2+1])
+        self.props[tkey].distances.push(this.abdistances[self.indexes[tkey][i]*2+1])
       }
     }
   }
