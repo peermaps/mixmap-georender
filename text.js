@@ -20,9 +20,9 @@ function Text(opts) {
   if (!opts) opts = {}
   if (!(this instanceof Text)) return new Text(opts)
 
-  this._font = opts.font || '15px helvetica, arial'
+  this._font = opts.font || '70px helvetica, arial'
   this._fillStyle = 'black'
-  this._lineWidth = 4
+  this._lineWidth = 5
   this._strokeStyle = 'white'
 
   this._canvas = opts.canvas || document.createElement('canvas')
@@ -49,7 +49,7 @@ Text.prototype.update = function (props, map) {
   var viewboxHeightLat = map.viewbox[3] - map.viewbox[1]
   var labels = []
   labels.push({ type: 'bbox', bounds: map.viewbox })
-  var ph = 4, pw = 4
+  var ph = 8, pw = 8
   for (var key in props) {
     if (!props.hasOwnProperty(key)) continue
     var type = labelTypes[key]
@@ -65,15 +65,15 @@ Text.prototype.update = function (props, map) {
       var lat = p.positions[ix*2+1]
       if (map.viewbox[0] > lon || lon > map.viewbox[2]) continue
       if (map.viewbox[1] > lat || lat > map.viewbox[3]) continue
-      var pxToLon = (map.viewbox[2]-map.viewbox[0]) / map._size[0]
-      var pxToLat = (map.viewbox[3]-map.viewbox[1]) / map._size[1]
+      var pxToLon = (map.viewbox[2]-map.viewbox[0]) / map._size[0] * 0.25
+      var pxToLat = (map.viewbox[3]-map.viewbox[1]) / map._size[1] * 0.25
       var lonPx = lon / (map.viewbox[2]-map.viewbox[0]) * map._size[0]
       var latPx = lat / (map.viewbox[3]-map.viewbox[1]) * map._size[1]
       var m = this._ctx.measureText(text)
-      var widthPx = Math.ceil(m.actualBoundingBoxRight - m.actualBoundingBoxLeft)
+      var widthPx = Math.ceil(m.actualBoundingBoxRight + m.actualBoundingBoxLeft)
       var heightPx = Math.ceil(m.actualBoundingBoxAscent + m.actualBoundingBoxDescent)
-      var widthLon = (widthPx + pw + 1) * pxToLon
-      var heightLat = (heightPx + ph + 1) * pxToLat
+      var widthLon = (widthPx + pw) * pxToLon * 1.8
+      var heightLat = (heightPx + ph) * pxToLat * 1.8
       labels.push({
         type: 'point',
         point: [lon,lat],

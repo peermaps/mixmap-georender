@@ -13,13 +13,26 @@ module.exports = function (map) {
       `,
       pickFrag: `
         precision highp float;
+        uniform vec2 size;
         varying float vft, vindex;
-        varying vec2 vp;
+        varying vec2 vpos;
         varying vec4 vcolor;
         uniform float featureCount;
         void main () {
+          float n = mod((vpos.x*0.5+0.5)*size.x, 2.0);
+          vec4 pix1 = vec4(
+            floor(vindex/(256.0*256.0)),
+            mod(vindex/256.0, 256.0),
+            mod(vindex, 256.0),
+            255.0) / 255.0;
+          float opacity = floor(min(vcolor.w, 1.0));
+          //vec4 pix2 = vec4((0.0+opacity)/255.0, 0.0, 0.0, 1.0);
+          vec4 pix2 = vec4(10.0/255.0, 0.0, 0.0, 1.0);
+          gl_FragColor = mix(pix1, pix2, step(1.0, n));
+          /*
           float opacity = floor(min(vcolor.w, 1.0));
           gl_FragColor = vec4(vindex, vft, opacity, 1.0);
+          */
         }
       `,
       vert: glsl`
@@ -33,6 +46,7 @@ module.exports = function (map) {
         uniform vec2 offset, size;
         uniform float featureCount, aspect, zoom;
         varying float vft, vindex, zindex;
+        varying vec2 vpos;
         varying vec4 vcolor;
         void main () {
           vft = featureType;
@@ -47,6 +61,7 @@ module.exports = function (map) {
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             1.0/(1.0+zindex), 1) + vec4(position.x * psizex, position.y * psizey, 0, 0);
+          vpos = gl_Position.xy;
          }
       `,
       uniforms: {
@@ -112,12 +127,25 @@ module.exports = function (map) {
       `,
       pickFrag: `
         precision highp float;
+        uniform vec2 size;
         varying float vft, vindex;
+        varying vec2 vpos;
         varying vec4 vcolor;
         uniform float featureCount;
         void main () {
+          float n = mod((vpos.x*0.5+0.5)*size.x, 2.0);
+          vec4 pix1 = vec4(
+            floor(vindex/(256.0*256.0)),
+            mod(vindex/256.0, 256.0),
+            mod(vindex, 256.0),
+            255.0) / 255.0;
+          float opacity = floor(min(vcolor.w, 1.0));
+          vec4 pix2 = vec4((2.0+opacity)/255.0, 0.0, 0.0, 1.0);
+          gl_FragColor = mix(pix1, pix2, step(1.0, n));
+          /*
           float opacity = floor(min(vcolor.w, 1.0));
           gl_FragColor = vec4(vindex, vft, 2.0+opacity, 1.0);
+          */
         }
       `,
       vert: glsl`
@@ -205,15 +233,25 @@ module.exports = function (map) {
       `,
       pickFrag: `
         precision highp float;
-        uniform vec4 viewbox;
         uniform vec2 size;
-        varying float vft, vindex, vdashLength, vdashGap;
+        varying float vft, vindex;
+        varying vec2 vpos;
         varying vec4 vcolor;
         uniform float featureCount;
-        varying vec2 vdist;
         void main () {
+          float n = mod((vpos.x*0.5+0.5)*size.x, 2.0);
+          vec4 pix1 = vec4(
+            floor(vindex/(256.0*256.0)),
+            mod(vindex/256.0, 256.0),
+            mod(vindex, 256.0),
+            255.0) / 255.0;
+          float opacity = floor(min(vcolor.w, 1.0));
+          vec4 pix2 = vec4((2.0+opacity)/255.0, 0.0, 0.0, 1.0);
+          gl_FragColor = mix(pix1, pix2, step(1.0, n));
+          /*
           float opacity = floor(min(vcolor.w, 1.0));
           gl_FragColor = vec4(vindex, vft, 2.0+opacity, 1.0);
+          */
         }
       `,
       vert: glsl`
@@ -244,8 +282,8 @@ module.exports = function (map) {
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             1.0/(1.0+zindex), 1);
-          vpos = gl_Position.xy;
           gl_Position += vec4(vnorm, 0, 0);
+          vpos = gl_Position.xy;
         }
       `,
       uniforms: {
@@ -288,12 +326,22 @@ module.exports = function (map) {
       `,
       pickFrag: `
         precision highp float;
+        uniform vec2 size;
         varying float vft, vindex;
+        varying vec2 vpos;
         varying vec4 vcolor;
         uniform float featureCount;
         void main () {
+          float n = mod((vpos.x*0.5+0.5)*size.x, 2.0);
+          vec4 pix1 = vec4(
+            floor(vindex/(256.0*256.0)),
+            mod(vindex/256.0, 256.0),
+            mod(vindex, 256.0),
+            255.0) / 255.0;
           float opacity = floor(min(vcolor.w, 1.0));
-          gl_FragColor = vec4(vindex, vft, 4.0+opacity, 1.0);
+          vec4 pix2 = vec4((4.0+opacity)/255.0, 0.0, 0.0, 1.0);
+          gl_FragColor = mix(pix1, pix2, step(1.0, n));
+          //gl_FragColor = vec4(vindex, vft, 4.0+opacity, 1.0);
         }
       `,
       vert: glsl`
@@ -307,6 +355,7 @@ module.exports = function (map) {
         uniform float aspect, featureCount, zoom;
         uniform sampler2D styleTexture;
         varying float vft, vindex, zindex;
+        varying vec2 vpos;
         varying vec4 vcolor;
         void main () {
           vft = featureType;
@@ -319,6 +368,7 @@ module.exports = function (map) {
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
             1.0/(1.0+zindex), 1);
+          vpos = gl_Position.xy;
         }
       `,
       uniforms: {
@@ -368,12 +418,21 @@ module.exports = function (map) {
       `,
       pickFrag: `
         precision highp float;
+        uniform vec2 size;
         varying float vft, vindex;
+        varying vec2 vpos;
         varying vec4 vcolor;
         uniform float featureCount;
         void main () {
+          float n = mod((vpos.x*0.5+0.5)*size.x, 2.0);
+          vec4 pix1 = vec4(
+            floor(vindex/(256.0*256.0)),
+            mod(vindex/256.0, 256.0),
+            mod(vindex, 256.0),
+            0.0);
           float opacity = floor(min(vcolor.w, 1.0));
-          gl_FragColor = vec4(vindex, vft, 2.0+opacity, 1.0);
+          vec4 pix2 = vec4((4.0+opacity)/255.0, 0.0, 0.0, 1.0);
+          gl_FragColor = mix(pix1, pix2, step(n, 1.0));
         }
       `,
       vert: glsl`
@@ -461,7 +520,7 @@ module.exports = function (map) {
           float zindex = 1000.0;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
-            ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
+            (p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0,
             1.0/(1.0+zindex), 1);
         }
       `,
