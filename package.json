@@ -1,6 +1,6 @@
 {
   "name": "mixmap-georender",
-  "version": "3.0.3",
+  "version": "4.0.0",
   "description": "a mixmap layer for rendering peermaps georender data",
   "main": "index.js",
   "scripts": {
