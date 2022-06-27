@@ -43,14 +43,14 @@ module.exports = function (map) {
         attribute vec2 position, ioffset;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size;
+        uniform vec2 offset, size, texSize;
         uniform float featureCount, aspect, zoom;
         varying float vft, vindex, zindex;
         varying vec2 vpos;
         varying vec4 vcolor;
         void main () {
           vft = featureType;
-          Point point = readPoint(styleTexture, featureType, zoom, featureCount);
+          Point point = readPoint(styleTexture, featureType, zoom, featureCount, texSize);
           vcolor = point.fillColor;
           vindex = index;
           zindex = point.zindex;
@@ -72,9 +72,10 @@ module.exports = function (map) {
         },
         styleTexture: map.prop('style'),
         featureCount: map.prop('featureCount'),
+        texSize: map.prop('imageSize'),
         aspect: function (context) {
           return context.viewportWidth / context.viewportHeight
-        },
+        }
       },
       attributes: {
         position: [-0.1,0.1,0.1,0.1,0.1,-0.1,-0.1,-0.1],
@@ -155,7 +156,7 @@ module.exports = function (map) {
         attribute vec2 position, normal, dist;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size;
+        uniform vec2 offset, size, texSize;
         uniform float featureCount, aspect, zoom;
         uniform sampler2D styleTexture;
         varying float vft, vindex, zindex, vdashLength, vdashGap;
@@ -163,7 +164,7 @@ module.exports = function (map) {
         varying vec4 vcolor;
         void main () {
           vft = featureType;
-          Line line = readLine(styleTexture, featureType, zoom, featureCount);
+          Line line = readLine(styleTexture, featureType, zoom, texSize);
           vcolor = line.strokeColor;
           vdashLength = line.strokeDashLength;
           vdashGap = line.strokeDashGap;
@@ -188,6 +189,7 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
+        texSize: map.prop('imageSize'),
         featureCount: map.prop('featureCount')
       },
       attributes: {
@@ -261,7 +263,7 @@ module.exports = function (map) {
         attribute vec2 position, normal, dist;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size;
+        uniform vec2 offset, size, texSize;
         uniform float featureCount, aspect, zoom;
         uniform sampler2D styleTexture;
         varying float vft, vindex, zindex, vdashLength, vdashGap;
@@ -269,7 +271,7 @@ module.exports = function (map) {
         varying vec4 vcolor;
         void main () {
           vft = featureType;
-          Line line = readLine(styleTexture, featureType, zoom, featureCount);
+          Line line = readLine(styleTexture, featureType, zoom, texSize);
           vcolor = line.fillColor;
           vdashLength = line.fillDashLength;
           vdashGap = line.fillDashGap;
@@ -293,6 +295,7 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
+        texSize: map.prop('imageSize'),
         featureCount: map.prop('featureCount')
       },
       attributes: {
@@ -351,7 +354,7 @@ module.exports = function (map) {
         attribute vec2 position;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size;
+        uniform vec2 offset, size, texSize;
         uniform float aspect, featureCount, zoom;
         uniform sampler2D styleTexture;
         varying float vft, vindex, zindex;
@@ -359,7 +362,7 @@ module.exports = function (map) {
         varying vec4 vcolor;
         void main () {
           vft = featureType;
-          Area area = readArea(styleTexture, featureType, zoom, featureCount);
+          Area area = readArea(styleTexture, featureType, zoom, featureCount, texSize);
           vcolor = area.color;
           vindex = index;
           zindex = area.zindex;
@@ -378,7 +381,8 @@ module.exports = function (map) {
           return size
         },
         featureCount: map.prop('featureCount'),
-        styleTexture: map.prop('style')
+        styleTexture: map.prop('style'),
+        texSize: map.prop('imageSize')
       },
       attributes: {
         position: map.prop('positions'),
@@ -442,7 +446,7 @@ module.exports = function (map) {
         attribute vec2 position, normal, dist;
         attribute float featureType, index;
         uniform vec4 viewbox;
-        uniform vec2 offset, size;
+        uniform vec2 offset, size, texSize;
         uniform float featureCount, aspect, zoom;
         uniform sampler2D styleTexture;
         varying float vft, vindex, zindex, vdashLength, vdashGap;
@@ -450,7 +454,7 @@ module.exports = function (map) {
         varying vec4 vcolor;
         void main () {
           vft = featureType;
-          AreaBorder areaBorder = readAreaBorder(styleTexture, featureType, zoom, featureCount);
+          AreaBorder areaBorder = readAreaBorder(styleTexture, featureType, zoom, featureCount, texSize);
           vcolor = areaBorder.color;
           vdashLength = areaBorder.dashLength;
           vdashGap = areaBorder.dashGap;
@@ -475,6 +479,7 @@ module.exports = function (map) {
           return size
         },
         styleTexture: map.prop('style'),
+        texSize: map.prop('imageSize'),
         featureCount: map.prop('featureCount')
       },
       attributes: {

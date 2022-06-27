@@ -9,8 +9,8 @@ function Prepare(opts) {
   this.style = opts.styleTexture
   this.pixels = opts.stylePixels
   this.data = opts.decoded
-  console.log('data: ', this.data)
   this.zoomCount = opts.zoomEnd - opts.zoomStart
+  this.imageSize = opts.imageSize
   this.indexes = {
     point: new Uint32Array(this.data.point.types.length),
     line: new Uint32Array(this.data.line.types.length),
@@ -85,6 +85,7 @@ function Prepare(opts) {
       idToIndex: pointIndexes.idToIndex,
       labels: this.data.point.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     pointT: {
@@ -96,6 +97,7 @@ function Prepare(opts) {
       idToIndex: null,
       labels: this.data.point.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     pointP: {
@@ -107,6 +109,7 @@ function Prepare(opts) {
       idToIndex: null,
       labels: this.data.point.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     line: {
@@ -120,6 +123,7 @@ function Prepare(opts) {
       idToIndex: lineIndexes.idToIndex,
       labels: this.data.line.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount,
     },
     lineT: {
@@ -133,6 +137,7 @@ function Prepare(opts) {
       idToIndex: null,
       labels: this.data.line.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     lineP: {
@@ -146,6 +151,7 @@ function Prepare(opts) {
       idToIndex: null,
       labels: this.data.line.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     area: {
@@ -158,6 +164,7 @@ function Prepare(opts) {
       cells: this.data.area.cells,
       labels: this.data.area.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     areaT: {
@@ -170,6 +177,7 @@ function Prepare(opts) {
       cells: null,
       labels: this.data.area.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     areaP: {
@@ -182,6 +190,7 @@ function Prepare(opts) {
       cells: null,
       labels: this.data.area.labels,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     areaBorder: {
@@ -197,6 +206,7 @@ function Prepare(opts) {
       indexToId: null,
       idToIndex: null,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount,
     },
     areaBorderT: {
@@ -209,6 +219,7 @@ function Prepare(opts) {
       indexToId: null,
       idToIndex: null,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
     areaBorderP: {
@@ -221,6 +232,7 @@ function Prepare(opts) {
       indexToId: null,
       idToIndex: null,
       style: this.style,
+      imageSize: this.imageSize,
       featureCount
     },
   }
@@ -231,7 +243,7 @@ Prepare.prototype._splitSort = function (key, zoom) {
   var pkey = key+'P'
   var splitT = partition(this.indexes[key], function (i) {
     var opacity = self.getOpacity(key, self.data[key].types[i], zoom)
-    return opacity > 100
+    return opacity >= 100
   })
 
   this.indexes[tkey] = this.indexes[key].subarray(0, splitT)
@@ -239,8 +251,8 @@ Prepare.prototype._splitSort = function (key, zoom) {
   this.indexes[tkey].sort(function (a, b) {
     var xa = self.data[key].types[a]
     var xb = self.data[key].types[b]
-    var zindexa = self.pixels[(xa + (zoom * 2 + 1) * featureCount)*4 + 1]
-    var zindexb = self.pixels[(xb + (zoom * 2 + 1) * featureCount)*4 + 1]
+    var zindexa = self.pixels[(xa + (zoom * 2 + 1) * self.imageSize[0])*4 + 1]
+    var zindexb = self.pixels[(xb + (zoom * 2 + 1) * self.imageSize[0])*4 + 1]
     return zindexa - zindexb
   })
   self.props[tkey].id = []
@@ -349,7 +361,7 @@ Prepare.prototype.getOpacity = function (key, type, zoom) {
   else if (key === 'areaBorder') {
     var y = zoom * 7 + this.zoomCount * 8 + this.zoomCount * 6 + this.zoomCount * 3
   }
-  var index = (type + y * featureCount)*4 + 3
+  var index = (type + y * this.imageSize[0])*4 + 3
   return this.pixels[index]
 }
 

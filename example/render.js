@@ -36,16 +36,17 @@ function ready({style, decoded}) {
     styleTexture: map.regl.texture(style),
     zoomStart: 1,
     zoomEnd: 21,
+    imageSize: [style.width, style.height],
     decoded
   })
   var zoom = Math.round(map.getZoom())
   var props = null
   var text = new Text
-  update(zoom)
+  update(zoom, [style.width, style.height])
   map.on('viewbox', function () {
     var z = Math.round(map.getZoom())
     if (zoom !== z) {
-      update(z)
+      update(z, [style.width, style.height])
     } else {
       //draw.label.props = [text.update(props, map)]
     }
@@ -92,8 +93,10 @@ window.addEventListener('keydown', function (ev) {
     map.setZoom(Math.min(6,Math.round(map.getZoom()+1)))
   } else if (ev.code === 'Minus') {
     map.setZoom(map.getZoom()-1)
+    console.log('zoom:', map.getZoom()-1)
   } else if (ev.code === 'Equal') {
     map.setZoom(map.getZoom()+1)
+    console.log('zoom:', map.getZoom()-1)
   }
 })
 
