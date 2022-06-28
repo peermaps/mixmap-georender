@@ -7,12 +7,12 @@ var lpb = require('length-prefixed-buffers/without-count')
 var Text = require('../text.js')
  
 var mix = mixmap(regl, { extensions: [
-  'oes_element_index_uint', 'oes_texture_float', 'EXT_float_blend', 'angle_instanced_arrays'] })
+  'oes_element_index_uint', 'EXT_float_blend', 'angle_instanced_arrays'] })
 var map = mix.create({ 
   viewbox: [+36.2146, +49.9962, +36.2404, +50.0154],
   //viewbox: [+29.9, +31.1, +30.1, +31.3],
   backgroundColor: [0.82, 0.85, 0.99, 1.0],
-  pickfb: { colorFormat: 'rgba', colorType: 'float32' }
+  pickfb: { colorFormat: 'rgba' }
 })
 window.map = map
 var geoRender = require('../index.js')(map)
@@ -49,12 +49,13 @@ function ready({style, decoded}) {
     if (zoom !== z) {
       update(z)
     } else {
-      //draw.label.props = [text.update(props, map)]
+      draw.label.props = [text.update(props, map)]
     }
     zoom = z
   })
   function update(zoom) {
     props = prep.update(zoom)
+    //console.log('areaP props: ', props.areaP.indexes, 'areaT props: ', props.areaT.indexes)
     draw.point.props = [props.pointP]
     draw.pointT.props = [props.pointT]
     draw.lineFill.props = [props.lineP]
@@ -65,29 +66,41 @@ function ready({style, decoded}) {
     draw.areaT.props = [props.areaT]
     draw.areaBorder.props = [props.areaBorderP]
     draw.areaBorderT.props = [props.areaBorderT]
-    //draw.label.props = [text.update(props, map)]
+    draw.label.props = [text.update(props, map)]
     map.draw()
   }
   window.addEventListener('click', function (ev) {
-    console.log(ev.offsetX, ev.offsetY)
-    map.pick({ x: ev.offsetX, y: ev.offsetY }, function (err, data) {
-      if (data[2] === 0.0) {
-        console.log(data[1], props.pointT.indexToId[data[0]])
+    //console.log(ev.offsetX, ev.offsetY)
+    var pickProps = { 
+      x: ev.offsetX*2, //multiply by 2 b/c width is twice as long
+      y: ev.offsetY,
+      width: 2,
+    }
+    map.pick(pickProps, function (err, data) {
+      cdata = data[0]*256*256 + data[1]*256 + data[2]
+      //console.log('data: ', data, 'cdata: ', cdata)
+      if (data[4] === 0.0) {
+        console.log('point: ', 'index :', cdata, 'id: ', Math.floor(props.pointT.indexToId[cdata]/3))
       }
-      else if (data[2] === 1.0) {
-        console.log(data[1], props.pointP.indexToId[data[0]])
+      else if (data[4] === 1.0) {
+        console.log('point: ', 'index :', cdata, 'id: ', Math.floor(props.pointP.indexToId[cdata]/3))
+        //console.log(data[1], props.pointP.indexToId[data[0]])
       }
-      else if (data[2] === 2.0) {
-        console.log(data[1], props.lineT.indexToId[data[0]])
+      else if (data[4] === 2.0) {
+        console.log('line: ', 'index :', cdata, 'id: ', Math.floor(props.lineT.indexToId[cdata]/3))
+        //console.log(data[1], props.lineT.indexToId[data[0]])
       }
-      else if (data[2] === 3.0) {
-        console.log(data[1], props.lineP.indexToId[data[0]])
+      else if (data[4] === 3.0) {
+        console.log('line: ', 'index :', cdata, 'id: ', Math.floor(props.lineP.indexToId[cdata]/3))
+        //console.log(data[1], props.lineP.indexToId[data[0]])
       }
-      else if (data[2] === 4.0) {
-        console.log(data[1], props.areaT.indexToId[data[0]])
+      else if (data[4] === 4.0) {
+        console.log('area: ', 'index :', cdata, 'id: ', Math.floor(props.areaP.indexToId[cdata]/3))
+        //console.log(data[1], props.areaT.indexToId[data[0]])
       }
-      else if (data[2] === 5.0) {
-        console.log(data[1], props.areaP.indexToId[data[0]])
+      else if (data[4] === 5.0) {
+        console.log('area: ', 'index :', cdata, 'id: ', Math.floor(props.areaT.indexToId[cdata]/3))
+        //console.log(data[1], props.areaP.indexToId[data[0]])
       }
     })
   })
@@ -98,7 +111,7 @@ require('resl')({
   manifest: {
     style: {
       type: 'image',
-      src: './example/style.png'
+      src: './example/style2.png'
     },
     decoded: {
       type: 'binary',
@@ -112,6 +125,7 @@ require('resl')({
 
 window.addEventListener('resize', function (ev) {
   map.resize(window.innerWidth, window.innerHeight)
+  //do i have to do something with picksize here?
 })
 
 window.addEventListener('keydown', function (ev) {
@@ -127,4 +141,9 @@ window.addEventListener('keydown', function (ev) {
 })
 
 document.body.appendChild(mix.render())
-document.body.appendChild(map.render({ width: window.innerWidth, height: window.innerHeight }))
+document.body.appendChild(map.render({
+  width: window.innerWidth,
+  height: window.innerHeight,
+  pickWidth: window.innerWidth*2.0,
+  pickHeight: window.innerheight
+}))

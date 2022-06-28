@@ -272,7 +272,7 @@ Prepare.prototype._splitSort = function (key, zoom) {
       }
       else if (key === 'areaBorder') {
         self.props[tkey].distances.push(this.abdistances[self.indexes[tkey][i]*2])
-        self.props[tkey].distances.push(this.abistances[self.indexes[tkey][i]*2+1])
+        self.props[tkey].distances.push(this.abdistances[self.indexes[tkey][i]*2+1])
       }
     }
   }
@@ -306,6 +306,7 @@ Prepare.prototype._splitSort = function (key, zoom) {
   self.props[pkey].indexToId = pindexes.indexToId
   self.props[pkey].idToIndex = pindexes.idToIndex
 }
+
 Prepare.prototype._splitSortArea = function (key, zoom) {
   var self = this
   var tkey = key+'T'
@@ -336,16 +337,16 @@ Prepare.prototype.update = function (zoom) {
 
 Prepare.prototype.getOpacity = function (key, type, zoom) {
   if (key === 'point') {
-    var y = zoom * 2
+    var y = zoom * 7
   }
   else if (key === 'line') {
-    var y = zoom * 2 + this.zoomCount * 2
+    var y = zoom * 7 + this.zoomCount * 8
   }
   else if (key === 'area') {
-    var y = zoom * 2 + this.zoomCount * 2 + this.zoomCount * 4
+    var y = zoom * 7 + this.zoomCount * 8 + this.zoomCount * 6
   }
   else if (key === 'areaBorder') {
-    var y = zoom * 2 + this.zoomCount * 2 + this.zoomCount * 4 + this.zoomCount * 2
+    var y = zoom * 7 + this.zoomCount * 8 + this.zoomCount * 6 + this.zoomCount * 3
   }
   var index = (type + y * featureCount)*4 + 3
   return this.pixels[index]
