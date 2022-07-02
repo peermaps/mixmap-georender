@@ -21,7 +21,8 @@
     "glsl-georender-style-texture": "^4.0.2",
     "glslify": "^7.0.0",
     "label-placement-engine": "^2.1.0",
-    "partition-array": "^1.0.0"
+    "partition-array": "^1.0.0",
+    "qbzf": "^1.1.0"
   },
   "devDependencies": {
     "budo": "^11.6.2",
