@@ -16,6 +16,7 @@ var labelTypes = {
   areaT: 'bbox',
 }
 var uvs = [0,0, 1,0, 1,1, 0,1]
+var padding = [10,10]
 
 module.exports = Text
 
@@ -75,8 +76,10 @@ Text.prototype.update = function (props, map) {
       id: l.id,
       text: l.text,
       height: l.heightPx,
-      fillColor: [0,1,0],
-      strokeColor: [1,0,1],
+      fillColor: [0,0,0],
+      strokeColor: [1,1,1],
+      strokeWidth: 150,
+      padding,
     })
   }
 
@@ -180,9 +183,10 @@ Text.prototype._addPoint = function (map, labels, p, pw, ph) {
     var pxToLat = (map.viewbox[3]-map.viewbox[1]) / map._size[1]
     var m = this._qbzf.measure({
       text,
-      strokeWidth: 100,
+      strokeWidth: 150,
+      padding,
     })
-    var fontSize = 18
+    var fontSize = 12
     var widthPx = Math.round(m.units[0]/this._qbzf.unitsPerEm*fontSize)
     var heightPx = Math.round(m.units[1]/this._qbzf.unitsPerEm*fontSize)
     var widthLon = (widthPx + pw + 1) * pxToLon
