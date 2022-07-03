@@ -527,14 +527,14 @@ module.exports = function (map) {
           float outline = 1.0-smoothstep(vStrokeWidth-a,vStrokeWidth+a,ldist);
           vec3 fill = vFillColor;
           vec3 stroke = vStrokeColor;
-          vec3 bg = vec3(0,1,1);
+          vec3 bg = vec3(0,0.5,0.5);
 
           vec3 c = mix(
             mix(bg,stroke,outline),
             mix(stroke,fill,smoothstep(ldist,0.0,a)),
             mod(qbzf.count,2.0)
           );
-          gl_FragColor = vec4(c,1);
+          gl_FragColor = vec4(vec3(mod(qbzf.count,2.0)),1);
         }`,
       vert: `
         precision highp float;

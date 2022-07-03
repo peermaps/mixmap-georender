@@ -15,7 +15,7 @@ var labelTypes = {
   areaP: 'bbox',
   areaT: 'bbox',
 }
-var uvs = [1,1,1,0,0,0,0,1]
+var uvs = [0,0, 1,0, 1,1, 0,1]
 
 module.exports = Text
 
@@ -63,13 +63,16 @@ Text.prototype.update = function (props, map) {
   //this._addArea(map, labels, props.areaT, pw, ph)
   //this._addArea(map, labels, props.areaP, pw, ph)
   this._labelEngine.update(labels)
-
+  this._atlas.clear()
+  var ilabels = {}, idLabels = {}
   for (var i = 0; i < labels.length; i++) {
     if (!this._labelEngine.isVisible(i)) continue
     var l = labels[i]
     if (l.type !== 'point' && l.type !== 'line' && l.type !== 'area') continue
+    idLabels[l.id] = l
+    ilabels[l.id] = i
     this._atlas.add({
-      id: i,
+      id: l.id,
       text: l.text,
       height: l.heightPx,
       fillColor: [0,1,0],
@@ -84,12 +87,14 @@ Text.prototype.update = function (props, map) {
   for (var i = 0; i < ns.length; i++) {
     var n = ns[i]
     var d = data[n]
+    if (!d) continue
     var psize = 0
     for (var j = 0; j < d.ids.length; j++) {
       var id = d.ids[j]
-      var l = labels[id]
-      var pstart = this._labelEngine.offsets.positions[id*2+0]
-      var pend = this._labelEngine.offsets.positions[id*2+1]
+      var l = idLabels[id]
+      var ix = ilabels[id]
+      var pstart = this._labelEngine.offsets.positions[ix*2+0]
+      var pend = this._labelEngine.offsets.positions[ix*2+1]
       psize += pend-pstart
     }
     var props = {
@@ -111,9 +116,10 @@ Text.prototype.update = function (props, map) {
     var pindex = 0
     for (var j = 0; j < d.ids.length; j++) {
       var id = d.ids[j]
-      var l = labels[id]
-      var pstart = this._labelEngine.offsets.positions[id*2+0]/2
-      var pend = this._labelEngine.offsets.positions[id*2+1]/2
+      var l = idLabels[id]
+      var ix = ilabels[id]
+      var pstart = this._labelEngine.offsets.positions[ix*2+0]/2
+      var pend = this._labelEngine.offsets.positions[ix*2+1]/2
       for (var k = 0; k < pend-pstart; k++) {
         props.positions[pindex*2+0] = this._labelEngine.data.positions[(pstart+k)*2+0]
         props.positions[pindex*2+1] = this._labelEngine.data.positions[(pstart+k)*2+1]
@@ -121,18 +127,18 @@ Text.prototype.update = function (props, map) {
         positionMap[(pstart+k)*2+1] = pindex
         props.uvs[pindex*2+0] = uvs[k*2+0]
         props.uvs[pindex*2+1] = uvs[k*2+1]
-        props.offsets[pindex] = d.offsets[j]
-        props.units[pindex*2+0] = d.units[j*2+0]
-        props.units[pindex*2+1] = d.units[j*2+1]
-        props.size[pindex*2+0] = d.size[j*2+0]
-        props.size[pindex*2+1] = d.size[j*2+1]
-        props.fillColors[pindex*3+0] = d.fillColor[j*3+0]
-        props.fillColors[pindex*3+1] = d.fillColor[j*3+1]
-        props.fillColors[pindex*3+2] = d.fillColor[j*3+2]
-        props.strokeWidths[pindex] = d.strokeWidth[j]
-        props.strokeColors[pindex*3+0] = d.strokeColor[j*3+0]
-        props.strokeColors[pindex*3+1] = d.strokeColor[j*3+1]
-        props.strokeColors[pindex*3+2] = d.strokeColor[j*3+2]
+        props.offsets[pindex] = d.offsets[j*4]
+        props.units[pindex*2+0] = d.units[j*4][0]
+        props.units[pindex*2+1] = d.units[j*4][1]
+        props.size[pindex*2+0] = d.size[j*4][0]
+        props.size[pindex*2+1] = d.size[j*4][1]
+        props.fillColors[pindex*3+0] = d.fillColor[j*4][0]
+        props.fillColors[pindex*3+1] = d.fillColor[j*4][1]
+        props.fillColors[pindex*3+2] = d.fillColor[j*4][2]
+        props.strokeWidths[pindex] = d.strokeWidth[j*4]
+        props.strokeColors[pindex*3+0] = d.strokeColor[j*4][0]
+        props.strokeColors[pindex*3+1] = d.strokeColor[j*4][1]
+        props.strokeColors[pindex*3+2] = d.strokeColor[j*4][2]
         pindex++
       }
     }
@@ -140,20 +146,21 @@ Text.prototype.update = function (props, map) {
   var cindex = {}, csize = {}
   for (var i = 0; i < this._labelEngine.data.cells.length; i++) {
     var c = this._labelEngine.data.cells[i]
-    var n = positionMap[c*2+0], j = positionMap[c*2+1]
+    var n = positionMap[c*2+0]
     if (csize[n] === undefined) csize[n] = 1
     else csize[n]++
   }
   for (var i = 0; i < ns.length; i++) {
     var n = Number(ns[i])
+    if (!this._props[n]) continue
     this._props[n].cells = new Uint32Array(csize[n])
   }
   for (var i = 0; i < this._labelEngine.data.cells.length; i++) {
     var c = this._labelEngine.data.cells[i]
     var n = positionMap[c*2+0], j = positionMap[c*2+1]
+    if (!this._props[n]) continue
     if (n === 0) continue
     if (cindex[n] === undefined) cindex[n] = 0
-    if (!this._props[n]) console.log('!',n)
     this._props[n].cells[cindex[n]++] = j
   }
   return this._props
@@ -178,7 +185,6 @@ Text.prototype._addPoint = function (map, labels, p, pw, ph) {
     var fontSize = 18
     var widthPx = Math.round(m.units[0]/this._qbzf.unitsPerEm*fontSize)
     var heightPx = Math.round(m.units[1]/this._qbzf.unitsPerEm*fontSize)
-    console.log(widthPx, heightPx, text)
     var widthLon = (widthPx + pw + 1) * pxToLon
     var heightLat = (heightPx + ph + 1) * pxToLat
     labels.push({
@@ -188,6 +194,7 @@ Text.prototype._addPoint = function (map, labels, p, pw, ph) {
       labelMargin: [10/map._size[0]*widthLon,10/map._size[1]*heightLat],
       pointSize: [10/map._size[0]*widthLon,10/map._size[1]*heightLat],
       pointMargin: [10/map._size[0]*widthLon,10/map._size[1]*heightLat],
+      id,
       widthPx,
       heightPx,
       text,
