@@ -504,16 +504,16 @@ module.exports = function (map) {
         #pragma glslify: QBZF = require('qbzf/h')
         #pragma glslify: create_qbzf = require('qbzf/create')
         #pragma glslify: read_curve = require('qbzf/read')
-        varying vec2 vuv, vunits, vsize;
+        varying vec2 vuv, vunits, vsize, vPxSize;
         varying float vStrokeWidth, voffset;
         varying vec3 vFillColor, vStrokeColor;
         uniform sampler2D curveTex, gridTex;
         uniform vec2 curveSize, dim;
         uniform float gridN, aspect;
 
-        void main () {
+        vec4 draw(vec2 uv) {
           QBZF qbzf = create_qbzf(
-            vuv, gridN, vsize, vunits, vec3(dim,voffset),
+            uv, gridN, vsize, vunits, vec3(dim,voffset),
             gridTex, curveSize
           );
           float ldist = 1e30;
@@ -528,22 +528,23 @@ module.exports = function (map) {
           vec3 fill = vFillColor;
           vec3 stroke = vStrokeColor;
           float cm = mod(qbzf.count,2.0);
-          if (cm < 0.5 && ldist > vStrokeWidth+a) discard;
-
-          vec3 c = mix(
-            stroke,
-            //mix(stroke,fill,smoothstep(ldist,0.0,a)),
-            mix(stroke,fill,smoothstep(0.0,1.0,vStrokeWidth-ldist)),
-            cm
-          );
-          gl_FragColor = vec4(c,1);
+          if (cm < 0.5 && ldist > vStrokeWidth+a) return vec4(0);
+          float m = smoothstep(0.0,1.0,vStrokeWidth-ldist);
+          return vec4(mix(stroke, mix(stroke,fill,m), cm),1);
+        }
+        void main() {
+          float dx = 0.5/vPxSize.x;
+          vec4 c0 = draw(vuv-vec2(dx,0));
+          vec4 c1 = draw(vuv);
+          vec4 c2 = draw(vuv+vec2(dx,0));
+          gl_FragColor = c0*0.25 + c1*0.5 + c2*0.25;
         }`,
       vert: `
         precision highp float;
-        attribute vec2 position, uv, units, gsize;
+        attribute vec2 position, uv, units, gsize, pxSize;
         attribute vec3 fillColor, strokeColor;
         attribute float strokeWidth, ioffset;
-        varying vec2 vuv, vunits, vsize;
+        varying vec2 vuv, vunits, vsize, vPxSize;
         varying vec3 vFillColor, vStrokeColor;
         varying float vStrokeWidth, voffset;
         uniform vec4 viewbox;
@@ -557,6 +558,7 @@ module.exports = function (map) {
           vFillColor = fillColor;
           vStrokeColor = strokeColor;
           vStrokeWidth = strokeWidth;
+          vPxSize = pxSize;
           vec2 p = position.xy + offset;
           float zindex = 1000.0;
           gl_Position = vec4(
@@ -583,6 +585,7 @@ module.exports = function (map) {
         fillColor: map.prop('fillColors'),
         strokeColor: map.prop('strokeColors'),
         strokeWidth: map.prop('strokeWidths'),
+        pxSize: map.prop('pxSize'),
       },
       elements: map.prop('cells'),
       blend: {

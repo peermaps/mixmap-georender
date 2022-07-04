@@ -110,6 +110,7 @@ Text.prototype.update = function (props, map) {
       fillColors: new Float32Array(psize/2*3),
       strokeWidths: new Float32Array(psize/2),
       strokeColors: new Float32Array(psize/2*3),
+      pxSize: new Float32Array(psize),
       curves: d.curves,
       grid: d.grid,
     }
@@ -142,6 +143,8 @@ Text.prototype.update = function (props, map) {
         props.strokeColors[pindex*3+0] = d.strokeColor[j*4][0]
         props.strokeColors[pindex*3+1] = d.strokeColor[j*4][1]
         props.strokeColors[pindex*3+2] = d.strokeColor[j*4][2]
+        props.pxSize[pindex*2+0] = l.widthPx
+        props.pxSize[pindex*2+1] = l.heightPx
         pindex++
       }
     }
