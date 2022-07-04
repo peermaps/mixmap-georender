@@ -17,6 +17,7 @@ var labelTypes = {
 }
 var uvs = [0,0, 1,0, 1,1, 0,1]
 var padding = [10,10]
+var fontSize = 12
 
 module.exports = Text
 
@@ -59,10 +60,10 @@ Text.prototype.update = function (props, map) {
   var ph = 4, pw = 4
   this._addPoint(map, labels, props.pointT, pw, ph)
   this._addPoint(map, labels, props.pointP, pw, ph)
-  //this._addLine(map, labels, props.lineT, pw, ph)
-  //this._addLine(map, labels, props.lineP, pw, ph)
-  //this._addArea(map, labels, props.areaT, pw, ph)
-  //this._addArea(map, labels, props.areaP, pw, ph)
+  this._addLine(map, labels, props.lineT, pw, ph)
+  this._addLine(map, labels, props.lineP, pw, ph)
+  this._addArea(map, labels, props.areaT, pw, ph)
+  this._addArea(map, labels, props.areaP, pw, ph)
   this._labelEngine.update(labels)
   this._atlas.clear()
   var ilabels = {}, idLabels = {}
@@ -174,6 +175,7 @@ Text.prototype.update = function (props, map) {
 
 Text.prototype._addPoint = function (map, labels, p, pw, ph) {
   if (!p || !p.positions) return
+  var aspect = map._size[0] / map._size[1]
   for (var ix = 0; ix < p.id.length; ix++) {
     var id = p.id[ix]
     if (!p.labels.hasOwnProperty(id) || p.labels[id].length === 0) continue
@@ -184,14 +186,8 @@ Text.prototype._addPoint = function (map, labels, p, pw, ph) {
     if (map.viewbox[1] > lat || lat > map.viewbox[3]) continue
     var pxToLon = (map.viewbox[2]-map.viewbox[0]) / map._size[0]
     var pxToLat = (map.viewbox[3]-map.viewbox[1]) / map._size[1]
-    var m = this._qbzf.measure({
-      text,
-      strokeWidth: 150,
-      padding,
-    })
-    var fontSize = 12
+    var m = this._qbzf.measure({ text, strokeWidth: 150, padding })
     var widthPx = Math.round(m.units[0]/this._qbzf.unitsPerEm*fontSize)
-    var aspect = map._size[0] / map._size[1]
     var heightPx = Math.round(m.units[1]/this._qbzf.unitsPerEm*fontSize)
     var widthLon = (widthPx + pw + 1) * pxToLon
     var heightLat = (heightPx + ph + 1) * pxToLat / aspect
@@ -211,9 +207,9 @@ Text.prototype._addPoint = function (map, labels, p, pw, ph) {
 }
 
 Text.prototype._addLine = function (map, labels, l) {
-  return
   var ph = 4, pw = 4
   if (!l || !l.positions) return
+  var aspect = map._size[0] / map._size[1]
   var start = 0, prev = null
   for (var ix = 0; ix < l.id.length; ix++) {
     var id = l.id[ix]
@@ -234,13 +230,9 @@ Text.prototype._addLine = function (map, labels, l) {
     start = ix
     var pxToLon = (map.viewbox[2]-map.viewbox[0]) / map._size[0]
     var pxToLat = (map.viewbox[3]-map.viewbox[1]) / map._size[1]
-    /*
-    var m = this._ctx.measureText(text)
-    var widthPx = Math.ceil(m.actualBoundingBoxRight - m.actualBoundingBoxLeft)
-    var heightPx = Math.ceil(m.actualBoundingBoxAscent + m.actualBoundingBoxDescent)
-    */
-    var widthPx = 100
-    var heightPx = 15
+    var m = this._qbzf.measure({ text, strokeWidth: 150, padding })
+    var widthPx = Math.round(m.units[0]/this._qbzf.unitsPerEm*fontSize)
+    var heightPx = Math.round(m.units[1]/this._qbzf.unitsPerEm*fontSize)
     var widthLon = (widthPx + pw + 1) * pxToLon
     var heightLat = (heightPx + ph + 1) * pxToLat
     labels.push({
@@ -250,6 +242,7 @@ Text.prototype._addLine = function (map, labels, l) {
       labelMargin: [10/map._size[0]*widthLon,10/map._size[1]*heightLat],
       lineSize: [10/map._size[0]*widthLon,10/map._size[1]*heightLat],
       lineMargin: [10/map._size[0]*widthLon,10/map._size[1]*heightLat],
+      id,
       widthPx,
       heightPx,
       text,
@@ -258,9 +251,9 @@ Text.prototype._addLine = function (map, labels, l) {
 }
 
 Text.prototype._addArea = function (map, labels, l) {
-  return
   var ph = 4, pw = 4
   if (!l || !l.positions) return
+  var aspect = map._size[0] / map._size[1]
   var start = 0, prev = null
   for (var ix = 0; ix < l.id.length; ix++) {
     var id = l.id[ix]
@@ -283,13 +276,9 @@ Text.prototype._addArea = function (map, labels, l) {
     start = ix
     var pxToLon = (map.viewbox[2]-map.viewbox[0]) / map._size[0]
     var pxToLat = (map.viewbox[3]-map.viewbox[1]) / map._size[1]
-    /*
-    var m = this._ctx.measureText(text)
-    var widthPx = Math.ceil(m.actualBoundingBoxRight - m.actualBoundingBoxLeft)
-    var heightPx = Math.ceil(m.actualBoundingBoxAscent + m.actualBoundingBoxDescent)
-    */
-    var widthPx = 100
-    var heightPx = 15
+    var m = this._qbzf.measure({ text, strokeWidth: 150, padding })
+    var widthPx = Math.round(m.units[0]/this._qbzf.unitsPerEm*fontSize)
+    var heightPx = Math.round(m.units[1]/this._qbzf.unitsPerEm*fontSize)
     var widthLon = (widthPx + pw + 1) * pxToLon
     var heightLat = (heightPx + ph + 1) * pxToLat
     labels.push({
@@ -297,6 +286,7 @@ Text.prototype._addArea = function (map, labels, l) {
       positions,
       labelSize: [widthLon,heightLat],
       labelMargin: [10/map._size[0]*widthLon,10/map._size[1]*heightLat],
+      id,
       widthPx,
       heightPx,
       text,
