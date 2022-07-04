@@ -509,7 +509,7 @@ module.exports = function (map) {
         varying vec3 vFillColor, vStrokeColor;
         uniform sampler2D curveTex, gridTex;
         uniform vec2 curveSize, dim;
-        uniform float gridN;
+        uniform float gridN, aspect;
 
         void main () {
           QBZF qbzf = create_qbzf(
@@ -561,8 +561,10 @@ module.exports = function (map) {
           float zindex = 1000.0;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
-            (p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0,
-            1.0/(1.0+zindex), 1);
+            ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
+            1.0/(1.0+zindex),
+            1
+          );
         }
       `,
       uniforms: {

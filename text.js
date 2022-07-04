@@ -188,9 +188,10 @@ Text.prototype._addPoint = function (map, labels, p, pw, ph) {
     })
     var fontSize = 12
     var widthPx = Math.round(m.units[0]/this._qbzf.unitsPerEm*fontSize)
+    var aspect = map._size[0] / map._size[1]
     var heightPx = Math.round(m.units[1]/this._qbzf.unitsPerEm*fontSize)
     var widthLon = (widthPx + pw + 1) * pxToLon
-    var heightLat = (heightPx + ph + 1) * pxToLat
+    var heightLat = (heightPx + ph + 1) * pxToLat / aspect
     labels.push({
       type: 'point',
       point: [lon,lat],
