@@ -30,7 +30,7 @@ var draw = {
   //label: map.createDraw(geoRender.labels),
 }
 
-function ready({style, decoded}) {
+function ready({style, decoded, font}) {
   var prep = prepare({
     stylePixels: getImagePixels(style),
     styleTexture: map.regl.texture(style),
@@ -40,14 +40,15 @@ function ready({style, decoded}) {
   })
   var zoom = Math.round(map.getZoom())
   var props = null
-  var text = new Text
+  var text = new Text({ font })
   update(zoom)
   map.on('viewbox', function () {
     var z = Math.round(map.getZoom())
     if (zoom !== z) {
       update(z)
     } else {
-      //draw.label.props = [text.update(props, map)]
+      draw.label.props = [text.update(props, map)]
+      map.draw()
     }
     zoom = z
   })
@@ -61,7 +62,7 @@ function ready({style, decoded}) {
     draw.lineStrokeT.props = [props.lineT]
     draw.area.props = [props.areaP]
     draw.areaT.props = [props.areaT]
-    //draw.label.props = [text.update(props, map)]
+    draw.label.props = [text.update(props, map)]
     draw.areaBorder.props = [props.areaBorderP]
     draw.areaBorderT.props = [props.areaBorderT]
     map.draw()
@@ -78,7 +79,11 @@ require('resl')({
       type: 'binary',
       src: './example/kharkiv' || location.search.slice(1),
       parser: data => decode(lpb.decode(Buffer.from(data)))
-    }
+    },
+    font: {
+      type: 'binary',
+      src: 'example/font'
+    },
   },
   onDone: ready
 })
