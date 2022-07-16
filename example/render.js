@@ -27,7 +27,7 @@ var draw = {
   lineFillT: map.createDraw(geoRender.lineFill),
   point: map.createDraw(geoRender.points),
   pointT: map.createDraw(geoRender.points),
-  //label: map.createDraw(geoRender.labels),
+  label: {},
 }
 
 function ready({style, decoded, font}) {
@@ -47,7 +47,14 @@ function ready({style, decoded, font}) {
     if (zoom !== z) {
       update(z)
     } else {
-      draw.label.props = [text.update(props, map)]
+      draw.label.props = {}
+      var tprops = text.update(props, map)
+      var ns = Object.keys(tprops)
+      for (var i = 0; i < ns.length; i++) {
+        var n = ns[i]
+        if (!draw.label[n]) draw.label[n] = map.createDraw(geoRender.labels(n))
+        draw.label[n].props = [tprops[n]]
+      }
       map.draw()
     }
     zoom = z
@@ -82,7 +89,8 @@ require('resl')({
     },
     font: {
       type: 'binary',
-      src: 'example/font'
+      src: 'example/font',
+      parser: data => new Uint8Array(data),
     },
   },
   onDone: ready
