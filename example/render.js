@@ -36,6 +36,7 @@ function ready({style, decoded, font}) {
     styleTexture: map.regl.texture(style),
     zoomStart: 1,
     zoomEnd: 21,
+    imageSize: [style.width, style.height],
     decoded
   })
   var zoom = Math.round(map.getZoom())
@@ -47,6 +48,7 @@ function ready({style, decoded, font}) {
     if (zoom !== z) {
       update(z)
     } else {
+      /*
       draw.label.props = {}
       var tprops = text.update(props, map)
       var ns = Object.keys(tprops)
@@ -55,6 +57,7 @@ function ready({style, decoded, font}) {
         if (!draw.label[n]) draw.label[n] = map.createDraw(geoRender.labels(n))
         draw.label[n].props = [tprops[n]]
       }
+      */
       map.draw()
     }
     zoom = z
@@ -69,7 +72,7 @@ function ready({style, decoded, font}) {
     draw.lineStrokeT.props = [props.lineT]
     draw.area.props = [props.areaP]
     draw.areaT.props = [props.areaT]
-    draw.label.props = [text.update(props, map)]
+    //draw.label.props = [text.update(props, map)]
     draw.areaBorder.props = [props.areaBorderP]
     draw.areaBorderT.props = [props.areaBorderT]
     map.draw()
@@ -80,7 +83,7 @@ require('resl')({
   manifest: {
     style: {
       type: 'image',
-      src: './example/style.png'
+      src: './example/style11.png'
     },
     decoded: {
       type: 'binary',
