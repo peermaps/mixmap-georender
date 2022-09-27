@@ -6,9 +6,23 @@ module.exports = function (map) {
     points: {
       frag: glsl`
         precision highp float;
+        #pragma glslify: SpriteMeta = require('glsl-georender-style-texture/spritemeta.h');
+        #pragma glslify: readSprite = require('glsl-georender-style-texture/readsprite.glsl');
+        varying vec2 vuv;
         varying vec4 vcolor;
+        varying float vsprite, vsmwidth, vsmheight, vsmx, vsmy, vsmtype;
+        uniform sampler2D styleTexture;
+        uniform vec2 texSize;
         void main () {
-          gl_FragColor = vcolor;
+          SpriteMeta spriteMeta;
+          spriteMeta.width = vsmwidth;
+          spriteMeta.height = vsmheight;
+          spriteMeta.x = vsmx;
+          spriteMeta.y = vsmy;
+          spriteMeta.type = vsmtype;
+          //waves: 0, 504; 499, 747
+          gl_FragColor = vec4(readSprite(styleTexture, texSize, spriteMeta, vuv).xyz, 1);
+          //gl_FragColor = vcolor;
         }
       `,
       pickFrag: `
@@ -39,24 +53,35 @@ module.exports = function (map) {
         precision highp float;
         #pragma glslify: Point = require('glsl-georender-style-texture/point.h');
         #pragma glslify: readPoint = require('glsl-georender-style-texture/point.glsl');
+        #pragma glslify: SpriteMeta = require('glsl-georender-style-texture/spritemeta.h');
+        #pragma glslify: readSpriteMeta = require('glsl-georender-style-texture/spritemeta.glsl');
         uniform sampler2D styleTexture;
-        attribute vec2 position, ioffset;
+        attribute vec2 position, ioffset, uv;
         attribute float featureType, index;
         uniform vec4 viewbox;
         uniform vec2 offset, size, texSize;
         uniform float featureCount, aspect, zoom;
-        varying float vft, vindex, zindex;
-        varying vec2 vpos;
+        varying float vft, vindex, zindex, vsprite, vsmwidth, vsmheight, vsmx, vsmy, vsmtype;
+        varying vec2 vpos, vuv;
         varying vec4 vcolor;
         void main () {
           vft = featureType;
           Point point = readPoint(styleTexture, featureType, zoom, texSize);
+          //SpriteMeta spriteMeta = readSpriteMeta(styleTexture, texSize, point.sprite-1.0);
+          SpriteMeta spriteMeta = readSpriteMeta(styleTexture, texSize, 2.0);
+          vsmwidth = spriteMeta.width;
+          vsmheight = spriteMeta.height;
+          vsmx = spriteMeta.x;
+          vsmy = spriteMeta.y;
+          vsmtype = spriteMeta.type;
+          vsprite = point.sprite;
           vcolor = point.fillColor;
           vindex = index;
+          vuv = uv;
           zindex = point.zindex;
           vec2 p = offset + ioffset;
-          float psizex = 5.0 * point.size / size.x * 2.0;
-          float psizey = 5.0 * point.size / size.y * 2.0;
+          float psizex = 50.0 * point.size / size.x;
+          float psizey = 50.0 * point.size / size.y;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
@@ -78,7 +103,9 @@ module.exports = function (map) {
         },
       },
       attributes: {
-        position: [-0.1,0.1,0.1,0.1,0.1,-0.1,-0.1,-0.1],
+        position: [-1,1,1,1,1,-1,-1,-1],
+        //uv: [0,0, 0,1, 1,1, 1,0],
+        uv: [1,0, 0,0, 0,1, 1,1],
         ioffset: {
           buffer: map.prop('positions'),
           divisor: 1
