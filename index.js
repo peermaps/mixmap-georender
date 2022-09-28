@@ -67,8 +67,7 @@ module.exports = function (map) {
         void main () {
           vft = featureType;
           Point point = readPoint(styleTexture, featureType, zoom, texSize);
-          //SpriteMeta spriteMeta = readSpriteMeta(styleTexture, texSize, point.sprite-1.0);
-          SpriteMeta spriteMeta = readSpriteMeta(styleTexture, texSize, 2.0);
+          SpriteMeta spriteMeta = readSpriteMeta(styleTexture, texSize, point.sprite);
           vsmwidth = spriteMeta.width;
           vsmheight = spriteMeta.height;
           vsmx = spriteMeta.x;
@@ -80,8 +79,8 @@ module.exports = function (map) {
           vuv = uv;
           zindex = point.zindex;
           vec2 p = offset + ioffset;
-          float psizex = 50.0 * point.size / size.x;
-          float psizey = 50.0 * point.size / size.y;
+          float psizex = 5.0 * point.size / size.x;
+          float psizey = 5.0 * point.size / size.y;
           gl_Position = vec4(
             (p.x - viewbox.x) / (viewbox.z - viewbox.x) * 2.0 - 1.0,
             ((p.y - viewbox.y) / (viewbox.w - viewbox.y) * 2.0 - 1.0) * aspect,
