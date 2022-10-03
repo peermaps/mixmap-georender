@@ -20,8 +20,11 @@ module.exports = function (map) {
           spriteMeta.x = vsmx;
           spriteMeta.y = vsmy;
           spriteMeta.type = vsmtype;
-          //waves: 0, 504; 499, 747
-          gl_FragColor = vec4(readSprite(styleTexture, texSize, spriteMeta, vuv).xyz, 1);
+          gl_FragColor = mix(
+            vec4(readSprite(styleTexture, texSize, spriteMeta, vuv).xyz, 1);
+            vcolor,
+            step(0.5, vsprite)
+          );
           //gl_FragColor = vcolor;
         }
       `,
@@ -67,7 +70,7 @@ module.exports = function (map) {
         void main () {
           vft = featureType;
           Point point = readPoint(styleTexture, featureType, zoom, texSize);
-          SpriteMeta spriteMeta = readSpriteMeta(styleTexture, texSize, point.sprite);
+          SpriteMeta spriteMeta = readSpriteMeta(styleTexture, texSize, point.sprite - 1.0);
           vsmwidth = spriteMeta.width;
           vsmheight = spriteMeta.height;
           vsmx = spriteMeta.x;
