@@ -21,9 +21,9 @@ module.exports = function (map) {
           spriteMeta.y = vsmy;
           spriteMeta.type = vsmtype;
           gl_FragColor = mix(
-            vec4(readSprite(styleTexture, texSize, spriteMeta, vuv).xyz, 1);
+            vec4(readSprite(styleTexture, texSize, spriteMeta, vuv).xyz, 1.0),
             vcolor,
-            step(0.5, vsprite)
+            step(vsprite, 0.5)
           );
           //gl_FragColor = vcolor;
         }
